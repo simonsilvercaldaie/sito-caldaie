@@ -1,0 +1,50 @@
+'use client'
+import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+
+interface PayPalBtnProps {
+    amount: string;
+    courseTitle: string;
+    onSuccess: () => void;
+}
+
+export function PayPalBtn({ amount, courseTitle, onSuccess }: PayPalBtnProps) {
+
+    const initialOptions = {
+        clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "test", // Fallback to "test" only for dev structure, needs real key
+        currency: "EUR",
+        intent: "capture",
+    };
+
+    return (
+        <PayPalScriptProvider options={initialOptions}>
+            <PayPalButtons
+                style={{ layout: "horizontal", color: "gold", tagline: false }}
+                createOrder={(data, actions) => {
+                    return actions.order.create({
+                        intent: "CAPTURE",
+                        purchase_units: [
+                            {
+                                description: courseTitle,
+                                amount: {
+                                    value: amount,
+                                    currency_code: "EUR"
+                                },
+                            },
+                        ],
+                    });
+                }}
+                onApprove={async (data, actions) => {
+                    if (actions.order) {
+                        const order = await actions.order.capture();
+                        console.log("Order Successful:", order);
+                        onSuccess();
+                    }
+                }}
+                onError={(err) => {
+                    console.error("PayPal Error:", err);
+                    alert("Errore PayPal: " + JSON.stringify(err));
+                }}
+            />
+        </PayPalScriptProvider>
+    );
+}
