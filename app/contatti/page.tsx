@@ -1,10 +1,12 @@
 'use client'
-import { useState, useEffect } from 'react'
-import { Mail, Send, MessageSquare, Instagram, Youtube } from 'lucide-react'
+import { useState, useEffect, useRef } from 'react'
+import { Mail, Send, MessageSquare, Instagram, Youtube, Loader2 } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
+import emailjs from '@emailjs/browser'
 
 export default function ContactsPage() {
+    const formRef = useRef<HTMLFormElement>(null)
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -13,6 +15,7 @@ export default function ContactsPage() {
     })
     const [sending, setSending] = useState(false)
     const [sent, setSent] = useState(false)
+    const [error, setError] = useState<string | null>(null)
 
     // Math Captcha
     const [captchaNumbers, setCaptchaNumbers] = useState({ a: 0, b: 0 })
@@ -33,6 +36,7 @@ export default function ContactsPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        setError(null)
 
         // Verifica captcha
         const correctAnswer = captchaNumbers.a + captchaNumbers.b
@@ -44,19 +48,28 @@ export default function ContactsPage() {
 
         setSending(true)
 
-        // Costruisce il link mailto con i dati del form
-        const mailtoSubject = encodeURIComponent(formData.subject)
-        const mailtoBody = encodeURIComponent(
-            `Nome: ${formData.name}\nEmail: ${formData.email}\n\nMessaggio:\n${formData.message}`
-        )
-        const mailtoLink = `mailto:simonsilver@tiscali.it?subject=${mailtoSubject}&body=${mailtoBody}`
+        try {
+            // Invia email tramite EmailJS
+            await emailjs.send(
+                'service_fwvybtr',      // Service ID
+                'template_b8p58ci',     // Template ID
+                {
+                    from_name: formData.name,
+                    from_email: formData.email,
+                    subject: formData.subject,
+                    message: formData.message,
+                },
+                'NcJg5-hiu3gVJiJZ-'     // Public Key
+            )
 
-        // Apre il client email
-        window.location.href = mailtoLink
-
-        setSending(false)
-        setSent(true)
-        setFormData({ name: '', email: '', subject: '', message: '' })
+            setSent(true)
+            setFormData({ name: '', email: '', subject: '', message: '' })
+        } catch (err: any) {
+            console.error('EmailJS Error:', err)
+            setError('Errore nell\'invio. Riprova o contattaci direttamente via email.')
+        } finally {
+            setSending(false)
+        }
     }
 
     return (
@@ -98,12 +111,13 @@ export default function ContactsPage() {
                                     </button>
                                 </div>
                             ) : (
-                                <form onSubmit={handleSubmit} className="space-y-6">
+                                <form ref={formRef} onSubmit={handleSubmit} className="space-y-6">
                                     <div className="grid md:grid-cols-2 gap-6">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Nome Completo</label>
                                             <input
                                                 type="text"
+                                                name="from_name"
                                                 required
                                                 value={formData.name}
                                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -115,6 +129,7 @@ export default function ContactsPage() {
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                                             <input
                                                 type="email"
+                                                name="from_email"
                                                 required
                                                 value={formData.email}
                                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -127,6 +142,7 @@ export default function ContactsPage() {
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Oggetto</label>
                                         <input
                                             type="text"
+                                            name="subject"
                                             required
                                             value={formData.subject}
                                             onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
@@ -137,6 +153,7 @@ export default function ContactsPage() {
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Messaggio</label>
                                         <textarea
+                                            name="message"
                                             required
                                             rows={5}
                                             value={formData.message}
@@ -164,13 +181,19 @@ export default function ContactsPage() {
                                         )}
                                     </div>
 
+                                    {error && (
+                                        <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg">
+                                            {error}
+                                        </div>
+                                    )}
+
                                     <button
                                         type="submit"
                                         disabled={sending}
                                         className="w-full py-4 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
                                     >
                                         {sending ? (
-                                            <>Invio in corso...</>
+                                            <><Loader2 className="w-5 h-5 animate-spin" /> Invio in corso...</>
                                         ) : (
                                             <>
                                                 <Send className="w-5 h-5" /> Invia Messaggio
@@ -273,6 +296,13 @@ export default function ContactsPage() {
                     </div>
                     <div className="text-sm">
                         &copy; {new Date().getFullYear()} Simon Silver. P.IVA 03235620121
+                    </div>
+                    <div className="flex flex-wrap gap-4 justify-center">
+                        <a href="https://www.youtube.com/@SimonSilverCaldaie" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">YouTube</a>
+                        <a href="https://www.instagram.com/simon_silver" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Instagram</a>
+                        <Link href="/contatti" className="hover:text-white transition-colors">Contatti</Link>
+                        <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+                        <Link href="/termini" className="hover:text-white transition-colors">Termini</Link>
                     </div>
                 </div>
             </footer>
