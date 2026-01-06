@@ -32,11 +32,11 @@ export default function Home() {
                         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
                             <Link href="/login" className="flex items-center justify-center gap-2 px-8 py-4 bg-accent text-white rounded-xl text-lg font-bold hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/20">
                                 <PlayCircle className="w-6 h-6" />
-                                Accedi alla Masterclass
+                                Accedi alla Libreria
                             </Link>
-                            <button className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary border-2 border-primary/10 rounded-xl text-lg font-bold hover:bg-gray-50 transition-all">
+                            <Link href="/catalogo" className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary border-2 border-primary/10 rounded-xl text-lg font-bold hover:bg-accent hover:text-white hover:border-accent transition-all">
                                 Catalogo Corsi
-                            </button>
+                            </Link>
                         </div>
                     </div>
 
@@ -75,7 +75,7 @@ export default function Home() {
                                 <ShieldCheck className="w-8 h-8" />
                             </div>
                             <h3 className="text-xl font-bold">Pagamento Sicuro</h3>
-                            <p className="text-gray-400">Transazioni protette con PayPal. Soddisfatto o rimborsato (termini applicabili).</p>
+                            <p className="text-gray-400">Transazioni protette con PayPal.</p>
                         </div>
                     </div>
                 </section>
@@ -91,12 +91,14 @@ export default function Home() {
                         <span className="font-semibold text-slate-200">Simon Silver Caldaie</span>
                     </div>
                     <div className="text-sm">
-                        &copy; 2024 Simon Silver. Tutti i diritti riservati.
+                        &copy; {new Date().getFullYear()} Simon Silver. P.IVA 03235620121
                     </div>
-                    <div className="flex gap-4">
+                    <div className="flex flex-wrap gap-4 justify-center">
                         <a href="https://www.youtube.com/@SimonSilverCaldaie" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">YouTube</a>
                         <a href="https://www.instagram.com/simon_silver" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Instagram</a>
                         <Link href="/contatti" className="hover:text-white transition-colors">Contatti</Link>
+                        <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+                        <Link href="/termini" className="hover:text-white transition-colors">Termini</Link>
                     </div>
                 </div>
             </footer>

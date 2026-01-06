@@ -64,7 +64,7 @@ export default function ProductShowcase() {
         <section className="py-20 px-4 md:px-8 bg-muted/30">
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-16 space-y-4">
-                    <h2 className="text-3xl md:text-4xl font-bold text-primary">Masterclass Premium Disponibili</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold text-primary">Libreria Corsi Premium</h2>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">
                         Corsi completi dalla diagnosi alla risoluzione. Acquista una volta, accedi per sempre.
                     </p>
