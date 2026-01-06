@@ -10,6 +10,7 @@ export default function LoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [showPassword, setShowPassword] = useState(false)
+    const [acceptedTerms, setAcceptedTerms] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [mode, setMode] = useState<'login' | 'signup'>('login')
@@ -19,6 +20,13 @@ export default function LoginPage() {
         e.preventDefault()
         setLoading(true)
         setError(null)
+
+        // Verifica T&C solo in signup
+        if (mode === 'signup' && !acceptedTerms) {
+            setError('Devi accettare i Termini e Condizioni per registrarti.')
+            setLoading(false)
+            return
+        }
 
         try {
             if (mode === 'signup') {
@@ -34,7 +42,7 @@ export default function LoginPage() {
                     password,
                 })
                 if (error) throw error
-                router.push('/dashboard') // Reindirizza alla dashboard dopo il login
+                router.push('/dashboard')
             }
         } catch (err: any) {
             setError(err.message)
@@ -116,12 +124,32 @@ export default function LoginPage() {
                                 )}
                             </button>
                         </div>
-                        <div className="flex justify-end mt-2">
-                            <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline">
-                                Password dimenticata?
-                            </Link>
-                        </div>
+                        {mode === 'login' && (
+                            <div className="flex justify-end mt-2">
+                                <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline">
+                                    Password dimenticata?
+                                </Link>
+                            </div>
+                        )}
                     </div>
+
+                    {/* Checkbox T&C solo in modalità signup */}
+                    {mode === 'signup' && (
+                        <label className="flex items-start gap-2 cursor-pointer text-sm text-gray-600 leading-snug select-none">
+                            <input
+                                type="checkbox"
+                                checked={acceptedTerms}
+                                onChange={(e) => setAcceptedTerms(e.target.checked)}
+                                className="mt-0.5 w-4 h-4 rounded border-gray-300 text-primary focus:ring-primary flex-shrink-0"
+                            />
+                            <span>
+                                Accetto i{' '}
+                                <Link href="/termini" target="_blank" className="text-accent font-bold hover:underline">
+                                    Termini e Condizioni
+                                </Link>
+                            </span>
+                        </label>
+                    )}
 
                     {error && (
                         <div className="p-3 bg-red-50 text-red-600 text-sm rounded-lg">
