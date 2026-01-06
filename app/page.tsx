@@ -60,8 +60,8 @@ export default function Home() {
                             <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-accent">
                                 <MonitorPlay className="w-8 h-8" />
                             </div>
-                            <h3 className="text-xl font-bold">Video 4K Dettagliati</h3>
-                            <p className="text-gray-400">Riprese ravvicinate dei componenti e spiegazioni chiare, niente giri di parole.</p>
+                            <h3 className="text-xl font-bold">Video Dettagliati</h3>
+                            <p className="text-gray-400">Spiegazioni chiare, niente giri di parole.</p>
                         </div>
                         <div className="flex flex-col items-center space-y-4">
                             <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center text-accent">
@@ -96,7 +96,7 @@ export default function Home() {
                     <div className="flex gap-4">
                         <a href="https://www.youtube.com/@SimonSilverCaldaie" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">YouTube</a>
                         <a href="https://www.instagram.com/simon_silver" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Instagram</a>
-                        <a href="#" className="hover:text-white transition-colors">Contatti</a>
+                        <Link href="/contatti" className="hover:text-white transition-colors">Contatti</Link>
                     </div>
                 </div>
             </footer>
