@@ -43,9 +43,17 @@ export default function ContactsPage() {
         }
 
         setSending(true)
-        // Simulazione invio
-        await new Promise(resolve => setTimeout(resolve, 1500))
-        console.log('Form Data:', formData)
+
+        // Costruisce il link mailto con i dati del form
+        const mailtoSubject = encodeURIComponent(formData.subject)
+        const mailtoBody = encodeURIComponent(
+            `Nome: ${formData.name}\nEmail: ${formData.email}\n\nMessaggio:\n${formData.message}`
+        )
+        const mailtoLink = `mailto:simonsilver@tiscali.it?subject=${mailtoSubject}&body=${mailtoBody}`
+
+        // Apre il client email
+        window.location.href = mailtoLink
+
         setSending(false)
         setSent(true)
         setFormData({ name: '', email: '', subject: '', message: '' })
