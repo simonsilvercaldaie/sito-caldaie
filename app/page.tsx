@@ -94,8 +94,8 @@ export default function Home() {
                         &copy; 2024 Simon Silver. Tutti i diritti riservati.
                     </div>
                     <div className="flex gap-4">
-                        <a href="#" className="hover:text-white transition-colors">YouTube</a>
-                        <a href="#" className="hover:text-white transition-colors">Instagram</a>
+                        <a href="https://www.youtube.com/@SimonSilverCaldaie" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">YouTube</a>
+                        <a href="https://www.instagram.com/simon_silver" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Instagram</a>
                         <a href="#" className="hover:text-white transition-colors">Contatti</a>
                     </div>
                 </div>

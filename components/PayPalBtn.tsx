@@ -42,7 +42,11 @@ export function PayPalBtn({ amount, courseTitle, onSuccess }: PayPalBtnProps) {
                 }}
                 onError={(err) => {
                     console.error("PayPal Error:", err);
-                    alert("Errore PayPal: " + JSON.stringify(err));
+                    alert("Si è verificato un errore con PayPal. Se stai testando con lo stesso account del venditore, PayPal potrebbe bloccarlo. Prova con una carta diversa.");
+                }}
+                onCancel={() => {
+                    console.log("Pagamento annullato dall'utente");
+                    alert("Hai annullato il pagamento.");
                 }}
             />
         </PayPalScriptProvider>

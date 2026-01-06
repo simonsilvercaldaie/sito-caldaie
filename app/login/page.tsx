@@ -2,13 +2,14 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
-import { Lock, Mail, Loader2, KeyRound } from 'lucide-react'
+import { Lock, Mail, Loader2, KeyRound, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [mode, setMode] = useState<'login' | 'signup'>('login')
@@ -84,7 +85,7 @@ export default function LoginPage() {
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                                className="w-full pl-10 pr-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-black"
                                 placeholder="nome@esempio.com"
                                 required
                             />
@@ -96,13 +97,29 @@ export default function LoginPage() {
                         <div className="relative">
                             <KeyRound className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                             <input
-                                type="password"
+                                type={showPassword ? "text" : "password"}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2 border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none"
+                                className="w-full pl-10 pr-12 py-2 border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none text-black"
                                 placeholder="••••••••"
                                 required
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+                            >
+                                {showPassword ? (
+                                    <EyeOff className="w-5 h-5" />
+                                ) : (
+                                    <Eye className="w-5 h-5" />
+                                )}
+                            </button>
+                        </div>
+                        <div className="flex justify-end mt-2">
+                            <Link href="/auth/forgot-password" className="text-sm text-primary hover:underline">
+                                Password dimenticata?
+                            </Link>
                         </div>
                     </div>
 
@@ -145,7 +162,7 @@ export default function LoginPage() {
                     </Link>
                 </div>
 
-            </div>
-        </div>
+            </div >
+        </div >
     )
 }

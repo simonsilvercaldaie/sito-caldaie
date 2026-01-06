@@ -77,6 +77,13 @@ export default function DashboardPage() {
                         <User className="w-4 h-4" />
                         {user?.email}
                     </div>
+                    <Link
+                        href="/dashboard/account"
+                        className="flex items-center gap-2 px-4 py-2 text-primary border border-primary/20 hover:bg-primary/5 rounded-lg transition-colors text-sm font-bold"
+                    >
+                        <User className="w-4 h-4" />
+                        Account
+                    </Link>
                     <button
                         onClick={handleLogout}
                         className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium border border-transparent hover:border-red-100"
@@ -89,7 +96,7 @@ export default function DashboardPage() {
 
             <main className="max-w-6xl mx-auto px-4 py-8">
 
-                <div className="grid md:grid-cols-3 gap-6 mb-8">
+                <div className="grid md:grid-cols-2 gap-6 mb-8">
                     <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
                         <div className="flex items-center gap-3 mb-2 text-primary">
                             <Video className="w-6 h-6" />
@@ -97,14 +104,6 @@ export default function DashboardPage() {
                         </div>
                         <p className="text-3xl font-bold text-gray-800">{stats.count}</p>
                         <p className="text-sm text-gray-500">Video pronti da guardare</p>
-                    </div>
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div className="flex items-center gap-3 mb-2 text-accent">
-                            <ShoppingBag className="w-6 h-6" />
-                            <h3 className="font-bold">Investimento</h3>
-                        </div>
-                        <p className="text-3xl font-bold text-gray-800">€ {stats.totalSpent.toFixed(2)}</p>
-                        <p className="text-sm text-gray-500">Valore formazione acquisita</p>
                     </div>
                 </div>
 
@@ -141,7 +140,7 @@ export default function DashboardPage() {
                                         <h3 className="font-bold text-lg text-primary mb-2 line-clamp-2">{purchase.course_id}</h3>
                                         <p className="text-xs text-gray-400 mb-4">Acquistato il {new Date(purchase.created_at).toLocaleDateString('it-IT')}</p>
 
-                                        <Link 
+                                        <Link
                                             href={`/watch/${encodeURIComponent(purchase.course_id)}`}
                                             className="w-full py-2 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                                         >
