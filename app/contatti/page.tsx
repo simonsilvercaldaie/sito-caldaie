@@ -1,6 +1,6 @@
 'use client'
-import { useState } from 'react'
-import { Mail, Phone, MapPin, Send, MessageSquare, Instagram, Youtube } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { Mail, Send, MessageSquare, Instagram, Youtube } from 'lucide-react'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
 
@@ -14,8 +14,34 @@ export default function ContactsPage() {
     const [sending, setSending] = useState(false)
     const [sent, setSent] = useState(false)
 
+    // Math Captcha
+    const [captchaNumbers, setCaptchaNumbers] = useState({ a: 0, b: 0 })
+    const [captchaAnswer, setCaptchaAnswer] = useState('')
+    const [captchaError, setCaptchaError] = useState(false)
+
+    useEffect(() => {
+        generateCaptcha()
+    }, [])
+
+    const generateCaptcha = () => {
+        const a = Math.floor(Math.random() * 10) + 1
+        const b = Math.floor(Math.random() * 10) + 1
+        setCaptchaNumbers({ a, b })
+        setCaptchaAnswer('')
+        setCaptchaError(false)
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        // Verifica captcha
+        const correctAnswer = captchaNumbers.a + captchaNumbers.b
+        if (parseInt(captchaAnswer) !== correctAnswer) {
+            setCaptchaError(true)
+            generateCaptcha()
+            return
+        }
+
         setSending(true)
         // Simulazione invio
         await new Promise(resolve => setTimeout(resolve, 1500))
@@ -57,7 +83,7 @@ export default function ContactsPage() {
                                     <h3 className="text-2xl font-bold text-gray-800 mb-2">Messaggio Inviato!</h3>
                                     <p className="text-gray-500 mb-6">Grazie per averci contattato. Ti risponderemo il prima possibile.</p>
                                     <button
-                                        onClick={() => setSent(false)}
+                                        onClick={() => { setSent(false); generateCaptcha(); }}
                                         className="text-primary font-bold hover:underline"
                                     >
                                         Invia un altro messaggio
@@ -111,6 +137,25 @@ export default function ContactsPage() {
                                             placeholder="Scrivi qui la tua richiesta..."
                                         ></textarea>
                                     </div>
+
+                                    {/* Math Captcha */}
+                                    <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Verifica anti-spam: Quanto fa {captchaNumbers.a} + {captchaNumbers.b}?
+                                        </label>
+                                        <input
+                                            type="number"
+                                            required
+                                            value={captchaAnswer}
+                                            onChange={(e) => { setCaptchaAnswer(e.target.value); setCaptchaError(false); }}
+                                            className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-black ${captchaError ? 'border-red-500 bg-red-50' : 'bg-white'}`}
+                                            placeholder="Scrivi il risultato"
+                                        />
+                                        {captchaError && (
+                                            <p className="text-red-500 text-sm mt-2">Risposta errata. Riprova.</p>
+                                        )}
+                                    </div>
+
                                     <button
                                         type="submit"
                                         disabled={sending}
