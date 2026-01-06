@@ -198,10 +198,10 @@ export default function ContactsPage() {
                                         <details className="group cursor-pointer">
                                             <summary className="font-medium text-gray-700 flex items-center gap-2 group-hover:text-primary transition-colors">
                                                 <span className="w-1.5 h-1.5 bg-accent rounded-full"></span>
-                                                Posso chiedere il rimborso?
+                                                È previsto il rimborso?
                                             </summary>
                                             <p className="text-sm text-gray-500 mt-2 pl-4 leading-relaxed">
-                                                Sì, offriamo una garanzia soddisfatto o rimborsato entro 14 giorni se il corso non soddisfa le tue aspettative.
+                                                Trattandosi di contenuti digitali ad accesso immediato, una volta sbloccato il corso non è previsto il diritto di recesso, come da normativa vigente (D.Lgs. 206/2005, art. 59). Prima dell'acquisto, acconsenti esplicitamente all'accesso immediato.
                                             </p>
                                         </details>
                                     </li>
