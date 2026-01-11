@@ -16,13 +16,14 @@ export default function ProductShowcase() {
         <section className="py-20 px-4 md:px-8 bg-muted/30">
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-16 space-y-4">
-                    <h2 className="text-3xl md:text-4xl font-bold text-primary">Corsi in Evidenza</h2>
+                    <h2 className="text-3xl md:text-4xl font-bold text-primary">I Nostri Percorsi Formativi</h2>
                     <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                        Guarda l'anteprima gratuita, poi acquista il video premium completo con diagnosi avanzata e casi reali.
+                        Un metodo strutturato in 3 livelli: dalle basi fondamentali alla diagnosi avanzata.
+                        Scegli il tuo punto di partenza.
                     </p>
                 </div>
 
-                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid md:grid-cols-3 gap-8">
                     {featuredCourses.map((course) => (
                         <Link
                             key={course.id}
