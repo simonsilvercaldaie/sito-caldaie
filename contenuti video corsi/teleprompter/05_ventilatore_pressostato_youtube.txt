@@ -1,0 +1,213 @@
+﻿[0:00-0:45] HOOK + INTRO
+
+Ciao tecnici. 
+
+La caldaia non accende.
+Provi il reset... niente.
+Senti il ventilatore che gira...
+ma la fiamma non parte. 
+
+Controlli la valvola gas: corrente OK.
+Controlli l'elettrodo: scintilla OK.
+Ma il gas non arriva. 
+
+E allora capisci: il pressostato aria non chiude.
+Il ventilatore non crea abbastanza pressione.
+O il pressostato è guasto. 
+
+Sono Simone, tecnico caldaista.
+E questa è la Parte 1 su ventilatore e pressostato aria. 
+
+[0:45-2:00] COSA VEDRAI
+
+In questo video imparerai:
+
+Primo: cos'è il ventilatore e qual è il suo ruolo nella combustione. 
+
+Secondo: l'evoluzione dai ventilatori AC ai moderni EC modulanti. 
+
+Terzo: cos'è il pressostato aria e come protegge la caldaia. 
+
+Quarto: i sintomi classici di guasto e come diagnosticarli. 
+
+Quinto: i controlli rapidi da fare prima di sostituire. 
+
+Nella Parte 2 sul mio sito, vedrai la diagnosi elettrica completa,
+i test con manometro differenziale,
+e la sostituzione passo-passo. 
+
+Iniziamo. 
+
+[2:00-4:30] COS'È IL VENTILATORE
+
+Il ventilatore è il componente che aspira aria per la combustione.
+E spinge i fumi verso lo scarico. 
+
+Nelle caldaie a camera stagna (la maggior parte oggi)...
+il ventilatore crea una depressione nella camera di combustione.
+Aspira aria dall'esterno attraverso il doppio tubo coassiale.
+E spinge i fumi caldi verso l'uscita. 
+
+Senza ventilatore, la caldaia non può funzionare.
+Non c'è aria, non c'è combustione. 
+
+Come funziona: 
+
+Una girante (tipo turbina) ruota velocemente.
+Crea una differenza di pressione.
+L'aria viene aspirata dentro la camera di combustione.
+I fumi vengono espulsi all'esterno. 
+
+[4:30-7:00] EVOLUZIONE DEI VENTILATORI
+
+I ventilatori sono cambiati molto negli ultimi 20 anni. 
+
+Generazione 1: Ventilatori AC a velocità fissa: 
+
+Motore asincrono 230V.
+Una sola velocità.
+Potenza fissa sempre al massimo. 
+
+Consumi alti, rumorosi.
+Li trovi nelle caldaie di 15+ anni. 
+
+Generazione 2: Ventilatori AC a due velocità: 
+
+Due velocità: alta e bassa.
+La scheda seleziona in base alla potenza richiesta.
+Un po' più efficienti. 
+
+Generazione 3: Ventilatori EC modulanti: 
+
+La tecnologia attuale.
+Motore a magneti permanenti (brushless).
+Velocità controllata dalla scheda elettronicamente. 
+
+Vantaggi: 
+- Modulazione continua da minimo a massimo
+- Consumi ridotti del 50-70%
+- Molto più silenziosi
+- Feedback di velocità alla scheda 
+
+Il segnale di controllo può essere: 
+- PWM (impulsi digitali)
+- Tensione analogica 0-10V
+- Segnale tachimetrico per conferma velocità 
+
+[7:00-9:30] COS'È IL PRESSOSTATO ARIA
+
+Il pressostato aria è un sensore di sicurezza. 
+
+Verifica che il ventilatore stia effettivamente funzionando
+e che i fumi possano uscire liberamente. 
+
+Come funziona: 
+
+È collegato con un tubicino alla camera di combustione.
+Quando il ventilatore crea depressione...
+il pressostato "sente" la differenza di pressione.
+E chiude un contatto elettrico. 
+
+Solo quando il contatto chiude...
+la scheda dà il consenso all'apertura del gas.
+È una sicurezza pre-accensione. 
+
+Cosa può bloccare il pressostato: 
+
+- Ventilatore fermo o troppo lento
+- Camino ostruito (nido di uccelli, ghiaccio)
+- Tubicino del pressostato intasato o scollegato
+- Pressostato guasto 
+
+[9:30-11:30] SINTOMI DI GUASTO
+
+Vediamo i sintomi classici. 
+
+Sintomo numero uno: caldaia non accende, errore pressostato. 
+
+Codici tipici: 
+- Vaillant F33, F27
+- Ariston 501, 604
+- Beretta A02, A08
+- Immergas errore pressostato 
+
+La caldaia tenta la sequenza: ventilatore → pressostato → gas.
+Ma si blocca al pressostato. 
+
+Sintomo numero due: ventilatore rumoroso. 
+
+Ronzii metallici, vibrazioni, fischi.
+Cuscinetti usurati.
+Girante sbilanciata o sporco accumulato. 
+
+Sintomo numero tre: caldaia che va a intermittenza. 
+
+Parte, si ferma, riparte.
+Il pressostato chiude e apre instabilmente.
+Spesso il tubicino è parzialmente ostruito. 
+
+[11:30-13:00] CONTROLLI RAPIDI
+
+Prima di sostituire, verifica: 
+
+Controllo uno: il ventilatore gira? 
+Guarda e ascolta.
+Se non gira affatto, problema sul motore o alimentazione. 
+
+Controllo due: il tubicino è collegato? 
+Spesso si stacca.
+Un tubicino staccato = pressostato che non chiude mai. 
+
+Controllo tre: il tubicino è pulito? 
+Soffia dentro con la bocca.
+Deve passare aria liberamente.
+Se è ostruito, pulisci o sostituisci. 
+
+Controllo quattro: lo scarico è libero? 
+Controlla il terminale esterno.
+Nidi, foglie, ghiaccio possono bloccare. 
+
+Controllo cinque: bypass del pressostato. 
+
+Se vuoi verificare se è il pressostato...
+Puoi bypassare momentaneamente il contatto.
+MAI lasciare bypassato! Solo per diagnosi. 
+
+Se bypassando parte... il problema è il pressostato. 
+
+[13:00-15:00] CLIFFHANGER + CTA
+
+Ricapitolando. 
+
+Il ventilatore crea la depressione per aspirare aria ed espellere fumi.
+Il pressostato verifica che il ventilatore funzioni
+prima di autorizzare l'accensione del gas. 
+
+I problemi comuni sono:
+- Ventilatore fermo o rumoroso
+- Tubicino scollegato o intasato
+- Scarico ostruito
+- Pressostato guasto 
+
+I controlli rapidi spesso risolvono senza ricambi. 
+
+In questo video ti ho spiegato il cosa e il perché. 
+
+Nella Parte 2 su simonsilvercaldaie.it
+ti mostro il come. 
+
+Vedrai:
+- Test elettrico del ventilatore (alimentazione, assorbimento, segnale)
+- Test del pressostato con multimetro
+- Verifica con manometro differenziale
+- Sostituzione passo-passo
+- Tre casi reali 
+
+Il link è in descrizione. 
+
+Alla prossima, tecnici.
+
+FINE SCRIPT PARTE 1
+
+Durata stimata: 15 minuti
+Parole totali: ~1950

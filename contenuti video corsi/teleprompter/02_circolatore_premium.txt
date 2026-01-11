@@ -1,0 +1,505 @@
+﻿# INTRO (3 minuti)
+
+Benvenuto nel video tecnico completo sul circolatore. 
+
+Sono Simone.
+E questo è un video solo per tecnici professionisti. 
+
+Se hai visto il mio video su YouTube...
+sai già cos'è un circolatore e i sintomi base.
+Conosci il trucco dello sblocco. 
+
+Qui andiamo in profondità. 
+
+Vedrai:
+- Come testare elettricamente il circolatore
+- Diagnosi completa del segnale PWM
+- Come riconoscere le diverse generazioni di circolatori
+- Procedura di sostituzione passo-passo
+- Sfogo aria e spurgo corretto
+- E quattro casi reali complessi dal campo 
+
+Prendi gli appunti.
+Queste sono cose che non trovi nei manuali. 
+
+# MODULO 1: TEORIA AVANZATA (12 minuti)
+
+1.1 Tipologie Complete di Circolatori
+
+Vediamo tutte le tipologie che puoi incontrare. 
+
+Circolatori a velocità fissa (3 velocità): 
+
+Il tipo più semplice e vecchio.
+Selettore manuale con 3 posizioni: bassa, media, alta.
+Potenza fissa in base alla selezione. 
+
+Marche tipiche: Grundfos UPS 15-50, Wilo RS 15. 
+
+Consumi elevati: 45-90 Watt costanti.
+Ma affidabilità altissima.
+Pochi guasti, facili da diagnosticare. 
+
+Circolatori a velocità variabile continua: 
+
+Hanno un converter interno.
+Variano la velocità automaticamente.
+Ma non comunicano con la scheda caldaia. 
+
+Regolazione autonoma basata su sensori interni.
+Grundfos ALPHA1, Wilo Yonos. 
+
+Circolatori modulanti PWM: 
+
+La generazione attuale.
+Ricevono un segnale PWM dalla scheda caldaia.
+E girano alla velocità comandata. 
+
+PWM = Pulse Width Modulation.
+Modulazione a larghezza d'impulso. 
+
+La scheda manda impulsi a frequenza fissa.
+La durata dell'impulso determina la velocità.
+Impulso lungo = velocità alta.
+Impulso corto = velocità bassa. 
+
+Marche: Grundfos ALPHA2/ALPHA3, Wilo Para PWM, DAB Evosta2. 
+
+Circolatori con comunicazione BUS: 
+
+L'ultima evoluzione.
+Comunicazione digitale bidirezionale.
+Protocolli: Modbus, eBUS, OpenTherm. 
+
+Non solo ricevono comandi.
+Mandano indietro informazioni:
+velocità attuale, assorbimento, errori. 
+
+Ancora poco diffusi nelle caldaie murali.
+Più comuni in sistemi domotici avanzati. 
+
+1.2 Il Segnale PWM in Dettaglio
+
+Approfondiamo il PWM perché qui la maggior parte dei tecnici sbaglia. 
+
+Come funziona: 
+
+La scheda genera un segnale digitale.
+Frequenza tipica: 500 Hz oppure 1 kHz.
+Tensione: 0V (basso) e 5V o 10V (alto). 
+
+Il duty cycle determina la velocità: 
+
+Duty cycle 10%: impulso corto, velocità minima.
+Duty cycle 50%: impulso medio, velocità media.
+Duty cycle 100%: impulso lungo, velocità massima. 
+
+In assenza di segnale PWM: 
+
+Dipende dal modello!
+Alcuni circolatori girano al minimo.
+Altri girano al massimo.
+Altri si fermano completamente. 
+
+Questo è fondamentale per la diagnosi. 
+
+1.3 Specifiche Elettriche per Marca
+
+ Modello  Tipo controllo 
+-
+ UPS 15-50  3 velocità 
+ ALPHA2  PWM 
+ UPM3  PWM 
+ RS 15  3 velocità 
+ Para PWM  PWM 
+ Evotron  Interno 
+ Evosta2  PWM 
+ interno  PWM 
+ interno  PWM 
+
+Questi valori sono cruciali per la diagnosi. 
+
+Se un circolatore Vaillant OEM non riceve PWM... si ferma.
+Se un ALPHA2 non riceve PWM... gira al massimo. 
+
+Comportamenti opposti! 
+
+1.4 Curve Caratteristiche e Prevalenza
+
+Ogni circolatore ha una curva caratteristica. 
+
+Sull'asse X: la portata in litri/minuto o m³/h.
+Sull'asse Y: la prevalenza in metri colonna d'acqua. 
+
+Più spingi portata... meno prevalenza hai.
+E viceversa. 
+
+Perché è importante? 
+
+Se l'impianto ha molta resistenza (tubi piccoli, tanti radiatori)...
+il circolatore deve avere più prevalenza.
+Altrimenti l'acqua non arriva agli ultimi radiatori. 
+
+Un circolatore sottodimensionato = radiatori distanti freddi. 
+
+Valori tipici caldaie murali: 
+
+Portata max: 2-3 m³/h (33-50 litri/min)
+Prevalenza max: 5-7 metri 
+
+Sufficienti per appartamenti e villette normali. 
+
+# MODULO 2: DIAGNOSI COMPLETA (15 minuti)
+
+2.1 Strumenti Necessari
+
+Per una diagnosi professionale ti serve: 
+
+Numero uno: Multimetro digitale.
+Per misurare tensione AC, assorbimento e continuità. 
+
+Numero due: Pinza amperometrica.
+Per misurare l'assorbimento senza scollegare. 
+
+Numero tre: Cacciavite a taglio grande.
+Per lo sblocco manuale. 
+
+Numero quattro (opzionale): Oscilloscopio o tester PWM.
+Per visualizzare il segnale dalla scheda. 
+
+2.2 Test 1: Verifica Alimentazione
+
+Prima cosa: il circolatore riceve corrente? 
+
+Procedura:
+1. Metti la caldaia in richiesta riscaldamento
+2. Aspetta che la fiamma parta
+3. Togli il connettore dal circolatore
+4. Misura la tensione ai morsetti 
+
+Risultato atteso: 230V AC circa. 
+
+Se leggi 0V:
+- La scheda non sta alimentando
+- Controlla i fusibili sulla scheda
+- Controlla il relè del circolatore
+- Verifica i sensori di sicurezza 
+
+Se leggi 230V ma il circolatore non gira:
+il problema è nel circolatore stesso. 
+
+2.3 Test 2: Misura Assorbimento
+
+Se il circolatore parte... misura quanto assorbe. 
+
+Procedura:
+1. Circolatore collegato e acceso
+2. Pinza amperometrica su un solo filo (fase o neutro)
+3. Leggi l'assorbimento in Ampere 
+
+Valori normali: 
+
+Circolatori a 3 velocità:
+- Velocità 1: 0.15-0.25 A
+- Velocità 2: 0.25-0.35 A
+- Velocità 3: 0.35-0.50 A 
+
+Circolatori modulanti:
+- A regime: 0.05-0.20 A (dipende dalla velocità)
+- In spunto: fino a 0.5 A per pochi secondi 
+
+Valori anomali: 
+
+Sopra 0.5A costante: cuscinetto duro, girante bloccata.
+Zero: non gira o girante libera sull'albero.
+Oscillante: problema elettrico interno. 
+
+2.4 Test 3: Verifica Segnale PWM
+
+Fondamentale per circolatori modulanti. 
+
+Procedura:
+1. Trova il connettore del segnale PWM
+2. Di solito filo separato, spesso blu o grigio
+3. Multimetro su DC Volt
+4. Misura tra filo PWM e neutro 
+
+Cosa aspettarti: 
+
+Richiesta minima: circa 1-2V DC medi.
+Richiesta massima: circa 8-10V DC medi. 
+
+Se il segnale non varia con la richiesta:
+problema sulla scheda elettronica. 
+
+Se il segnale è sempre 0V:
+la scheda non sta comandando il circolatore. 
+
+Nota importante: 
+
+Il multimetro legge un valore medio.
+Non la forma d'onda esatta.
+Per vedere il PWM vero serve un oscilloscopio 
+o un tester PWM dedicato. 
+
+2.5 Test 4: Verifica Circolazione Effettiva
+
+Il circolatore gira... ma l'acqua circola davvero? 
+
+Procedura:
+1. Caldaia in riscaldamento a potenza stabile
+2. Termometro a contatto o laser
+3. Misura temperatura mandata (uscita caldaia)
+4. Misura temperatura ritorno (ingresso caldaia) 
+
+Delta T normale: 15-20 gradi.
+Esempio: mandata 60°C, ritorno 42°C. Delta 18°C. OK. 
+
+Delta T troppo alto (oltre 25°C):
+Il circolatore gira piano o c'è un'ostruzione. 
+
+Delta T quasi zero (sotto 5°C):
+Il circolatore non sta spingendo.
+Girante staccata dall'albero o by-pass aperto. 
+
+2.6 Test 5: Verifica Rotazione Girante
+
+Alcuni circolatori hanno una finestrella sulla parte frontale.
+Puoi vedere se la girante gira. 
+
+Altrimenti:
+1. Togli la vite centrale
+2. Guarda dentro con una torcia
+3. Verifica che la girante ruoti con l'albero 
+
+Ho visto giranti staccate dall'albero.
+Il motore girava... ma la girante no.
+Zero circolazione. 
+
+2.7 Codici Errore Correlati
+
+Errori comuni legati al circolatore: 
+
+Vaillant F20/F28: sovratemperatura primario
+Ariston 105/106: temperatura mandata troppo alta
+Beretta A07: mancanza circolazione
+Immergas blocco: surriscaldamento
+Baxi E25: circolazione insufficiente 
+
+Quando vedi "surriscaldamento" o "temperatura alta"...
+pensa sempre al circolatore. 
+
+# MODULO 3: SOSTITUZIONE E SPURGO (10 minuti)
+
+3.1 Quando Sostituire
+
+Sostituire se:
+- Bloccato meccanicamente e lo sblocco non funziona
+- Cuscinetti rumorosi anche dopo sblocco
+- Assorbimento anomalo persistente
+- Girante staccata o danneggiata
+- Corrosione visibile
+- Perdite d'acqua dal corpo 
+
+Non sostituire se:
+- Solo bloccato da fermo estivo (sblocca prima)
+- Il segnale PWM non arriva (problema scheda)
+- Aria intrappolata (sfoga prima)
+- Connettore ossidato (pulisci prima) 
+
+3.2 Procedura Sostituzione
+
+Passo 1: Togli corrente. Sicurezza. 
+
+Passo 2: Chiudi i rubinetti di intercettazione del circolatore.
+Se non ci sono, chiudi l'impianto o scarica l'acqua. 
+
+Passo 3: Metti una bacinella sotto.
+Scollega i tubi raccordati.
+Uscirà acqua residua. 
+
+Passo 4: Scollega l'elettrico.
+Connettore alimentazione e eventuale PWM. 
+
+Passo 5: Svita e rimuovi il circolatore.
+Attenzione alle guarnizioni. 
+
+Passo 6: Monta il nuovo circolatore.
+Usa guarnizioni nuove. Sempre.
+Orientamento corretto: freccia del flusso. 
+
+Passo 7: Ricollega i tubi.
+Stringi a mano, poi un quarto di giro con la chiave. 
+
+Passo 8: Ricollega l'elettrico.
+Verifica la polarità se indicata. 
+
+Passo 9: Riapri i rubinetti e riempi l'impianto.
+Sfoga l'aria dal circolatore e dai radiatori. 
+
+3.3 Sfogo Aria dal Circolatore
+
+Fondamentale dopo la sostituzione. 
+
+Molti circolatori hanno una vite di spurgo.
+Sulla parte superiore del corpo. 
+
+Procedura:
+1. Riempi l'impianto lentamente
+2. Porta la pressione a 1.5 bar
+3. Allenta la vite di spurgo
+4. Aspetta: prima esce aria, poi acqua
+5. Quando esce solo acqua, richiudi 
+
+Se non sfoghi il circolatore: 
+
+Sentirai ronzii e vibrazioni.
+A volte non parte proprio.
+L'aria impedisce la rotazione. 
+
+Ho visto circolatori nuovi "guasti" che erano solo pieni d'aria. 
+
+3.4 Spurgo Impianto Completo
+
+Dopo la sostituzione, sfoga tutto l'impianto. 
+
+Ordine corretto:
+1. Circolatore
+2. Radiatori più lontani dalla caldaia
+3. Radiatori più vicini
+4. Sfogo caldaia 
+
+Durante lo spurgo:
+tieni il circolatore spento o al minimo.
+Così l'aria sale meglio nei punti alti. 
+
+# MODULO 4: CASI REALI DAL CAMPO (8 minuti)
+
+Caso 1: Il Circolatore che Girava a Vuoto
+
+Cliente: radiatori freddi, caldaia che parte. 
+
+Diagnosi iniziale:
+- Circolatore assorbe corrente: sì
+- Si sente ronzare: sì
+- Sembra che giri 
+
+Ma l'acqua non circolava.
+Delta T mandata/ritorno: quasi zero. 
+
+Apro il circolatore: la girante si era staccata dall'albero.
+Il motore girava... ma la girante no. 
+
+Lezione: non fidarti solo del rumore.
+Verifica la circolazione effettiva con le temperature. 
+
+Caso 2: Il Segnale PWM Mancante
+
+Caldaia recente, 3 anni.
+I radiatori non si scaldano bene. 
+
+Circolatore ALPHA2.
+Gira... ma sempre al minimo. 
+
+Test PWM: zero volt. 
+
+La scheda non stava comandando la modulazione.
+Cambio la scheda → Problema risolto. 
+
+Il circolatore era perfetto.
+Se l'avessi cambiato, 150 euro buttati. 
+
+Lezione: sempre testare il segnale PWM
+prima di condannare il circolatore modulante. 
+
+Caso 3: L'Aria che Tornava Sempre
+
+Cliente: rumori nei radiatori dopo ogni accensione.
+Ha già spurgato dieci volte. 
+
+Circolatore e vaso: perfetti.
+Nessuna perdita visibile. 
+
+Lo sfogo automatico era incrostato.
+La membrana non chiudeva bene.
+Ad ogni fermata del circolatore, aspirava aria. 
+
+Sostituisco lo sfogo automatico.
+Fine dei problemi. 
+
+Lezione: a volte il problema non è dove pensi.
+L'aria può entrare, non solo uscire. 
+
+Caso 4: Il Circolatore Bruciato dalla Scheda
+
+Caldaia con scheda guasta.
+Il tecnico precedente aveva cambiato la scheda.
+Ma il circolatore nuovo non funzionava. 
+
+La scheda vecchia aveva mandato tensione sbagliata.
+Il circolatore si era bruciato.
+Poi il cliente ha cambiato la scheda... ma non il circolatore. 
+
+Risultato: scheda nuova ok, ma circolatore morto. 
+
+Lezione: quando cambi la scheda dopo un guasto,
+verifica sempre i componenti che controllava. 
+
+# CHIUSURA (2 minuti)
+
+Ricapitolando. 
+
+Il circolatore è il cuore dell'impianto.
+Senza circolazione, tutto si ferma. 
+
+I test fondamentali:
+1. Verifica alimentazione 230V
+2. Misura assorbimento con pinza
+3. Verifica segnale PWM (per modulanti)
+4. Controllo delta T mandata/ritorno
+5. Verifica rotazione girante 
+
+Quando sostituire:
+- Cuscinetti rumorosi non risolvibili
+- Girante staccata
+- Sblocco manuale non efficace
+- Avvolgimento bruciato 
+
+Attenzione ai modulanti:
+Se il PWM manca... è la scheda, non il circolatore. 
+
+Lo sfogo aria dopo la sostituzione è obbligatorio. 
+
+Hai domande?
+Scrivimi a info@simonsilvercaldaie.it. 
+
+Nel prossimo video tecnico:
+la valvola gas.
+Come testarla, taratura, modulazione. 
+
+Grazie per la fiducia.
+Ci vediamo al prossimo video. 
+
+PDF Checklist Diagnosi Circolatore
+- [ ] Alimentazione 230V presente
+- [ ] Circolatore gira (rumore/vibrazione)
+- [ ] Assorbimento normale
+- [ ] Segnale PWM presente e variabile (se modulante)
+- [ ] Delta T mandata/ritorno corretto
+- [ ] Girante fissata all'albero
+- [ ] Aria spurgata
+
+Tabella Valori PWM per Marca
+ Tipo segnale 
+--
+ PWM 1kHz 
+ PWM 500Hz 
+ Analogico 
+ PWM 1kHz 
+
+FINE SCRIPT PARTE 2
+
+Durata stimata: 45 minuti
+Parole totali: ~5850
+Velocità lettura: 120 parole/min
+Piattaforma: Solo sito simonsilvercaldaie.it (a pagamento)

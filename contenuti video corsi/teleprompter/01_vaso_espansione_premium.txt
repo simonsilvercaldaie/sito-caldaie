@@ -1,0 +1,498 @@
+﻿# INTRO (3 minuti)
+
+Benvenuto nel video tecnico completo sul vaso di espansione. 
+
+Sono Simone, tecnico caldaista.
+E questo è un video solo per tecnici professionisti. 
+
+Se hai visto il mio video su YouTube...
+sai già cos'è un vaso e perché serve.
+Conosci i sintomi base di un vaso guasto. 
+
+Qui andiamo molto più in profondità. 
+
+In questo video imparerai:
+
+Primo: la teoria avanzata con le formule di dimensionamento.
+Come calcolare se un vaso è sottodimensionato. 
+
+Secondo: la diagnosi completa con tutti e quattro i test professionali.
+Con strumenti specifici e procedure passo-passo. 
+
+Terzo: la procedura di ricarica azoto corretta.
+E quando è meglio ricaricare vs sostituire. 
+
+Quarto: i valori specifici per le marche più diffuse.
+Vaillant, Ariston, Beretta, Immergas, Baxi, Ferroli, Hermann e altre. 
+
+Quinto: cinque casi reali dal campo.
+Con diagnosi complete e soluzioni dettagliate. 
+
+Prendi carta e penna.
+O meglio... salva questo video nei preferiti.
+Ti servirà sul campo. 
+
+# MODULO 1: TEORIA AVANZATA (15 minuti)
+
+1.1 Fisica dell'Espansione Termica
+
+L'acqua si espande quando si scalda.
+Ma di quanto esattamente? 
+
+Il coefficiente di espansione volumetrica dell'acqua
+varia con la temperatura. 
+
+A 20°C: volume di riferimento 1.0
+A 50°C: volume 1.012 (+1.2%)
+A 70°C: volume 1.023 (+2.3%)
+A 80°C: volume 1.029 (+2.9%)
+A 90°C: volume 1.036 (+3.6%) 
+
+Questo significa che un impianto con 100 litri d'acqua...
+quando passa da 20°C a 80°C...
+genera circa 3 litri di acqua in più. 
+
+Dove vanno questi 3 litri?
+Nel vaso di espansione. 
+
+1.2 Formula di Dimensionamento del Vaso
+
+La formula per dimensionare un vaso è:
+
+V = (e × C) / (1 - (Pi/Pf))
+
+Dove:
+- V = Volume del vaso in litri
+- e = Coefficiente di espansione (da tabella)
+- C = Contenuto acqua impianto in litri
+- Pi = Pressione iniziale assoluta del vaso (bar + 1)
+- Pf = Pressione finale assoluta (taratura valvola sicurezza + 1) 
+
+Esempio pratico: 
+
+Impianto con 80 litri d'acqua.
+Temperatura massima 80°C.
+Precarica vaso 1 bar.
+Valvola sicurezza 3 bar. 
+
+e = 0.029 (da 20°C a 80°C)
+C = 80 litri
+Pi = 1 + 1 = 2 bar assoluti
+Pf = 3 + 1 = 4 bar assoluti 
+
+V = (0.029 × 80) / (1 - 2/4)
+V = 2.32 / 0.5
+V = 4.64 litri 
+
+Serve un vaso da minimo 5 litri.
+Le caldaie murali hanno vasi da 6-8 litri.
+In questo caso siamo a posto. 
+
+1.3 Il Problema del Vaso Sottodimensionato
+
+Quando un vaso è sottodimensionato? 
+
+Caso tipico numero uno: 
+Caldaia vecchia con vaso da 5 litri.
+Impianto ampliato con nuovi radiatori.
+Il contenuto acqua è aumentato del 50%.
+Ma il vaso è rimasto lo stesso. 
+
+Caso tipico numero due: 
+Impianto a pavimento collegato a caldaia murale.
+L'impianto ha 150+  litri di contenuto.
+Il vaso interno da 8 litri non basta. 
+
+Sintomi di vaso sottodimensionato: 
+- La pressione sale molto durante il riscaldamento
+- La valvola di sicurezza interviene a caldaia calda
+- Il manometro oscilla tra 1 bar freddo e 2.8+ caldo 
+
+Soluzione: aggiungere un vaso esterno supplementare. 
+
+1.4 Tipologie Complete di Vasi
+
+Vediamo tutte le varianti che puoi incontrare. 
+
+Per tipo di attacco: 
+
+Vaso a cartuccia (Vaillant, alcuni Junkers):
+- Attacco rapido a baionetta
+- Sostituzione veloce senza svuotare
+- Ricambi costosi e specifici
+- Non ricaricabile in modo tradizionale 
+
+Vaso a flangia (vasi esterni):
+- Flangia con guarnizione
+- Smontabile per sostituzione membrana
+- Standard industriale 
+
+Vaso saldato (caldaie economiche):
+- Tutto saldato, non smontabile
+- Se si guasta, si butta tutto
+- Membrana fissa 
+
+Per materiale membrana: 
+
+EPDM (Etilene Propilene Diene):
+- Il più comune
+- Temperatura max 100-110°C
+- Buona resistenza all'invecchiamento
+- Va bene per il 95% delle applicazioni 
+
+Butile:
+- Migliore impermeabilità all'ossigeno
+- Per impianti senza trattamento acqua
+- Più rigido, meno elastico 
+
+NBR (Nitrile):
+- Per applicazioni speciali
+- Resistenza a oli e grassi
+- Raramente usato in riscaldamento 
+
+1.5 Precariche Standard per Tipo di Impianto
+
+La precarica corretta dipende dall'altezza statica dell'impianto. 
+
+Regola base: 
+Precarica = Altezza statica in metri / 10 + 0.3 bar 
+
+Esempi pratici: 
+
+Caldaia al piano terra, termosifoni a 3 metri sopra:
+3m / 10 + 0.3 = 0.6 bar 
+
+Caldaia in cantina, termosifoni a 8 metri sopra:
+8m / 10 + 0.3 = 1.1 bar 
+
+Caldaia al primo piano, termosifoni sotto:
+0m / 10 + 0.3 = 0.3 bar 
+
+Ma attenzione! 
+
+I costruttori spesso indicano una precarica standard
+indipendente dall'impianto reale.
+Segui sempre prima il manuale. 
+
+# MODULO 2: DIAGNOSI COMPLETA (12 minuti)
+
+2.1 Strumenti Necessari
+
+Per una diagnosi professionale ti servono: 
+
+Numero uno: Manometro per vaso espansione.
+Quello con attacco per valvola tipo bicicletta.
+Range 0-3 bar è sufficiente. 
+
+Numero due: Compressore o bombola azoto.
+Per ricaricare se necessario.
+Mai usare aria compressa normale! Contiene umidità. 
+
+Numero tre: Secchio o bacinella.
+Per raccogliere l'acqua durante i test. 
+
+Numero quattro: Chiave per valvola Schrader.
+Per svitare l'anima e verificare cosa esce. 
+
+2.2 Test 1: Pressione con Manometro
+
+Prima cosa: misura la pressione di precarica. 
+
+Procedura:
+1. La caldaia deve essere spenta e fredda
+2. Scarica la pressione impianto a zero
+3. Collega il manometro alla valvola del vaso
+4. Leggi la pressione 
+
+Risultati possibili: 
+
+Pressione corretta (es. 0.8-1.0 bar): vaso ok.
+Pressione bassa (es. 0.2 bar): vaso scarico, ricaricare.
+Pressione zero: o è totalmente scarico, o la membrana è bucata. 
+
+Se leggi zero, fai il test 2. 
+
+2.3 Test 2: Verifica Membrana (Acqua dalla Valvola)
+
+Questo è il test definitivo per la membrana. 
+
+Procedura:
+1. Caldaia spenta, impianto in pressione (1-1.5 bar)
+2. Svita l'anima della valvola del vaso
+3. Osserva cosa esce 
+
+Se esce aria/azoto: la membrana è integra.
+Probabilmente solo scarico, puoi ricaricare. 
+
+Se esce acqua: la membrana è bucata.
+L'acqua dell'impianto è passata nella camera gas.
+Il vaso va sostituito. 
+
+Questo test da solo risolve il 90% delle diagnosi. 
+
+2.4 Test 3: Pressione Impianto a Caldo vs Freddo
+
+Questo test verifica se il vaso sta lavorando. 
+
+Procedura:
+1. Imposta la caldaia a una temperatura alta (70-80°C)
+2. Nota la pressione a freddo (es. 1.2 bar)
+3. Fai scaldare l'impianto al massimo
+4. Nota la pressione a caldo (es. 1.8 bar)
+5. Calcola il delta 
+
+Delta normale: 0.3-0.6 bar.
+Delta alto (oltre 1 bar): il vaso non sta assorbendo. 
+
+2.5 Test 4: Test della Percussione
+
+Test rapido senza strumenti. 
+
+Procedura:
+1. Bussa sulla parte superiore del vaso
+2. Bussa sulla parte inferiore del vaso
+3. Confronta il suono 
+
+Vaso funzionante:
+- Sopra: suono vuoto (camera gas)
+- Sotto: suono pieno (camera acqua) 
+
+Vaso con membrana bucata:
+- Suono pieno in entrambe le zone
+- L'acqua ha invaso tutto il vaso 
+
+È un test grossolano ma utile quando non hai strumenti. 
+
+2.6 Codici Errore Correlati
+
+Errori comuni legati al vaso: 
+
+Vaillant F22/F24: pressione troppo bassa
+Ariston 108: pressione impianto bassa
+Beretta E01: pressione acqua insufficiente
+Immergas: mancanza acqua (icona goccia)
+Baxi E10: pressione bassa 
+
+Quando vedi questi errori...
+prima di cercare perdite, controlla il vaso. 
+
+# MODULO 3: PROCEDURA DI RICARICA E SOSTITUZIONE (10 minuti)
+
+3.1 Quando Ricaricare vs Sostituire
+
+Ricaricare se:
+- La membrana è integra (test 2 negativo)
+- Il vaso ha meno di 8-10 anni
+- La precarica è solo bassa, non zero 
+
+Sostituire se:
+- La membrana è bucata (esce acqua dalla valvola)
+- Il vaso ha più di 10 anni
+- Ci sono segni di corrosione esterna
+- La ricarica non tiene (perde di nuovo in pochi giorni) 
+
+3.2 Procedura di Ricarica Azoto
+
+Passo 1: Spegni la caldaia e lasciala raffreddare. 
+
+Passo 2: Scarica completamente la pressione dell'impianto.
+Apri lo scarico sotto la caldaia.
+Aspetta che il manometro arrivi a zero. 
+
+Passo 3: Collega il compressore o la bombola azoto.
+Usa sempre azoto secco, mai aria compressa.
+L'aria contiene umidità che corrode. 
+
+Passo 4: Ricarica lentamente alla pressione corretta.
+Controlla il manometro.
+Non superare mai la pressione indicata dal costruttore. 
+
+Passo 5: Ricarica l'impianto con acqua.
+Porta la pressione a 1-1.5 bar a freddo.
+Sfoga l'aria dai radiatori. 
+
+Passo 6: Verifica funzionamento.
+Fai scaldare l'impianto.
+Controlla il delta di pressione caldo/freddo. 
+
+3.3 Procedura di Sostituzione Vaso
+
+Passo 1: Spegni e lascia raffreddare. 
+
+Passo 2: Chiudi i rubinetti di intercettazione se presenti.
+Altrimenti scarica tutto l'impianto. 
+
+Passo 3: Scarica la pressione a zero.
+Il vaso è ancora in pressione dall'azoto.
+Attenzione agli schizzi quando scolleghi. 
+
+Passo 4: Scollega il tubo di collegamento.
+Chiave inglese adeguata.
+Metti una bacinella sotto. 
+
+Passo 5: Smonta il vaso vecchio.
+Nelle caldaie murali è fissato con staffe o fascette. 
+
+Passo 6: Monta il vaso nuovo.
+Usa guarnizioni nuove se necessario.
+Verifica che la precarica sia quella corretta. 
+
+Passo 7: Ricollega e ricarica l'impianto.
+Sfoga aria.
+Verifica tenuta. 
+
+# MODULO 4: VALORI PER MARCA (5 minuti)
+
+4.1 Tabella Precariche Originali
+
+ Modelli comuni  Capacità |
+--|
+ ecoTEC plus/pro  10L |
+ turboTEC  8L |
+ Clas ONE/Premium  8L |
+ Genus Premium  8L |
+ Mynute  6L |
+ Exclusive  8L |
+ Victrix  8L |
+ Eolo  6L |
+ Luna3  7L |
+ Duo-tec  10L |
+ Bluehelix  8L |
+ Micra  6L |
+
+Questi valori sono indicativi.
+Controlla sempre il manuale specifico del modello. 
+
+# MODULO 5: CASI REALI DAL CAMPO (8 minuti)
+
+Caso 1: La Pressione che Cala Senza Perdite
+
+Cliente: "La caldaia perde pressione ogni 2-3 giorni.
+Il tecnico precedente ha cercato perdite ovunque.
+Non ha trovato niente." 
+
+Mia diagnosi:
+Test valvola vaso → esce acqua.
+Membrana bucata. 
+
+Soluzione: Cambio vaso.
+Problema risolto. 
+
+Tempo: 30 minuti totali. 
+
+Caso 2: La Valvola che Gocciola Sempre
+
+Cliente: "Ho già cambiato due valvole di sicurezza.
+Gocciolano sempre." 
+
+Mia diagnosi:
+Pressione a caldo: 2.9 bar. Altissima.
+Test vaso: precarica 0 bar. Completamente scarico. 
+
+Il vaso non assorbiva più l'espansione.
+La pressione saliva e la valvola faceva il suo lavoro. 
+
+Soluzione: Ricarica vaso a 0.8 bar.
+Le due valvole erano perfette.
+Sprecate entrambe. 
+
+Caso 3: Il Vaso Sottodimensionato
+
+Impianto a pavimento, 120 mq.
+Caldaia murale con vaso interno da 6 litri.
+La pressione oscillava da 1 bar a 2.5 bar. 
+
+Calcolo: 
+Contenuto acqua impianto: circa 150 litri.
+Espansione: 150 × 0.029 = 4.35 litri.
+Vaso necessario: almeno 10 litri. 
+
+Soluzione: Vaso supplementare esterno da 12 litri.
+Oscillazione ridotta a 0.4 bar.
+Sistema stabile. 
+
+Caso 4: Il Vaso Nuovo che Non Funziona
+
+Tecnico ha sostituito il vaso.
+Ma la pressione continua a calare. 
+
+Cosa era successo:
+Il vaso nuovo era arrivato con precarica di fabbrica 1.5 bar.
+Ma l'impianto richiedeva 0.75 bar. 
+
+Con 1.5 bar di precarica, il vaso non si riempiva d'acqua.
+Non assorbiva niente.
+E sembrava guasto anche lui. 
+
+Soluzione: Scaricato l'azoto a 0.75 bar.
+Tutto risolto. 
+
+Lezione: verifica sempre la precarica dei vasi nuovi! 
+
+Caso 5: Il Vaso con la Membrana Irrigidita
+
+Caldaia di 15 anni.
+La pressione oscillava troppo.
+Ma il vaso aveva ancora la precarica corretta.
+E dalla valvola non usciva acqua. 
+
+Cosa era successo:
+La membrana era integra ma irrigidita.
+Non si espandeva più correttamente.
+Il vaso assorbiva solo parzialmente. 
+
+Soluzione: Sostituzione vaso.
+15 anni sono tanti per una membrana. 
+
+# CHIUSURA (2 minuti)
+
+Ricapitolando. 
+
+Il vaso di espansione compensa l'espansione termica dell'acqua.
+Senza di lui, ogni ciclo di riscaldamento sarebbe un problema. 
+
+I quattro test professionali:
+1. Pressione alla valvola con manometro
+2. Verifica membrana (aria o acqua dalla valvola)
+3. Delta pressione caldo/freddo
+4. Percussione (suono vuoto vs pieno) 
+
+Quando ricaricare: membrana integra, vaso giovane.
+Quando sostituire: membrana bucata, vaso vecchio, ricarica non tiene. 
+
+Ricorda sempre:
+- Usa azoto, non aria compressa
+- Verifica la precarica dei vasi nuovi
+- La valvola che gocciola spesso è innocente 
+
+Hai domande?
+Scrivimi a info@simonsilvercaldaie.it. 
+
+Nel prossimo video tecnico:
+il circolatore.
+Come testarlo elettricamente, diagnosi PWM, e sostituzione. 
+
+Grazie per la fiducia.
+Ci vediamo al prossimo video. 
+
+PDF Checklist Diagnosi Vaso Espansione
+- [ ] Caldaia spenta e fredda
+- [ ] Pressione impianto scaricata a zero
+- [ ] Pressione precarica misurata
+- [ ] Test membrana eseguito (aria/acqua)
+- [ ] Delta pressione caldo/freddo verificato
+- [ ] Valore precarica corretto per modello
+- [ ] Decisione: ricaricare o sostituire
+
+Tabella Precariche per 20+ Modelli
+(File PDF separato allegato)
+
+Schema Calcolo Dimensionamento
+(Formula con esempi precompilati)
+
+FINE SCRIPT PARTE 2
+
+Durata stimata: 45 minuti
+Parole totali: ~5850
+Velocità lettura: 120 parole/min
+Piattaforma: Solo sito simonsilvercaldaie.it (a pagamento)

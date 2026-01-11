@@ -1,71 +1,17 @@
 'use client'
-import { PayPalBtn } from "@/components/PayPalBtn"
-import { Lock, MonitorPlay, ShieldCheck } from "lucide-react"
-import { supabase } from "@/lib/supabaseClient"
-import { useEffect, useState } from "react"
+import { Lock, MonitorPlay, ShieldCheck, PlayCircle } from "lucide-react"
+import { getAllCourses } from "@/lib/coursesData"
 import Link from "next/link"
 import Navbar from "@/components/Navbar"
 
-// Demo courses data
-const demoCourses = [
-    { id: 1, title: "Sostituzione Scambiatore Caldaia Condensazione", duration: "45 min", level: "Avanzato", price: "49.00" },
-    { id: 2, title: "Diagnosi Scheda Elettronica: Ripara o Sostituisci?", duration: "30 min", level: "Intermedio", price: "39.00" },
-    { id: 3, title: "Manutenzione Annuale Completa: Protocollo 2025", duration: "60 min", level: "Base", price: "59.00" },
-    { id: 4, title: "Analisi Fumi e Rendimento Combustione", duration: "35 min", level: "Intermedio", price: "35.00" },
-    { id: 5, title: "Sostituzione Valvola Gas: Procedura Sicura", duration: "40 min", level: "Avanzato", price: "45.00" },
-    { id: 6, title: "Circolatore Bloccato: Diagnosi e Riparazione", duration: "25 min", level: "Base", price: "29.00" },
-    { id: 7, title: "Pressostato Differenziale: Come Funziona", duration: "20 min", level: "Base", price: "25.00" },
-    { id: 8, title: "Sonda NTC: Test e Sostituzione", duration: "15 min", level: "Intermedio", price: "19.00" },
-    { id: 9, title: "Errori Frequenti Caldaie Vaillant: Guida Completa", duration: "50 min", level: "Avanzato", price: "55.00" },
-]
-
 export default function CatalogoPage() {
-    const [user, setUser] = useState<any>(null)
-    const [loading, setLoading] = useState(true)
+    const courses = getAllCourses()
 
-    useEffect(() => {
-        const checkUser = async () => {
-            const { data: { session } } = await supabase.auth.getSession()
-            setUser(session?.user || null)
-            setLoading(false)
-        }
-        checkUser()
-
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user || null)
-            setLoading(false)
-        })
-
-        return () => subscription.unsubscribe()
-    }, [])
-
-    const handlePurchaseSuccess = async (courseTitle: string, amount: string) => {
-        if (!user) {
-            alert("Devi essere loggato per acquistare!")
-            return
-        }
-
-        try {
-            const { error } = await supabase
-                .from('purchases')
-                .insert([
-                    {
-                        user_id: user.id,
-                        course_id: courseTitle,
-                        amount: parseFloat(amount)
-                    }
-                ])
-
-            if (error) throw error
-
-            alert(`Pagamento riuscito per: ${courseTitle}!\nIl corso è stato sbloccato nella tua Dashboard.`)
-        } catch (err: any) {
-            console.error("Errore salvataggio acquisto:", err)
-            alert("Pagamento ricevuto su PayPal, ma errore nel salvataggio su database. Contatta l'assistenza.")
-        }
+    const levelColors: Record<string, string> = {
+        "Base": "bg-green-100 text-green-800",
+        "Intermedio": "bg-yellow-100 text-yellow-800",
+        "Avanzato": "bg-red-100 text-red-800"
     }
-
-    if (loading) return <div className="py-20 text-center">Caricamento catalogo...</div>
 
     return (
         <div className="min-h-screen flex flex-col font-sans bg-gray-50">
@@ -82,47 +28,56 @@ export default function CatalogoPage() {
                             Tutti i <span className="text-accent">Corsi Disponibili</span>
                         </h1>
                         <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                            Esplora la nostra libreria completa di video corsi tecnici. Acquista singolarmente e accedi per sempre.
+                            Guarda l'anteprima gratuita su YouTube, poi acquista il video premium completo.
                         </p>
-                        {!user && (
-                            <div className="mt-6 p-4 bg-yellow-50 text-yellow-800 rounded-lg inline-block text-sm">
-                                ⚠️ Devi effettuare il <Link href="/login" className="font-bold underline">Login</Link> o <Link href="/login" className="font-bold underline">Registrarti</Link> per acquistare.
-                            </div>
-                        )}
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                        {demoCourses.map((course) => (
-                            <div key={course.id} className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl transition-all group flex flex-col">
-                                <div className="relative aspect-video bg-gray-200">
-                                    <div className="absolute inset-0 bg-primary/20 group-hover:bg-primary/10 transition-colors flex items-center justify-center">
-                                        <Lock className="w-12 h-12 text-primary/50 group-hover:scale-110 transition-transform" />
+                        {courses.map((course) => (
+                            <Link
+                                key={course.id}
+                                href={`/corso/${course.id}`}
+                                className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl hover:border-accent/30 transition-all group flex flex-col"
+                            >
+                                <div className="relative aspect-video bg-gradient-to-br from-primary to-slate-700">
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 group-hover:scale-110 transition-all">
+                                            <PlayCircle className="w-10 h-10 text-white" />
+                                        </div>
                                     </div>
                                     <div className="absolute top-4 right-4 bg-accent text-white font-bold px-3 py-1 rounded-full text-sm shadow-md">
                                         € {course.price}
                                     </div>
+                                    <div className="absolute top-4 left-4">
+                                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${levelColors[course.level]}`}>
+                                            {course.level}
+                                        </span>
+                                    </div>
                                 </div>
                                 <div className="p-6 space-y-4 flex-grow flex flex-col">
-                                    <h3 className="text-xl font-bold text-primary leading-tight">{course.title}</h3>
-                                    <div className="flex items-center gap-4 text-sm text-gray-500 mt-auto mb-4">
-                                        <span className="flex items-center gap-1"><MonitorPlay className="w-4 h-4" /> {course.duration}</span>
-                                        <span className="flex items-center gap-1"><ShieldCheck className="w-4 h-4" /> {course.level}</span>
+                                    <h3 className="text-xl font-bold text-primary leading-tight group-hover:text-accent transition-colors">
+                                        {course.title}
+                                    </h3>
+                                    <p className="text-sm text-gray-500 line-clamp-2 flex-grow">
+                                        {course.shortDescription}
+                                    </p>
+                                    <div className="flex flex-col gap-1 text-sm text-gray-500 pt-2 border-t border-gray-100">
+                                        <span className="flex items-center gap-1">
+                                            <MonitorPlay className="w-4 h-4 text-red-500" />
+                                            <strong>{course.freeDuration} gratis</strong> + {course.premiumDuration} premium
+                                        </span>
+                                        <span className="flex items-center gap-1">
+                                            <ShieldCheck className="w-4 h-4" />
+                                            {course.level}
+                                        </span>
                                     </div>
-                                    <div className="relative z-10">
-                                        {user ? (
-                                            <PayPalBtn
-                                                amount={course.price}
-                                                courseTitle={course.title}
-                                                onSuccess={() => handlePurchaseSuccess(course.title, course.price)}
-                                            />
-                                        ) : (
-                                            <Link href="/login" className="w-full py-3 bg-gray-200 text-gray-500 font-bold rounded-xl hover:bg-gray-300 transition-colors flex items-center justify-center gap-2">
-                                                Accedi per Acquistare
-                                            </Link>
-                                        )}
+                                    <div className="pt-2">
+                                        <span className="w-full py-3 bg-primary/10 text-primary font-semibold rounded-xl hover:bg-primary/20 transition-colors flex items-center justify-center gap-2 group-hover:bg-accent group-hover:text-white">
+                                            Scopri di più →
+                                        </span>
                                     </div>
                                 </div>
-                            </div>
+                            </Link>
                         ))}
                     </div>
 

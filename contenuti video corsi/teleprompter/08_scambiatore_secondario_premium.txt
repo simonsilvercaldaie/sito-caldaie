@@ -1,0 +1,197 @@
+﻿# INTRO (3 minuti)
+
+Benvenuto nel video tecnico completo sullo scambiatore secondario. 
+
+Qui impari le procedure operative professionali.
+Diagnosi termica, lavaggio specifico, test portata.
+E casi reali di scambiatori problematici. 
+
+Prendi appunti. 
+
+# MODULO 1: TEORIA AVANZATA (10 minuti)
+
+1.1 Il Trasferimento Termico nel Secondario
+
+Lo scambiatore secondario lavora in controcorrente. 
+
+L'acqua calda del primario entra da un lato.
+L'acqua fredda del sanitario entra dal lato opposto.
+Massima efficienza di scambio. 
+
+Fattori che influenzano lo scambio: 
+- Area delle piastre
+- Spessore del materiale
+- Conducibilità termica
+- Portate dei due fluidi
+- Temperatura di ingresso 
+
+1.2 Specifiche per Caldaia
+
+Portata sanitario tipica per caldaia 24 kW: 
+- Delta T 25°C: circa 10 l/min
+- Delta T 35°C: circa 7 l/min 
+
+Temperatura massima sanitario: 60-65°C. 
+
+Se la portata cala molto rispetto a questi valori...
+lo scambiatore è ostruito. 
+
+# MODULO 2: DIAGNOSI (12 minuti)
+
+2.1 Test Portata Sanitario
+
+Misura quanta acqua esce dal rubinetto in un minuto. 
+
+Procedura: 
+1. Prendi un secchio graduato
+2. Apri il rubinetto calda al massimo
+3. Conta 1 minuto
+4. Leggi i litri 
+
+Caldaia 24 kW: aspetti 10-12 litri/min.
+Caldaia 28 kW: aspetti 12-14 litri/min. 
+
+Se ottieni meno della metà...
+scambiatore ostruito o problema di portata acquedotto. 
+
+2.2 Test Temperatura
+
+Misura le temperature sui tubi dello scambiatore. 
+
+Lato primario: 
+- Ingresso: 60-70°C
+- Uscita: 40-50°C
+- Delta normale: 15-25°C 
+
+Lato secondario: 
+- Ingresso: 15-20°C (acqua rete)
+- Uscita: 40-55°C 
+
+Se il delta sul primario è molto basso...
+lo scambio non avviene.
+Scambiatore ostruito o circolazione primario bloccata. 
+
+2.3 Diagnosi Valvola Tre Vie
+
+Prima di accusare lo scambiatore...
+verifica che la valvola tre vie stia commutando. 
+
+Se la valvola non devia il flusso verso lo scambiatore secondario...
+non è colpa dello scambiatore. 
+
+Test: apri il rubinetto calda e verifica:
+- I tubi dello scambiatore secondario si scaldano?
+- Il ritorno riscaldamento resta freddo? 
+
+# MODULO 3: LAVAGGIO (12 minuti)
+
+3.1 Attrezzatura Specifica
+
+Per il secondario puoi lavare isolato dall'impianto. 
+
+Serve: 
+- Pompa lavaggio piccola
+- Tubi con attacchi rapidi
+- Acido specifico per sanitario (alimentare)
+- Neutralizzatore
+- Bacinella 
+
+3.2 Procedura Lavaggio Isolato
+
+Passo 1: Chiudi i rubinetti di intercettazione del sanitario. 
+
+Passo 2: Collega la pompa ai due attacchi dello scambiatore.
+Forma un circuito chiuso. 
+
+Passo 3: Riempi con soluzione acida diluita. 
+
+Passo 4: Fai circolare con inversione per 30-45 minuti.
+Controlla le reazioni (schiuma, bolle). 
+
+Passo 5: Svuota, risciacqua con acqua pulita. 
+
+Passo 6: Neutralizza. 
+
+Passo 7: Risciacquo finale e ricollega. 
+
+3.3 Verifica Risultati
+
+Misura di nuovo la portata. 
+
+Prima: 4 l/min (ostruito).
+Dopo: 11 l/min (normale). 
+
+Se la portata non migliora...
+sostituisci lo scambiatore. 
+
+# MODULO 4: SOSTITUZIONE (6 minuti)
+
+4.1 Procedura
+
+1. Chiudi acqua e gas
+2. Svuota il circuito primario (almeno la caldaia)
+3. Scollega i tubi (4 attacchi)
+4. Estrai lo scambiatore
+5. Installa il nuovo con guarnizioni nuove
+6. Ricollega, riempi, verifica tenuta 
+
+4.2 Attenzione alle Guarnizioni
+
+Usa sempre guarnizioni nuove.
+Le vecchie si deformano e perdono.
+Costa pochi euro, risparmia richiami. 
+
+# MODULO 5: CASI REALI (6 minuti)
+
+Caso 1: Lo Scambiatore Forato
+
+Cliente: acqua sanitaria tiepida.
+Ma anche: pressione riscaldamento che calava. 
+
+I due circuiti comunicavano.
+Foro interno tra primario e secondario.
+Acqua della rete entrava nel riscaldamento. 
+
+Soluzione: sostituzione immediata. 
+
+Caso 2: Il Calcare Totale
+
+Scambiatore di 10 anni.
+Portata sanitaria: 2 l/min invece di 10. 
+
+Lavaggio chimico: quasi nessun miglioramento.
+Canali completamente chiusi. 
+
+Soluzione: sostituzione. 
+
+Caso 3: La Valvola che Non Deviava
+
+Cliente: niente acqua calda.
+Caldaia funziona in riscaldamento. 
+
+Scambiatore secondario: freddo quando apri rubinetto.
+La valvola tre vie non commutava. 
+
+Soluzione: riparazione valvola tre vie. Scambiatore perfetto. 
+
+# CHIUSURA (2 minuti)
+
+Ricapitolando. 
+
+Lo scambiatore secondario è sensibile al calcare.
+Il lavaggio chimico spesso risolve.
+Ma verifica prima la valvola tre vie. 
+
+Il test portata è la diagnosi più semplice.
+Meno della metà del normale = problema. 
+
+Nel prossimo video: valvole di sicurezza e bypass.
+Componenti piccoli ma essenziali. 
+
+Grazie per la fiducia.
+Ci vediamo al prossimo video. 
+
+FINE SCRIPT PARTE 2
+
+Durata stimata: 45 minuti
+Parole totali: ~5850

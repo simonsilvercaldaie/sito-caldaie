@@ -1,0 +1,122 @@
+﻿[0:00-0:30] HOOK + INTRO
+
+Ciao tecnici. 
+
+La caldaia non parte.
+Il display dice: errore ventilatore o errore tiraggio. 
+
+Eppure senti che il ventilatore gira.
+O almeno... sembra che giri. 
+
+E allora cos'è? Ventilatore o pressostato? 
+
+Sono Simone, tecnico caldaista.
+E questa è la Parte 1 su ventilatore e pressostato. 
+
+[0:30-1:30] COSA VEDRAI
+
+In questo video imparerai:
+
+Primo: cos'è il ventilatore e qual è il suo ruolo.
+Secondo: cos'è il pressostato fumi e come funziona.
+Terzo: i sintomi classici di guasto. 
+Quarto: come capire se è uno o l'altro.
+
+Nella Parte 2, i test elettrici completi
+e le procedure di sostituzione. 
+
+Iniziamo. 
+
+[1:30-4:00] COS'È IL VENTILATORE
+
+Il ventilatore è il polmone della caldaia. 
+
+Crea il tiraggio necessario per la combustione.
+Aspira aria dall'esterno.
+E spinge i fumi nel camino. 
+
+Senza ventilatore: niente tiraggio, niente fiamma.
+La caldaia non può accendersi. 
+
+Nelle caldaie a condensazione il ventilatore è fondamentale.
+Crea la giusta miscela aria-gas. 
+
+[4:00-6:00] COS'È IL PRESSOSTATO FUMI
+
+Il pressostato fumi è un sensore di sicurezza. 
+
+Rileva se c'è tiraggio sufficiente.
+Se il tiraggio è ok, chiude un contatto.
+E la caldaia può accendersi. 
+
+Se il tiraggio è insufficiente...
+il pressostato resta aperto.
+E la caldaia non parte. Per sicurezza. 
+
+È una protezione contro i fumi che tornano in casa. 
+
+[6:00-9:00] SINTOMI DI GUASTO
+
+Sintomo numero uno: errore tiraggio. 
+
+Display: mancanza tiraggio, errore fumi, errore pressostato.
+La caldaia non si accende nemmeno. 
+
+Sintomo numero due: ventilatore rumoroso. 
+
+Rumori meccanici, vibrazioni, ronzii anomali.
+Il ventilatore sta soffrendo. 
+
+Sintomo numero tre: accensione intermittente. 
+
+A volte parte, a volte no.
+Il pressostato fa contatto sporadicamente. 
+
+[9:00-11:00] VENTILATORE O PRESSOSTATO?
+
+Come capire quale è guasto? 
+
+Test veloce numero uno: il ventilatore gira? 
+Avvicina l'orecchio. Deve girare forte.
+Se è fermo o gira piano: problema ventilatore. 
+
+Test veloce numero due: senti il click del pressostato? 
+Quando il ventilatore raggiunge velocità, click.
+Se non senti click: pressostato o tubicini ostruiti. 
+
+Test veloce numero tre: controlla i tubicini. 
+Spesso sono solo sporchi o scollegati.
+Soffia dentro: devono essere liberi. 
+
+[11:00-12:30] CONSEGUENZE
+
+Se ignori il problema: niente riscaldamento.
+Il cliente resta al freddo. 
+
+Un ventilatore costa 80-150 euro.
+Un pressostato costa 30-50 euro.
+Ma la diagnosi sbagliata costa di più. 
+
+[12:30-14:00] CLIFFHANGER + CTA
+
+Ricapitolando. 
+
+Il ventilatore crea il tiraggio.
+Il pressostato verifica che ci sia.
+Lavorano insieme. 
+
+In questo video ti ho spiegato il cosa. 
+
+Nella Parte 2 su simonsilvercaldaie.it
+ti mostro il come: test elettrici, misurazioni, sostituzioni. 
+
+Link in descrizione.
+Metti like e iscriviti. 
+
+Alla prossima, tecnici.
+
+FINE SCRIPT PARTE 1
+
+Durata stimata: 12-14 minuti
+Parole totali: ~1700
+Piattaforma: YouTube + sito (gratuito)

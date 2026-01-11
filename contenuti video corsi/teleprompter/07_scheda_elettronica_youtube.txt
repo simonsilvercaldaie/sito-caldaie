@@ -1,0 +1,176 @@
+﻿[0:00-0:45] HOOK + INTRO
+
+Ciao tecnici. 
+
+La caldaia mostra un errore.
+Un codice sul display.
+F28, 501, E02... qualcosa del genere. 
+
+E la prima cosa che pensi è:
+"Sarà la scheda." 
+
+Ma lo sai che la scheda è raramente guasta?
+Nell'80% dei casi, la scheda sta solo segnalando
+un problema altrove. 
+
+Sono Simone, tecnico caldaista.
+E questa è la Parte 1 sulla scheda elettronica. 
+
+[0:45-2:00] COSA VEDRAI
+
+In questo video imparerai:
+
+Primo: cos'è la scheda elettronica e che ruolo ha. 
+
+Secondo: gli input e output che gestisce. 
+
+Terzo: come interpretare i codici errore. 
+
+Quarto: quando la scheda è davvero guasta. 
+
+Quinto: i controlli da fare prima di sostituirla. 
+
+Nella Parte 2 sul mio sito, vedrai diagnosi avanzata,
+test dei relè, verifica sensori,
+e casi reali dove sembrava la scheda... e non lo era. 
+
+Iniziamo. 
+
+[2:00-4:30] COS'È LA SCHEDA ELETTRONICA
+
+La scheda elettronica è il cervello della caldaia.
+Controlla tutto. 
+
+Input (cosa riceve): 
+- Richiesta dal termostato ambiente
+- Temperature dalle sonde (mandata, ritorno, sanitario)
+- Segnale dal pressostato aria
+- Corrente di ionizzazione (fiamma presente)
+- Flussostato (acqua sanitaria in movimento)
+- Pressione impianto 
+
+Output (cosa comanda): 
+- Ventilatore
+- Valvola gas
+- Circolatore
+- Valvola tre vie
+- Display e LED 
+
+La scheda legge gli input, elabora, e attiva gli output.
+Se qualcosa non torna... si blocca e mostra un errore. 
+
+[4:30-7:00] TIPI DI SCHEDE
+
+Schede analogiche (vecchia generazione): 
+
+Circuiti discreti con transistor e relè.
+Meno funzioni, più semplici.
+Facili da riparare... una volta.
+Oggi obsolete. 
+
+Schede digitali con microprocessore: 
+
+La maggior parte delle caldaie attuali.
+Microcontrollore + display.
+Menù di configurazione e diagnostica.
+Codici errore dettagliati. 
+
+Schede con comunicazione BUS: 
+
+Comunicano con termostati intelligenti.
+Protocolli: eBUS (Vaillant), OpenTherm, Modbus.
+Diagnosi remota, integrazione domotica. 
+
+[7:00-9:30] INTERPRETARE I CODICI ERRORE
+
+Il codice errore è il primo indizio. 
+
+Ma attenzione: il codice indica il sintomo, non la causa. 
+
+Esempi: 
+
+F28 (Vaillant): mancata accensione.
+Non significa scheda guasta.
+Può essere: valvola gas, elettrodo, pressostato, gas mancante. 
+
+501 (Ariston): mancata ionizzazione.
+Può essere: elettrodo sporco, bruciatore sporco, posizione errata. 
+
+E01 (Beretta): mancanza fiamma.
+Stessa logica: guarda prima i componenti. 
+
+La scheda segnala.
+Il problema è altrove nell'80% dei casi. 
+
+[9:30-11:30] QUANDO LA SCHEDA È DAVVERO GUASTA
+
+Segni che la scheda è davvero il problema: 
+
+Numero uno: componenti visibilmente bruciati.
+Macchie nere, condensatori gonfi, tracce carbonizzate.
+Danno fisico evidente. 
+
+Numero due: display completamente spento.
+Nessun segno di vita.
+Verifica prima l'alimentazione! 
+
+Numero tre: uscite non funzionanti.
+Hai tensione di comando ma il relè non scatta.
+Oppure il relè scatta ma non c'è tensione in uscita. 
+
+Numero quattro: errori casuali senza senso.
+La caldaia va in errore per motivi assurdi.
+Comportamento irrazionale. 
+
+[11:30-13:00] CONTROLLI PRIMA DI SOSTITUIRE
+
+Prima di ordinare una scheda da 200-400 euro... 
+
+Controllo uno: alimentazione. 
+La scheda riceve 230V? 
+
+Controllo due: fusibili. 
+Sulla scheda ci sono quasi sempre dei fusibili.
+Controllali con il multimetro. 
+
+Controllo tre: connettori. 
+Tutti i connettori sono inseriti bene?
+Ossidazione? Contatti sporchi? 
+
+Controllo quattro: il componente segnalato dall'errore. 
+L'errore dice "pressostato"?
+Controlla PRIMA il pressostato. 
+
+Ho visto tecnici cambiare tre schede...
+prima di scoprire che il problema era un filo staccato. 
+
+[13:00-15:00] CLIFFHANGER + CTA
+
+Ricapitolando. 
+
+La scheda elettronica è il cervello della caldaia.
+Gestisce input e output.
+I codici errore indicano sintomi, non cause. 
+
+La scheda è guasta solo se:
+- Componenti visibilmente bruciati
+- Nessun segno di vita (dopo verifica alimentazione)
+- Relè o uscite non funzionanti
+- Comportamento irrazionale 
+
+Prima di sostituire: alimentazione, fusibili, connettori, componenti. 
+
+Nella Parte 2 su simonsilvercaldaie.it vedrai:
+- Test dei relè con multimetro
+- Verifica delle uscite
+- Diagnosi sensori guasti
+- Tre casi "sembrava la scheda" 
+
+Il link è in descrizione. 
+
+Alla prossima, tecnici.
+
+FINE SCRIPT PARTE 1
+
+Durata stimata: 15 minuti
+Parole totali: ~1950

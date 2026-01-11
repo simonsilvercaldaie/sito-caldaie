@@ -1,0 +1,339 @@
+﻿# INTRO (2 minuti)
+
+Bentornato. 
+
+Questa è la Parte 2 sul circolatore.
+Il video completo per tecnici professionisti. 
+
+Se hai visto la Parte 1 su YouTube...
+sai già cos'è un circolatore, i sintomi base,
+e il trucco dello sblocco manuale. 
+
+Ora andiamo in profondità. 
+
+In questo video vedrai:
+- Come testare elettricamente il circolatore
+- Diagnosi completa del segnale PWM
+- Procedura di sostituzione passo-passo
+- Sfogo aria e spurgo corretto
+- E tre casi reali dal campo 
+
+Prendi gli appunti.
+Queste sono cose che non trovi nei manuali. 
+
+# MODULO 1: TEORIA AVANZATA (10 minuti)
+
+1.1 Tipologie di Circolatori
+
+Esistono due categorie principali:
+
+Circolatori a velocità fissa: 
+Tre velocità selezionabili.
+Uno, due, tre... e basta.
+Li trovi nelle caldaie vecchie, pre-2010. 
+
+Circolatori modulanti: 
+Velocità variabile continua.
+Controllati dalla scheda elettronica via PWM.
+Standard nelle caldaie moderne. 
+
+La differenza è fondamentale per la diagnosi. 
+
+Un circolatore a velocità fissa:
+o gira o non gira. Diagnosi semplice. 
+
+Un circolatore modulante:
+può non ricevere il segnale PWM.
+Può riceverlo sbagliato.
+Può girare ma non alla velocità giusta. 
+
+1.2 Il Segnale PWM
+
+PWM significa Pulse Width Modulation. 
+
+La scheda manda un segnale che alterna ON e OFF.
+La percentuale di tempo ON determina la velocità. 
+
+Duty cycle 100%: massima velocità.
+Duty cycle 50%: metà velocità.
+Duty cycle 0%: circolatore fermo. 
+
+Perché è importante? 
+
+Perché se il circolatore non gira...
+potrebbe essere colpa della scheda, non del circolatore. 
+
+E se cambi il circolatore senza testare il PWM...
+spendi 150 euro per niente. 
+
+1.3 Specifiche Elettriche per Marca
+
+Valori tipici:
+
+ Modello comune  Tipo PWM |
+--|
+ Para 25/6  0-10V |
+ UPM3  onda quadra |
+ Evosta  0-10V |
+ interno  proprietario |
+ interno  0-10V |
+
+Questi valori ti servono per la diagnosi. 
+
+# MODULO 2: DIAGNOSI COMPLETA (15 minuti)
+
+2.1 Strumenti Necessari
+
+Per una diagnosi professionale:
+
+Numero uno: Multimetro digitale.
+Per misurare tensione e continuità. 
+
+Numero due: Pinza amperometrica.
+Per misurare l'assorbimento. 
+
+Numero tre: Cacciavite a taglio grande.
+Per lo sblocco manuale. 
+
+2.2 Test 1: Verifica Alimentazione
+
+Prima cosa: il circolatore riceve corrente? 
+
+Togli il connettore dal circolatore.
+Metti il multimetro su AC Volt.
+Misura tra i due poli di alimentazione. 
+
+Con caldaia in richiesta riscaldamento:
+Devi leggere 230V AC circa. 
+
+Se leggi 0V:
+- La scheda non sta alimentando
+- Controlla i fusibili sulla scheda
+- Controlla il relè del circolatore 
+
+Se leggi 230V ma il circolatore non gira:
+il problema è nel circolatore stesso. 
+
+2.3 Test 2: Misura Assorbimento
+
+Se il circolatore parte... misura quanto assorbe. 
+
+Metti la pinza amperometrica sul filo di fase.
+Solo uno dei due fili, non entrambi insieme. 
+
+Valori normali:
+- A regime: 0.1-0.4 Ampere
+- In spunto: fino a 1 Ampere per un secondo 
+
+Valori anomali:
+- Sempre sopra 0.5A: cuscinetto duro
+- Zero: non gira o girante libera sull'albero
+- Oscillante: problema elettrico interno 
+
+2.4 Test 3: Verifica Segnale PWM
+
+Per circolatori modulanti. 
+
+Trovi il connettore del segnale PWM.
+Di solito un filo separato, spesso blu o grigio. 
+
+Con il multimetro su DC Volt:
+misura tra il filo PWM e il neutro. 
+
+Richiesta minima: circa 1-2V
+Richiesta massima: circa 8-10V 
+
+Se il segnale non varia:
+problema sulla scheda elettronica. 
+
+Se il segnale è sempre 0V:
+nessun comando dalla scheda. 
+
+2.5 Test 4: Verifica Circolazione Effettiva
+
+Il circolatore gira... ma l'acqua circola? 
+
+Misura la temperatura dell'acqua:
+- Sul tubo di mandata: uscita caldaia
+- Sul tubo di ritorno: ingresso caldaia 
+
+Differenza normale: 15-20 gradi.
+Esempio: mandata 60°C, ritorno 42°C. 
+
+Se la differenza è troppo alta (oltre 25°C):
+il circolatore gira piano o c'è un'ostruzione. 
+
+Se la differenza è quasi zero:
+il circolatore non sta spingendo. 
+
+2.6 Codici Errore Correlati
+
+Errori comuni legati al circolatore:
+
+Vaillant F20/F28: temperatura di mandata troppo alta
+Ariston 501: mancanza circolazione acqua
+Immergas: surriscaldamento primario
+Beretta errore 30: flusso acqua insufficiente 
+
+Quando vedi "surriscaldamento"...
+pensa sempre al circolatore. 
+
+# MODULO 3: SOSTITUZIONE E SPURGO (12 minuti)
+
+3.1 Quando Sostituire
+
+Sostituire se:
+- Bloccato meccanicamente e non si libera
+- Cuscinetti rumorosi dopo lubrificazione
+- Assorbimento anomalo persistente
+- Visibilmente corroso o perdite 
+
+Riparare/pulire se:
+- Solo bloccato da fermo estivo
+- Aria intrappolata
+- Connettore ossidato 
+
+3.2 Procedura Sostituzione
+
+Passo 1: Togli corrente e chiudi il gas. 
+
+Passo 2: Chiudi i rubinetti di intercettazione.
+Se non ci sono, scarica tutto l'impianto. 
+
+Passo 3: Scarica la pressione.
+Apri uno scarico sotto la caldaia. 
+
+Passo 4: Scollega l'elettrico.
+Connettore alimentazione e PWM. 
+
+Passo 5: Svita il circolatore.
+Due dadi o due viti. Attenzione alle guarnizioni. 
+
+Passo 6: Monta il nuovo.
+Usa guarnizioni nuove. Stringi a croce. 
+
+Passo 7: Ricolega l'elettrico.
+Controlla polarità se indicata. 
+
+Passo 8: Riempi e sfoga. 
+
+3.3 Sfogo Aria dal Circolatore
+
+Molti circolatori hanno una vite di spurgo. 
+
+Procedura:
+1. Riempi l'impianto lentamente
+2. Porta la pressione a 1.5 bar
+3. Allenta la vite di spurgo
+4. Aspetta che esca prima aria, poi acqua
+5. Richiudi 
+
+Se non sfoghi il circolatore...
+sentirai ronzii e vibrazioni.
+A volte non parte proprio. 
+
+3.4 Spurgo Completo Impianto
+
+Ordine corretto:
+1. Radiatori al piano terra, dal più lontano
+2. Poi primo piano
+3. Infine sfogo caldaia 
+
+Durante lo spurgo:
+tieni il circolatore spento o al minimo.
+Così l'aria sale meglio. 
+
+# MODULO 4: CASI REALI DAL CAMPO (8 minuti)
+
+Caso 1: Il Circolatore che Girava a Vuoto
+
+Cliente: radiatori freddi, caldaia che parte. 
+
+Controllo il circolatore: assorbe corrente.
+Lo sento ronzare. Sembra che giri. 
+
+Ma l'acqua non circola.
+Differenza mandata/ritorno quasi zero. 
+
+Apro il circolatore: la girante si era staccata dall'albero.
+Il motore girava... ma la girante no. 
+
+Lezione: non fidarti solo del rumore.
+Verifica la circolazione effettiva. 
+
+Caso 2: Il Segnale PWM Mancante
+
+Caldaia nuova, pochi mesi.
+I radiatori non si scaldano bene. 
+
+Il circolatore gira, ma sempre al minimo. 
+
+Controllo il segnale PWM: zero volt. 
+
+La scheda non stava comandando la modulazione.
+Cambio la scheda. Problema risolto. 
+
+Lezione: sempre testare il segnale PWM
+prima di condannare il circolatore. 
+
+Caso 3: L'Aria che Tornava Sempre
+
+Cliente: rumori nei radiatori dopo ogni accensione.
+Ha già spurgato dieci volte. 
+
+Controllo circolatore e vaso: perfetti. 
+
+Lo sfogo automatico era incrostato.
+Non chiudeva bene.
+Ad ogni fermata, aspirava aria. 
+
+Sostituisco lo sfogo. Fine dei problemi. 
+
+Lezione: a volte il problema non è dove pensi. 
+
+# CHIUSURA (3 minuti)
+
+Ricapitolando. 
+
+Il circolatore è il cuore dell'impianto.
+Senza circolazione, niente riscaldamento. 
+
+I quattro test fondamentali:
+1. Verifica alimentazione 230V
+2. Misura assorbimento con pinza
+3. Verifica segnale PWM
+4. Controllo circolazione effettiva 
+
+Quando sostituire:
+- Cuscinetti rumorosi
+- Bloccato meccanicamente
+- Se il PWM manca: è la scheda, non il circolatore 
+
+Lo sfogo aria dopo la sostituzione è fondamentale. 
+
+Hai domande?
+Scrivimi a info@simonsilvercaldaie.it. 
+
+Nel prossimo video tecnico:
+la valvola gas. 
+
+Grazie per la fiducia.
+Ci vediamo al prossimo video. 
+
+PDF Checklist Diagnosi Circolatore
+- [ ] Alimentazione 230V presente
+- [ ] Circolatore gira (rumore/vibrazione)
+- [ ] Assorbimento normale (0.1-0.4A)
+- [ ] Segnale PWM presente e variabile
+- [ ] Circolazione effettiva (delta T corretto)
+- [ ] Aria spurgata
+
+Tabella Valori PWM per Marca
+(Tensioni tipiche per schede comuni)
+
+FINE SCRIPT PARTE 2
+
+Durata stimata: 40-45 minuti
+Parole totali: ~5000
+Velocità lettura: 120 parole/min
+Piattaforma: Solo sito simonsilvercaldaie.it (a pagamento)

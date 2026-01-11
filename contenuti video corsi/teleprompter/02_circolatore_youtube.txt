@@ -1,0 +1,317 @@
+﻿[0:00-0:45] HOOK + INTRO
+
+Ciao tecnici. 
+
+Radiatori freddi.
+La caldaia parte, il bruciatore si accende, la fiamma c'è...
+ma il calore non arriva ai termosifoni. 
+
+Il cliente ti dice: "eppure la caldaia funziona". 
+
+E tu già sai cosa controllare.
+Il circolatore. 
+
+Ma sai davvero come funziona?
+Sai riconoscere un circolatore PWM da uno tradizionale?
+Sai cosa fare quando il segnale dalla scheda non arriva? 
+
+Sono Simone, tecnico caldaista da oltre vent'anni.
+E questa è la Parte 1 sul circolatore. 
+
+In questo video ti spiego tutto quello che devi sapere
+per diagnosticare e sbloccare un circolatore
+senza perdere tempo. 
+
+[0:45-2:00] COSA VEDRAI IN QUESTO VIDEO
+
+In questo video imparerai:
+
+Primo: cos'è il circolatore e qual è il suo ruolo
+nel sistema di riscaldamento. 
+
+Secondo: come funziona tecnicamente
+e perché si blocca. 
+
+Terzo: l'evoluzione tecnologica dei circolatori
+dalle pompe anni 80 ai moderni PWM modulanti. 
+
+Quarto: i sintomi classici di un circolatore guasto
+e come riconoscerli immediatamente. 
+
+Quinto: il famoso trucco dello sblocco
+che può salvarti un intervento. 
+
+E alla fine... quando lo sblocco non funziona
+e il circolatore va sostituito. 
+
+Nella Parte 2, disponibile sul mio sito,
+ti mostrerò la diagnosi elettrica completa,
+il test del segnale PWM,
+la sostituzione passo-passo,
+e casi reali dal campo. 
+
+Iniziamo. 
+
+[2:00-4:30] COS'È IL CIRCOLATORE
+
+Il circolatore è una pompa elettrica.
+È il cuore dell'impianto di riscaldamento. 
+
+Sta dentro la caldaia, di solito nella parte bassa.
+Quella cosa tonda con il motore elettrico attaccato. 
+
+Ed ha un compito fondamentale:
+far circolare l'acqua nell'impianto. 
+
+Pensa a questo. 
+
+Lo scambiatore scalda l'acqua.
+Ma l'acqua calda deve arrivare ai radiatori.
+E poi tornare indietro per riscaldarsi. 
+
+Chi la spinge? 
+
+Il circolatore. 
+
+Senza circolatore...
+la caldaia scalda, e scalda, e scalda.
+Ma il calore resta lì, concentrato nello scambiatore.
+I radiatori restano freddi. 
+
+È come avere il cuore fermo.
+Il sangue c'è... ma non circola.
+Gli organi non ricevono ossigeno. 
+
+Lo stesso vale per l'impianto.
+L'acqua calda c'è... ma non si muove.
+I radiatori non ricevono calore. 
+
+[4:30-7:00] L'EVOLUZIONE DEI CIRCOLATORI
+
+I circolatori non sono tutti uguali.
+Sono cambiati tantissimo negli ultimi 30 anni. 
+
+Generazione 1: Velocità fissa (anni 80-90) 
+
+I vecchi circolatori avevano tre velocità.
+Uno, due, tre. E basta.
+Un selettore manuale sul motore. 
+
+Funzionavano sempre alla stessa velocità.
+Consumavano tanto.
+Ma erano robusti e semplici. 
+
+Li trovi ancora nelle caldaie di 20+ anni.
+Marca tipica: Grundfos UPS, Wilo RS. 
+
+Generazione 2: Alta efficienza (anni 2000-2010) 
+
+L'Europa ha imposto circolatori più efficienti.
+Classe energetica A invece di D.
+Motori a magneti permanenti. 
+
+Consumo ridotto dell'80%.
+Ma ancora con poche opzioni di controllo. 
+
+Generazione 3: PWM modulanti (2010-oggi) 
+
+I circolatori moderni sono totalmente controllati dalla scheda.
+La scheda manda un segnale PWM.
+Pulse Width Modulation. 
+
+Il circolatore gira esattamente alla velocità richiesta.
+Più la caldaia modula, più il circolatore modula.
+Massima efficienza. 
+
+Marche tipiche: Grundfos ALPHA, Wilo Para, DAB Evosta. 
+
+Attenzione però. 
+
+Con i circolatori PWM...
+se la scheda non manda il segnale...
+il circolatore non gira.
+Anche se è perfettamente funzionante. 
+
+[7:00-9:30] SINTOMI DI UN CIRCOLATORE GUASTO
+
+Vediamo i sintomi classici. 
+
+Sintomo numero uno: radiatori freddi con caldaia accesa. 
+
+La caldaia parte.
+Senti il bruciatore che va.
+Ma i radiatori non si scaldano. 
+
+Prima di pensare a valvole termostatiche o aria...
+controlla se il circolatore gira. 
+
+Sintomo numero due: rumori strani dalla caldaia. 
+
+Ronzii metallici.
+Vibrazioni anomale.
+Ticchettii ritmici. 
+
+Il circolatore che soffre fa rumore. 
+
+A volte è aria bloccata dentro.
+A volte è la girante che sfrega contro il corpo.
+A volte è il cuscinetto usurato. 
+
+Un circolatore sano quasi non lo senti.
+Se fa rumore... c'è un problema. 
+
+Sintomo numero tre: caldaia che va in blocco per surriscaldamento. 
+
+Errore tipico su tutte le marche:
+surriscaldamento o sovratemperatura. 
+
+Perché? 
+
+Perché l'acqua non circola.
+Il calore resta concentrato nello scambiatore.
+La sonda rileva temperature fuori scala.
+E la caldaia si blocca per protezione. 
+
+Questo è un errore grave.
+Se ignori il problema, rischi di bruciare lo scambiatore. 
+
+[9:30-11:30] IL TRUCCO DELLO SBLOCCO
+
+Prima di cambiare il circolatore...
+prova questo trucco. 
+
+Dopo mesi di fermo estivo...
+succede spesso che la girante si blocchi. 
+
+Il calcare, le impurità, l'ossido...
+si depositano sull'albero e lo incollano.
+Il motore prova a partire... ma non riesce a girare. 
+
+Sulla parte frontale del circolatore
+c'è spesso una vite centrale.
+Di solito a taglio grande. 
+
+Procedura di sblocco: 
+
+Passo 1: Togli corrente alla caldaia. Sicurezza prima di tutto. 
+
+Passo 2: Togli la vite centrale con un cacciavite a taglio. 
+
+Passo 3: Infila un cacciavite nell'alberino.
+Ruota manualmente l'albero.
+Destra e sinistra, avanti e indietro. 
+
+Passo 4: Se senti resistenza e poi si libera...
+hai sbloccato la girante. 
+
+Rimonta la vite.
+Riaccendi la caldaia.
+E verifica che il circolatore parta. 
+
+Nel 70% dei casi dopo il fermo estivo...
+questo trucco funziona. 
+
+Attenzione però. 
+
+Se si blocca una volta... si bloccherà ancora.
+È un intervento temporaneo.
+Avvisa il cliente che il ricambio potrebbe servire presto. 
+
+[11:30-13:00] QUANDO LO SBLOCCO NON BASTA
+
+Quando lo sblocco manuale non funziona? 
+
+Caso numero uno: l'albero non gira neanche manualmente.
+Il cuscinetto è gripato.
+Niente da fare. Va sostituito. 
+
+Caso numero due: l'albero gira ma il motore non parte.
+Problema elettrico.
+Bobina bruciata o condensatore guasto. 
+
+Caso numero tre: il circolatore ronza ma non gira.
+L'avvolgimento è in corto.
+Lo senti vibrare ma non c'è rotazione. 
+
+Caso numero quattro: nei circolatori PWM,
+la scheda non manda il segnale.
+Il circolatore è buono ma non riceve il comando.
+Qui il problema è la scheda, non il circolatore. 
+
+Questo è fondamentale nei circolatori moderni.
+Prima di cambiare il circolatore...
+verifica che riceva il segnale dalla scheda. 
+
+Altrimenti spendi 150 euro per niente. 
+
+[13:00-13:30] CONSEGUENZE SE IGNORI IL PROBLEMA
+
+Cosa succede se ignori il problema? 
+
+Primo: blocchi ripetuti.
+Il cliente ti chiama ogni settimana.
+Pessima reputazione. 
+
+Secondo: surriscaldamento dello scambiatore.
+Se l'acqua non circola, il calore si concentra.
+Lo scambiatore si danneggia. 
+
+Un circolatore costa 80-150 euro.
+Uno scambiatore costa 300-500 euro. 
+
+Meglio cambiare il circolatore in tempo. 
+
+[13:30-15:00] CLIFFHANGER + CTA
+
+Ricapitolando. 
+
+Il circolatore è il cuore dell'impianto.
+Spinge l'acqua calda nei radiatori. 
+
+I sintomi classici sono:
+- Radiatori freddi con caldaia accesa
+- Rumori strani, ronzii, vibrazioni
+- Blocchi per surriscaldamento 
+
+Il trucco dello sblocco manuale
+può salvarti un intervento.
+Ma è temporaneo. 
+
+In questo video ti ho spiegato il cosa e il perché. 
+
+Nella Parte 2 su simonsilvercaldaie.it
+ti mostro il come. 
+
+Ecco cosa troverai:
+
+La diagnosi elettrica completa con multimetro.
+Come testare alimentazione e assorbimento. 
+
+Il test del segnale PWM per circolatori modulanti.
+Come capire se il problema è il circolatore o la scheda. 
+
+La procedura di sostituzione passo-passo.
+Svuotamento, scollegamento, montaggio del nuovo. 
+
+Lo spurgo aria corretto dopo la sostituzione.
+Perché senza spurgo il nuovo circolatore fa rumore. 
+
+I valori specifici per Grundfos, Wilo, DAB
+e circolatori OEM delle marche più diffuse. 
+
+Quattro casi reali completi dal campo. 
+
+Il link è in descrizione. 
+
+Se il video ti è stato utile...
+metti like e iscriviti.
+Ogni settimana un componente diverso. 
+
+Alla prossima, tecnici.
+
+FINE SCRIPT PARTE 1
+
+Durata stimata: 15 minuti
+Parole totali: ~1950
+Velocità lettura: 130 parole/min
+Piattaforma: YouTube + Embed su sito (gratuito)

@@ -105,6 +105,45 @@ export default function DashboardPage() {
                         <p className="text-3xl font-bold text-gray-800">{stats.count}</p>
                         <p className="text-sm text-gray-500">Video pronti da guardare</p>
                     </div>
+
+                    {/* Bundle Progress Card */}
+                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <div className="flex items-center gap-3 mb-2 text-primary">
+                            <ShoppingBag className="w-6 h-6" />
+                            <h3 className="font-bold">Progresso Libreria</h3>
+                        </div>
+                        {stats.count >= 10 ? (
+                            <div>
+                                <p className="text-xl font-bold text-green-600">Libreria Completa! 🎉</p>
+                                <p className="text-sm text-gray-500">Hai accesso a tutti i 10 corsi</p>
+                            </div>
+                        ) : stats.count >= 5 ? (
+                            <div>
+                                <p className="text-xl font-bold text-gray-800">{stats.count}/10 corsi</p>
+                                <p className="text-sm text-gray-500">
+                                    Ti mancano {10 - stats.count} corsi per completare la libreria
+                                </p>
+                                <p className="text-xs text-green-600 mt-1">
+                                    Con il prossimo acquisto paghi max €298 totali
+                                </p>
+                            </div>
+                        ) : (
+                            <div>
+                                <p className="text-xl font-bold text-gray-800">{stats.count}/5 corsi</p>
+                                <p className="text-sm text-gray-500">
+                                    {stats.count > 0
+                                        ? `Ti mancano ${5 - stats.count} corsi per il bundle da 5`
+                                        : 'Inizia la tua libreria professionale'
+                                    }
+                                </p>
+                                {stats.count >= 3 && (
+                                    <p className="text-xs text-green-600 mt-1">
+                                        Con il prossimo acquisto paghi max €149 per 5 corsi!
+                                    </p>
+                                )}
+                            </div>
+                        )}
+                    </div>
                 </div>
 
                 <div className="space-y-6">
