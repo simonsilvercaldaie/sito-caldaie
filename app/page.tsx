@@ -35,12 +35,14 @@ export default function Home() {
                         </div>
                     </div>
 
-                    <div className="mt-16 relative w-full max-w-4xl aspect-video bg-primary rounded-2xl shadow-2xl flex items-center justify-center overflow-hidden border-4 border-white/50 ring-1 ring-gray-200">
-                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1581094794329-c8112a89af12?q=80&w=2532&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
-                        <div className="text-center z-10 p-6">
-                            <PlayCircle className="w-20 h-20 text-white/80 mx-auto mb-4" />
-                            <p className="text-white text-lg font-medium">Video Analisi Tecnica: Diagnostica Avanzata</p>
-                        </div>
+                    <div className="mt-16 w-full max-w-4xl aspect-video bg-black rounded-2xl shadow-2xl overflow-hidden border-4 border-white/20 ring-1 ring-gray-900/10">
+                        <iframe
+                            className="w-full h-full"
+                            src="https://www.youtube.com/embed/3B3go9raH38?rel=0"
+                            title="Presentazione Simon Silver Caldaie"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        />
                     </div>
                 </section>
 
