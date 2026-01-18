@@ -83,13 +83,25 @@ export default function LivelloPage() {
                                 className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 group flex flex-col h-full"
                             >
                                 <div className="relative aspect-video bg-slate-100">
-                                    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 group-hover:from-primary group-hover:to-slate-800 transition-colors duration-500">
-                                        <PlayCircle className="w-12 h-12 text-white/50 group-hover:text-white group-hover:scale-110 transition-all duration-300" />
-                                    </div>
+                                    {course.coverImage ? (
+                                        <div className="absolute inset-0 group-hover:scale-105 transition-transform duration-700">
+                                            <img
+                                                src={course.coverImage}
+                                                alt={course.title}
+                                                className="w-full h-full object-cover"
+                                            />
+                                            {/* Overlay gradiente per leggibilità badge se serve */}
+                                            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/80 to-transparent"></div>
+                                        </div>
+                                    ) : (
+                                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 group-hover:from-primary group-hover:to-slate-800 transition-colors duration-500">
+                                            <PlayCircle className="w-12 h-12 text-white/50 group-hover:text-white group-hover:scale-110 transition-all duration-300" />
+                                        </div>
+                                    )}
 
-                                    {/* Badge Prezzo Rimosso */}
-                                    <div className="absolute bottom-3 left-3 flex gap-2">
-                                        <span className="px-2 py-1 bg-black/50 backdrop-blur-md rounded text-white text-xs font-medium flex items-center gap-1">
+                                    {/* Badge Durata */}
+                                    <div className="absolute bottom-3 left-3 flex gap-2 z-10">
+                                        <span className="px-2 py-1 bg-black/60 backdrop-blur-md rounded text-white text-xs font-medium flex items-center gap-1 border border-white/10">
                                             <MonitorPlay className="w-3 h-3" /> {course.freeDuration}
                                         </span>
                                     </div>

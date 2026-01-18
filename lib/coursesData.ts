@@ -40,7 +40,8 @@ export const courses: Course[] = [
             "Flowchart decisionale universale",
             "Esempi pratici di 'rifiuto' all'avvio"
         ],
-        featured: true
+        featured: true,
+        coverImage: "/images/courses/01-caldaia-decisioni.png"
     },
     {
         id: "02-check-iniziale",
@@ -53,7 +54,8 @@ export const courses: Course[] = [
         level: "Base",
         price: "29.00",
         learnings: ["Osservazione preliminare", "Rumori e odori", "Pressioni e temperature a vista", "Errori da non commettere appena arrivati"],
-        premiumContent: ["Checklist dei 3 minuti da stampare", "Come interrogare il cliente mentre osservi", "Segnali visivi spesso ignorati"]
+        premiumContent: ["Checklist dei 3 minuti da stampare", "Come interrogare il cliente mentre osservi", "Segnali visivi spesso ignorati"],
+        coverImage: "/images/courses/02-check-iniziale.png"
     },
     {
         id: "03-schema-funzionale",
@@ -66,7 +68,8 @@ export const courses: Course[] = [
         level: "Base",
         price: "29.00",
         learnings: ["Schema idraulico vs elettrico", "Seguire il flusso logico", "Individuare il punto di rottura", "Mappa mentale del funzionamento"],
-        premiumContent: ["Analisi schemi reali (Vaillant, Ariston, ecc.)", "Simulazione guasto su carta", "Dal sintomo al blocco nello schema"]
+        premiumContent: ["Analisi schemi reali (Vaillant, Ariston, ecc.)", "Simulazione guasto su carta", "Dal sintomo al blocco nello schema"],
+        coverImage: "/images/courses/03-schema-funzionale.png"
     },
     {
         id: "04-acs-riscaldamento",
@@ -79,7 +82,8 @@ export const courses: Course[] = [
         level: "Base",
         price: "29.00",
         learnings: ["Interazione tra i due circuiti", "Il ruolo della valvola deviatrice", "Scambio termico indesiderato", "Diagnosi differenziale"],
-        premiumContent: ["Test pratici per isolare il circuito", "Problemi di trafilamento", "Caso studio: radiatori caldi in estate"]
+        premiumContent: ["Test pratici per isolare il circuito", "Problemi di trafilamento", "Caso studio: radiatori caldi in estate"],
+        coverImage: "/images/courses/04-acs-riscaldamento.png"
     },
     {
         id: "05-sicurezze",
@@ -92,7 +96,8 @@ export const courses: Course[] = [
         level: "Base",
         price: "29.00",
         learnings: ["Sicurezza sovratemperatura", "Mancanza acqua", "Mancanza tiraggio", "Distinguere guasto sonda da intervento sicurezza"],
-        premiumContent: ["Testare le sicurezze senza rischi", "Bypassare per test (con cautela)", "Gerarchia degli interventi"]
+        premiumContent: ["Testare le sicurezze senza rischi", "Bypassare per test (con cautela)", "Gerarchia degli interventi"],
+        coverImage: "/images/courses/05-sicurezze.png"
     },
     {
         id: "06-falsi-colpevoli",
@@ -105,7 +110,8 @@ export const courses: Course[] = [
         level: "Base",
         price: "29.00",
         learnings: ["La scheda elettronica (l'accusata n.1)", "La valvola gas", "Lo scambiatore", "Come scagionare i componenti innocenti"],
-        premiumContent: ["Statistica reale dei guasti", "Casi in cui sembrava lui ma non era", "Risparmiare ricambi inutili"]
+        premiumContent: ["Statistica reale dei guasti", "Casi in cui sembrava lui ma non era", "Risparmiare ricambi inutili"],
+        coverImage: "/images/courses/06-falsi-colpevoli.png"
     },
     {
         id: "07-manutenzione-vera",
@@ -118,7 +124,8 @@ export const courses: Course[] = [
         level: "Base",
         price: "29.00",
         learnings: ["Pulizia vs Controllo", "Punti critici da verificare sempre", "Prevenzione attiva", "Valore aggiunto per il cliente"],
-        premiumContent: ["Checklist manutenzione 'Premium'", "Pulizia scambiatori condensazione", "Controllo vaso espansione obbligatorio"]
+        premiumContent: ["Checklist manutenzione 'Premium'", "Pulizia scambiatori condensazione", "Controllo vaso espansione obbligatorio"],
+        coverImage: "/images/courses/07-manutenzione-vera.png"
     },
     {
         id: "08-segnali-deboli",
@@ -131,7 +138,8 @@ export const courses: Course[] = [
         level: "Base",
         price: "29.00",
         learnings: ["Ascolto della pompa", "Rumori di ebollizione", "Tempi di accensione ritardati", "Piccole oscillazioni di pressione"],
-        premiumContent: ["Diagnostica acustica", "Interpretare i log (se presenti)", "Prevedere la rottura per fidelizzare il cliente"]
+        premiumContent: ["Diagnostica acustica", "Interpretare i log (se presenti)", "Prevedere la rottura per fidelizzare il cliente"],
+        coverImage: "/images/courses/08-segnali-deboli.png"
     },
     {
         id: "09-quando-non-intervenire",
@@ -144,7 +152,8 @@ export const courses: Course[] = [
         level: "Base",
         price: "29.00",
         learnings: ["Valutazione costi/benefici", "Sicurezza impianto non a norma", "Caldaie a fine vita", "Etica professionale"],
-        premiumContent: ["Come dire di no al cliente", "Responsabilità legale", "Proporre la sostituzione in modo etico"]
+        premiumContent: ["Come dire di no al cliente", "Responsabilità legale", "Proporre la sostituzione in modo etico"],
+        coverImage: "/images/courses/09-quando-non-intervenire.png"
     },
 
     // --- LIVELLO INTERMEDIO (9 Video) ---
