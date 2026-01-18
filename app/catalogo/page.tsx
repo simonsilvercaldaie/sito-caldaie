@@ -18,101 +18,94 @@ export default function CatalogoPage() {
         "Avanzato": "bg-red-100 text-red-800 border-red-200"
     }
 
-    const CourseGrid = ({ title, description, level, items }: { title: string, description: string, level: string, items: typeof courses }) => (
-        <section className="mb-20 last:mb-0">
-            <div className="flex flex-col md:flex-row md:items-center gap-4 mb-8 border-b pb-4">
-                <div className={`px-4 py-2 rounded-lg font-bold text-sm uppercase tracking-wider border w-fit ${levelColors[level]}`}>
-                    {level}
+    const LevelCard = ({ title, description, level, link, colorClass, icon }: { title: string, description: string, level: string, link: string, colorClass: string, icon: any }) => (
+        <Link href={link} className="block group">
+            <div className={`rounded-3xl p-8 border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 h-full flex flex-col ${colorClass} bg-white hover:bg-gray-50`}>
+                <div className="flex items-center justify-between mb-6">
+                    <span className="px-4 py-2 rounded-full font-bold text-sm uppercase tracking-wider bg-white border shadow-sm">
+                        {level}
+                    </span>
+                    <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                        {icon}
+                    </div>
                 </div>
-                <div>
-                    <h2 className="text-3xl font-bold text-gray-900">{title}</h2>
-                    <p className="text-gray-500 mt-1">{description}</p>
+
+                <h2 className="text-3xl font-extrabold text-gray-900 mb-4 group-hover:text-primary transition-colors">
+                    {title}
+                </h2>
+                <p className="text-gray-600 text-lg mb-8 leading-relaxed flex-grow">
+                    {description}
+                </p>
+
+                <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
+                    <span className="font-bold text-gray-900 flex items-center gap-2">
+                        Esplora i 9 Corsi
+                    </span>
+                    <span className="text-xl group-hover:translate-x-2 transition-transform">→</span>
                 </div>
             </div>
-
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {items.map((course) => (
-                    <Link
-                        key={course.id}
-                        href={`/corso/${course.id}`}
-                        className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-gray-100 group flex flex-col h-full"
-                    >
-                        <div className="relative aspect-video bg-slate-100">
-                            {/* Placeholder o Immagine */}
-                            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 group-hover:from-primary group-hover:to-slate-800 transition-colors duration-500">
-                                <PlayCircle className="w-12 h-12 text-white/50 group-hover:text-white group-hover:scale-110 transition-all duration-300" />
-                            </div>
-
-                            <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-primary font-bold px-3 py-1 rounded-lg text-sm shadow-sm">
-                                € {course.price}
-                            </div>
-                            <div className="absolute bottom-3 left-3 flex gap-2">
-                                <span className="px-2 py-1 bg-black/50 backdrop-blur-md rounded text-white text-xs font-medium flex items-center gap-1">
-                                    <MonitorPlay className="w-3 h-3" /> {course.freeDuration}
-                                </span>
-                            </div>
-                        </div>
-
-                        <div className="p-5 flex-grow flex flex-col">
-                            <h3 className="text-lg font-bold text-gray-900 group-hover:text-primary transition-colors mb-2 line-clamp-2">
-                                {course.title}
-                            </h3>
-                            <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-grow">
-                                {course.shortDescription}
-                            </p>
-
-                            <div className="pt-4 mt-auto border-t border-gray-50 flex items-center justify-between text-sm">
-                                <span className="font-medium text-gray-400 group-hover:text-primary transition-colors">Vedi Dettagli</span>
-                                <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all">
-                                    →
-                                </div>
-                            </div>
-                        </div>
-                    </Link>
-                ))}
-            </div>
-        </section>
+        </Link>
     )
 
     return (
         <div className="min-h-screen flex flex-col font-sans bg-gray-50">
             <Navbar />
 
-            <main className="flex-grow py-12 px-4 md:px-8">
-                <div className="max-w-7xl mx-auto">
+            <main className="flex-grow py-16 px-4 md:px-8">
+                <div className="max-w-6xl mx-auto">
 
                     <div className="text-center mb-16">
                         <span className="inline-block py-1 px-3 bg-primary/10 text-primary font-bold rounded-full text-sm uppercase tracking-wider border border-primary/20 mb-4">
-                            Percorso Completo
+                            Percorso Formativo Completo
                         </span>
-                        <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-6">
-                            Scuola Tecnico Caldaie <span className="text-accent">A–Z</span>
+                        <h1 className="text-4xl md:text-6xl font-extrabold text-primary mb-6">
+                            Scegli il tuo <span className="text-accent">Livello</span>
                         </h1>
-                        <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                            Un percorso strutturato in 3 livelli per portarti da "cambio pezzi a caso" a tecnico specializzato che diagnostica e risolve.
+                        <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+                            Un percorso strutturato step-by-step per portarti da principiante a esperto.
+                            Non bruciare le tappe: inizia da dove serve.
                         </p>
                     </div>
 
-                    <CourseGrid
-                        title="FONDAMENTA"
-                        description="Per chi viene dall’idraulica o è alle prime armi. Capire cosa si sta guardando."
-                        level="Base"
-                        items={baseCourses}
-                    />
+                    <div className="grid md:grid-cols-3 gap-8">
+                        <LevelCard
+                            title="FONDAMENTA"
+                            description="Smetti di andare a caso. Capisci la logica, lo schema e le decisioni della caldaia."
+                            level="Base"
+                            link="/catalogo/base"
+                            colorClass="border-green-200 hover:border-green-400"
+                            icon={<ShieldCheck className="w-6 h-6 text-green-600" />}
+                        />
 
-                    <CourseGrid
-                        title="RIPARARE SUL SERIO"
-                        description="Qui entri nel lavoro vero. Smetti di andare a tentativi."
-                        level="Intermedio"
-                        items={intermedioCourses}
-                    />
+                        <LevelCard
+                            title="RIPARARE SUL SERIO"
+                            description="Risolvi guasti reali con metodo. Scambiatori, valvole, sensori e scheda."
+                            level="Intermedio"
+                            link="/catalogo/intermedio"
+                            colorClass="border-yellow-200 hover:border-yellow-400"
+                            icon={<MonitorPlay className="w-6 h-6 text-yellow-600" />}
+                        />
 
-                    <CourseGrid
-                        title="TECNICO CHE DECIDE"
-                        description="Diagnosi avanzata, elettronica e mindset. Il livello che ti differenzia."
-                        level="Avanzato"
-                        items={avanzatoCourses}
-                    />
+                        <LevelCard
+                            title="TECNICO CHE DECIDE"
+                            description="Diagnosi avanzata e mindset. Gestione del cliente e guasti impossibili."
+                            level="Avanzato"
+                            link="/catalogo/avanzato"
+                            colorClass="border-red-200 hover:border-red-400"
+                            icon={<ShieldCheck className="w-6 h-6 text-red-600" />}
+                        />
+                    </div>
+
+                    <div className="mt-20 text-center bg-white p-8 rounded-3xl border border-gray-100 shadow-lg">
+                        <h3 className="text-2xl font-bold text-primary mb-4">Non sai da dove iniziare?</h3>
+                        <p className="text-gray-600 max-w-2xl mx-auto mb-6">
+                            Se hai dubbi, il consiglio è sempre di partire dal <strong>Livello Base</strong>.
+                            Anche per i tecnici esperti, ripassare le fondamenta logiche spesso rivela lacune insospettabili.
+                        </p>
+                        <Link href="/catalogo/base" className="inline-block px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors">
+                            Inizia dalle Fondamenta
+                        </Link>
+                    </div>
 
                 </div>
             </main>
