@@ -1,18 +1,13 @@
-import { createClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import { TOS_VERSION, PAYMENTS_ENABLED, PAYPAL_API_URL, PAYPAL_ENV } from '@/lib/constants'
 import { getExpectedPrice } from '@/lib/serverPricing'
 import { getAllCourses } from '@/lib/coursesData'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID!
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET!
 
-// Regex permissiva per orderId PayPal (formati sandbox e live possono variare)
-// Lunghezza 10-32, caratteri alfanumerici e trattino
-// La verifica vera avviene chiamando le API PayPal
+// Regex permissiva per orderId PayPal
 const PAYPAL_ORDER_ID_REGEX = /^[A-Z0-9-]{10,32}$/i
 
 /**
@@ -66,7 +61,6 @@ async function verifyPayPalOrder(orderId: string, expectedAmount: number): Promi
 
         const order = await res.json()
 
-        // HARDENING: Verifica stato COMPLETED
         if (order.status !== 'COMPLETED') {
             console.error(`[complete-purchase] Ordine ${orderId} stato: ${order.status}`)
             return {
@@ -85,7 +79,6 @@ async function verifyPayPalOrder(orderId: string, expectedAmount: number): Promi
         const paidAmount = parseFloat(capture.amount.value)
         const currency = capture.amount.currency_code
 
-        // HARDENING: Verifica valuta EUR
         if (currency !== 'EUR') {
             console.error(`[complete-purchase] Ordine ${orderId} valuta errata: ${currency}`)
             return {
@@ -95,7 +88,6 @@ async function verifyPayPalOrder(orderId: string, expectedAmount: number): Promi
             }
         }
 
-        // Tolleranza di 0.01€ per arrotondamenti
         if (Math.abs(paidAmount - expectedAmount) > 0.01) {
             console.error(`[complete-purchase] Ordine ${orderId} importo: ${paidAmount}€, atteso: ${expectedAmount}€`)
             return {
@@ -126,20 +118,11 @@ async function verifyPayPalOrder(orderId: string, expectedAmount: number): Promi
  * POST /api/complete-purchase
  * 
  * PUNTO DI VERITÀ per il pagamento.
- * 
- * Body richiesto:
- * {
- *   "orderId": "PAYPAL_ORDER_ID",
- *   "level": "Base" | "Intermedio" | "Avanzato"
- * }
- * 
- * Il prezzo viene calcolato SERVER-SIDE, mai dal client.
+ * Usa createClient da @supabase/ssr per leggere la sessione dai cookie.
  */
 export async function POST(request: NextRequest) {
     try {
-        // ============================================
-        // VERIFICA PAGAMENTI ABILITATI
-        // ============================================
+        // Verifica pagamenti abilitati
         if (!PAYMENTS_ENABLED) {
             console.error('[complete-purchase] Pagamenti disabilitati')
             return NextResponse.json(
@@ -148,13 +131,10 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // ============================================
-        // PARSING E VALIDAZIONE INPUT
-        // ============================================
+        // Parsing e validazione input
         const body = await request.json()
         const { orderId, level } = body
 
-        // HARDENING: Valida orderId
         if (!orderId || typeof orderId !== 'string' || orderId.trim() === '') {
             console.error('[complete-purchase] orderId mancante o vuoto')
             return NextResponse.json(
@@ -163,7 +143,6 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // HARDENING: Valida formato orderId PayPal
         if (!PAYPAL_ORDER_ID_REGEX.test(orderId)) {
             console.error(`[complete-purchase] orderId formato non valido: ${orderId}`)
             return NextResponse.json(
@@ -172,7 +151,6 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // Valida level
         if (!level || !['Base', 'Intermedio', 'Avanzato'].includes(level)) {
             console.error(`[complete-purchase] level non valido: ${level}`)
             return NextResponse.json(
@@ -181,9 +159,7 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // ============================================
-        // CALCOLO PREZZO SERVER-SIDE (mai dal client)
-        // ============================================
+        // Calcolo prezzo server-side
         const expectedAmount = getExpectedPrice(level)
         if (expectedAmount === null) {
             console.error(`[complete-purchase] Prezzo non trovato per level: ${level}`)
@@ -193,51 +169,19 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // ============================================
-        // AUTENTICAZIONE
-        // ============================================
-        const cookieStore = await cookies()
-        const allCookies = cookieStore.getAll()
-        const authCookie = allCookies.find(c => c.name.includes('auth-token'))
-
-        if (!authCookie) {
-            return NextResponse.json(
-                { error: 'Non autenticato', code: 'NO_SESSION_COOKIE' },
-                { status: 401 }
-            )
-        }
-
-        let accessToken: string
-        try {
-            const parsed = JSON.parse(authCookie.value)
-            accessToken = parsed.access_token || parsed[0]?.access_token
-        } catch {
-            accessToken = authCookie.value
-        }
-
-        if (!accessToken) {
-            return NextResponse.json(
-                { error: 'Token sessione non valido', code: 'INVALID_TOKEN' },
-                { status: 401 }
-            )
-        }
-
-        const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-            global: { headers: { Authorization: `Bearer ${accessToken}` } }
-        })
-
+        // Autenticazione con @supabase/ssr
+        const supabase = await createClient()
         const { data: { user }, error: authError } = await supabase.auth.getUser()
 
         if (authError || !user) {
+            console.error('[complete-purchase] Utente non autenticato:', authError?.message)
             return NextResponse.json(
-                { error: 'Sessione non valida', code: 'INVALID_SESSION' },
+                { error: 'Non autenticato', code: 'UNAUTHORIZED' },
                 { status: 401 }
             )
         }
 
-        // ============================================
-        // IDEMPOTENZA: Verifica se ordine già processato
-        // ============================================
+        // Idempotenza: verifica se ordine già processato
         const { data: existingPurchase } = await supabase
             .from('purchases')
             .select('id')
@@ -245,9 +189,7 @@ export async function POST(request: NextRequest) {
             .maybeSingle()
 
         if (existingPurchase) {
-            // IDEMPOTENZA GLOBALE: stesso orderId non può essere usato due volte
-            // (né dallo stesso utente, né da utenti diversi)
-            console.log(`[complete-purchase] IDEMPOTENZA: Ordine ${orderId} già processato. Richiesta da user ${user.id} rifiutata (ordine già usato).`)
+            console.log(`[complete-purchase] IDEMPOTENZA: Ordine ${orderId} già processato.`)
             return NextResponse.json({
                 success: true,
                 alreadyProcessed: true,
@@ -255,9 +197,7 @@ export async function POST(request: NextRequest) {
             })
         }
 
-        // ============================================
-        // VERIFICA ToS
-        // ============================================
+        // Verifica ToS
         const { data: tosAcceptance, error: tosError } = await supabase
             .from('tos_acceptances')
             .select('id')
@@ -280,9 +220,7 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // ============================================
-        // VERIFICA ORDINE PAYPAL (con prezzo server-side)
-        // ============================================
+        // Verifica ordine PayPal
         const verification = await verifyPayPalOrder(orderId, expectedAmount)
 
         if (!verification.valid) {
@@ -292,9 +230,7 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // ============================================
-        // OTTIENI CORSI DA SBLOCCARE (server-side)
-        // ============================================
+        // Ottieni corsi da sbloccare
         const allCourses = getAllCourses()
         const coursesToUnlock = allCourses.filter(c => c.level === level)
 
@@ -306,9 +242,7 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // ============================================
-        // SALVATAGGIO ACQUISTO (con paypal_order_id per idempotenza)
-        // ============================================
+        // Salvataggio acquisto
         const purchaseRecords = coursesToUnlock.map(course => ({
             user_id: user.id,
             course_id: course.title,
@@ -321,9 +255,8 @@ export async function POST(request: NextRequest) {
             .insert(purchaseRecords)
 
         if (purchaseError) {
-            // Se errore unique constraint, è idempotenza (ordine già processato, anche da altro utente)
             if (purchaseError.code === '23505') {
-                console.log(`[complete-purchase] IDEMPOTENZA (DB): Ordine ${orderId} già presente. User ${user.id} tentativo duplicato bloccato.`)
+                console.log(`[complete-purchase] IDEMPOTENZA (DB): Ordine ${orderId} già presente.`)
                 return NextResponse.json({
                     success: true,
                     alreadyProcessed: true,

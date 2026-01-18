@@ -1,73 +1,25 @@
-import { createClient } from '@supabase/supabase-js'
-import { cookies } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient } from '@/lib/supabase/server'
 import { TOS_VERSION } from '@/lib/constants'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 /**
  * POST /api/verify-tos
  * 
  * Verifica che l'utente autenticato abbia accettato i ToS correnti.
- * 
- * AUTENTICAZIONE:
- * - Legge il token di sessione dai cookies Supabase (sb-*-auth-token)
- * - NON accetta token passati dal client nell'header (hardening)
- * - Valida il token con supabase.auth.getUser() che verifica lato server Supabase
- * 
- * RISCHI RESIDUI:
- * - Se i cookies sono rubati (XSS), l'attaccante può impersonare l'utente
- * - Mitigazione: HttpOnly cookies (default Supabase), CSP headers, HTTPS only
+ * Usa createClient da @supabase/ssr per leggere la sessione dai cookie.
  */
 export async function POST(request: NextRequest) {
     try {
-        // Leggi cookies di sessione Supabase
-        const cookieStore = await cookies()
-        const allCookies = cookieStore.getAll()
+        // Crea client Supabase con sessione da cookie
+        const supabase = await createClient()
 
-        // Trova il token di sessione Supabase (formato: sb-<project-ref>-auth-token)
-        const authCookie = allCookies.find(c => c.name.includes('auth-token'))
-
-        if (!authCookie) {
-            return NextResponse.json(
-                { error: 'Non autenticato', code: 'NO_SESSION_COOKIE' },
-                { status: 401 }
-            )
-        }
-
-        // Parsa il cookie (può essere JSON con access_token e refresh_token)
-        let accessToken: string
-        try {
-            const parsed = JSON.parse(authCookie.value)
-            accessToken = parsed.access_token || parsed[0]?.access_token
-        } catch {
-            // Se non è JSON, usa il valore diretto
-            accessToken = authCookie.value
-        }
-
-        if (!accessToken) {
-            return NextResponse.json(
-                { error: 'Token sessione non valido', code: 'INVALID_TOKEN' },
-                { status: 401 }
-            )
-        }
-
-        // Crea client Supabase con il token estratto dai cookies
-        const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-            global: {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                }
-            }
-        })
-
-        // Verifica sessione con il server Supabase (validazione reale, non solo parsing JWT)
+        // Verifica sessione utente
         const { data: { user }, error: authError } = await supabase.auth.getUser()
 
         if (authError || !user) {
+            console.error('[verify-tos] Utente non autenticato:', authError?.message)
             return NextResponse.json(
-                { error: 'Sessione scaduta o non valida', code: 'INVALID_SESSION' },
+                { error: 'Non autenticato', code: 'UNAUTHORIZED' },
                 { status: 401 }
             )
         }
@@ -81,7 +33,7 @@ export async function POST(request: NextRequest) {
             .maybeSingle()
 
         if (tosError) {
-            console.error('Errore verifica ToS:', tosError)
+            console.error('[verify-tos] Errore verifica:', tosError)
             return NextResponse.json(
                 { error: 'Errore verifica accettazione Termini', code: 'TOS_CHECK_ERROR' },
                 { status: 500 }
@@ -99,7 +51,6 @@ export async function POST(request: NextRequest) {
             )
         }
 
-        // ToS accettato → consenti procedere
         return NextResponse.json({
             success: true,
             userId: user.id,
@@ -109,7 +60,7 @@ export async function POST(request: NextRequest) {
         })
 
     } catch (error) {
-        console.error('Errore verifica checkout:', error)
+        console.error('[verify-tos] Errore interno:', error)
         return NextResponse.json(
             { error: 'Errore interno del server', code: 'INTERNAL_ERROR' },
             { status: 500 }

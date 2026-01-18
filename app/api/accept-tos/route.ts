@@ -1,68 +1,26 @@
-import { createClient } from '@supabase/supabase-js'
-import { cookies, headers } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
+import { headers } from 'next/headers'
+import { createClient } from '@/lib/supabase/server'
 import { TOS_VERSION } from '@/lib/constants'
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 
 /**
  * POST /api/accept-tos
  * 
  * Salva l'accettazione dei ToS con dati antifrode (IP, User-Agent).
- * Deve essere chiamata PRIMA del pagamento.
- * 
- * Raccoglie:
- * - user_id: dalla sessione autenticata
- * - tos_version: costante centralizzata
- * - ip_address: dall'header x-forwarded-for o x-real-ip
- * - user_agent: dall'header user-agent
+ * Usa createClient da @supabase/ssr per leggere la sessione dai cookie.
  */
 export async function POST(request: NextRequest) {
     try {
-        // Leggi cookies di sessione Supabase
-        const cookieStore = await cookies()
-        const allCookies = cookieStore.getAll()
-        const authCookie = allCookies.find(c => c.name.includes('auth-token'))
+        // Crea client Supabase con sessione da cookie
+        const supabase = await createClient()
 
-        if (!authCookie) {
-            return NextResponse.json(
-                { error: 'Non autenticato', code: 'NO_SESSION_COOKIE' },
-                { status: 401 }
-            )
-        }
-
-        // Estrai access token
-        let accessToken: string
-        try {
-            const parsed = JSON.parse(authCookie.value)
-            accessToken = parsed.access_token || parsed[0]?.access_token
-        } catch {
-            accessToken = authCookie.value
-        }
-
-        if (!accessToken) {
-            return NextResponse.json(
-                { error: 'Token sessione non valido', code: 'INVALID_TOKEN' },
-                { status: 401 }
-            )
-        }
-
-        // Crea client Supabase
-        const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-            global: {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                }
-            }
-        })
-
-        // Verifica sessione
+        // Verifica sessione utente
         const { data: { user }, error: authError } = await supabase.auth.getUser()
 
         if (authError || !user) {
+            console.error('[accept-tos] Utente non autenticato:', authError?.message)
             return NextResponse.json(
-                { error: 'Sessione non valida', code: 'INVALID_SESSION' },
+                { error: 'Non autenticato', code: 'UNAUTHORIZED' },
                 { status: 401 }
             )
         }
@@ -82,13 +40,22 @@ export async function POST(request: NextRequest) {
                     user_id: user.id,
                     tos_version: TOS_VERSION,
                     ip_address: ipAddress,
-                    user_agent: userAgent.substring(0, 500) // Limita lunghezza
+                    user_agent: userAgent.substring(0, 500)
                 },
                 { onConflict: 'user_id,tos_version', ignoreDuplicates: true }
             )
 
         if (tosError) {
-            console.error('Errore salvataggio ToS:', tosError)
+            // Se è unique constraint violation, l'utente ha già accettato
+            if (tosError.code === '23505') {
+                return NextResponse.json({
+                    success: true,
+                    alreadyAccepted: true,
+                    message: 'ToS già accettati'
+                }, { status: 409 })
+            }
+
+            console.error('[accept-tos] Errore salvataggio:', tosError)
             return NextResponse.json(
                 { error: 'Errore salvataggio accettazione', code: 'SAVE_ERROR' },
                 { status: 500 }
@@ -110,6 +77,8 @@ export async function POST(request: NextRequest) {
             )
         }
 
+        console.log(`[accept-tos] ToS accettati da user ${user.id} versione ${TOS_VERSION}`)
+
         return NextResponse.json({
             success: true,
             tosVersion: TOS_VERSION,
@@ -117,7 +86,7 @@ export async function POST(request: NextRequest) {
         })
 
     } catch (error) {
-        console.error('Errore accept-tos:', error)
+        console.error('[accept-tos] Errore interno:', error)
         return NextResponse.json(
             { error: 'Errore interno del server', code: 'INTERNAL_ERROR' },
             { status: 500 }
