@@ -75,16 +75,7 @@ export default function ProductShowcase() {
                     />
                 </div>
 
-                {/* CTA to Full Catalog */}
-                <div className="text-center mt-12">
-                    <p className="text-gray-500 mb-4">Oppure vedi l'elenco completo</p>
-                    <Link
-                        href="/catalogo"
-                        className="inline-flex items-center gap-2 px-8 py-3 bg-white text-primary border border-gray-200 font-bold rounded-xl hover:bg-gray-50 transition-all shadow-sm"
-                    >
-                        Vai al Catalogo Generale
-                    </Link>
-                </div>
+
             </div>
         </section>
     )
