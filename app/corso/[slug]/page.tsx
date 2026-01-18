@@ -72,7 +72,7 @@ export default function CorsoPage() {
         return () => subscription.unsubscribe()
     }, [course])
 
-    // Handler checkbox ToS: chiama API server-side
+    // Handler checkbox ToS: chiama API server-side con Bearer token
     const handleTosCheckbox = async (checked: boolean) => {
         if (!checked) {
             setTosAccepted(false)
@@ -81,7 +81,25 @@ export default function CorsoPage() {
 
         setTosLoading(true)
         try {
-            const res = await fetch('/api/accept-tos', { method: 'POST' })
+            // Ottieni sessione e access token
+            const { data: { session } } = await supabase.auth.getSession()
+            const accessToken = session?.access_token
+
+            if (!accessToken) {
+                alert('Sessione scaduta, effettua di nuovo l\'accesso.')
+                setTosAccepted(false)
+                setTosLoading(false)
+                return
+            }
+
+            // Chiama API con Bearer token
+            const res = await fetch('/api/accept-tos', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json'
+                }
+            })
 
             if (res.ok || res.status === 409) {
                 // 200 = salvato, 409 = già accettato

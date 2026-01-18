@@ -1,31 +1,52 @@
+import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
 import { TOS_VERSION } from '@/lib/constants'
+
+function getSupabaseAdmin() {
+    return createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+}
 
 /**
  * POST /api/verify-tos
  * 
- * Verifica che l'utente autenticato abbia accettato i ToS correnti.
- * Usa createClient da @supabase/ssr per leggere la sessione dai cookie.
+ * Verifica che l'utente abbia accettato i ToS correnti.
+ * Autenticazione via Bearer token.
  */
 export async function POST(request: NextRequest) {
     try {
-        // Crea client Supabase con sessione da cookie
-        const supabase = await createClient()
+        const authHeader = request.headers.get('authorization') || ''
 
-        // Verifica sessione utente
-        const { data: { user }, error: authError } = await supabase.auth.getUser()
-
-        if (authError || !user) {
-            console.error('[verify-tos] Utente non autenticato:', authError?.message)
+        if (!authHeader || !authHeader.toLowerCase().startsWith('bearer ')) {
+            console.error('[verify-tos] Token mancante')
             return NextResponse.json(
-                { error: 'Non autenticato', code: 'UNAUTHORIZED' },
+                { ok: false, error: 'missing_token' },
                 { status: 401 }
             )
         }
 
-        // Verifica accettazione ToS per questa versione
-        const { data: tosAcceptance, error: tosError } = await supabase
+        const token = authHeader.replace(/^Bearer\s+/i, '').trim()
+
+        if (!token) {
+            return NextResponse.json(
+                { ok: false, error: 'empty_token' },
+                { status: 401 }
+            )
+        }
+
+        const { data: { user }, error: authError } = await getSupabaseAdmin().auth.getUser(token)
+
+        if (authError || !user) {
+            console.error('[verify-tos] Token invalido:', authError?.message)
+            return NextResponse.json(
+                { ok: false, error: 'invalid_token' },
+                { status: 401 }
+            )
+        }
+
+        const { data: tosAcceptance, error: tosError } = await getSupabaseAdmin()
             .from('tos_acceptances')
             .select('id, accepted_at')
             .eq('user_id', user.id)
@@ -33,28 +54,23 @@ export async function POST(request: NextRequest) {
             .maybeSingle()
 
         if (tosError) {
-            console.error('[verify-tos] Errore verifica:', tosError)
+            console.error('[verify-tos] Errore query:', tosError)
             return NextResponse.json(
-                { error: 'Errore verifica accettazione Termini', code: 'TOS_CHECK_ERROR' },
+                { ok: false, error: 'query_error' },
                 { status: 500 }
             )
         }
 
         if (!tosAcceptance) {
             return NextResponse.json(
-                {
-                    error: 'Accetta i Termini e Condizioni prima di acquistare',
-                    code: 'TOS_NOT_ACCEPTED',
-                    requiredVersion: TOS_VERSION
-                },
+                { ok: false, error: 'tos_not_accepted', requiredVersion: TOS_VERSION },
                 { status: 403 }
             )
         }
 
         return NextResponse.json({
-            success: true,
+            ok: true,
             userId: user.id,
-            tosAccepted: true,
             tosVersion: TOS_VERSION,
             acceptedAt: tosAcceptance.accepted_at
         })
@@ -62,7 +78,7 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error('[verify-tos] Errore interno:', error)
         return NextResponse.json(
-            { error: 'Errore interno del server', code: 'INTERNAL_ERROR' },
+            { ok: false, error: 'internal_error' },
             { status: 500 }
         )
     }
