@@ -73,6 +73,9 @@ export function PayPalBtn({ amount, courseTitle, onSuccess }: PayPalBtnProps) {
             <p className="text-xs text-gray-400 text-center">
                 Procedendo acconsenti all'accesso immediato al contenuto.
             </p>
+            <p className="text-xs text-gray-500 text-center mt-1">
+                Questo accesso è personale e nominativo. Per team o aziende, contattaci per le licenze dedicate.
+            </p>
             {PAYPAL_ENV === 'sandbox' && (
                 <p className="text-xs text-amber-600 text-center font-semibold">
                     ⚠️ Ambiente di test (sandbox)
