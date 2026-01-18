@@ -122,39 +122,97 @@ export default function CorsoPage() {
     const handlePurchaseSuccess = async (orderId: string) => {
         if (!user || !course || !pricingInfo) return
 
-        try {
-            // Chiama API server-side per completare acquisto
-            // Il server calcola prezzo e corsi da sbloccare (non fidarsi del client)
-            const res = await fetch('/api/complete-purchase', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    orderId: orderId,
-                    level: course.level
-                })
-            })
+        // Ottieni token per Authorization header
+        const { data: { session } } = await supabase.auth.getSession()
+        const accessToken = session?.access_token
 
-            if (!res.ok) {
+        if (!accessToken) {
+            alert('Sessione scaduta. Effettua di nuovo l\'accesso e riprova.')
+            return
+        }
+
+        // Funzione per tentare il salvataggio (con retry)
+        const attemptSave = async (attempt: number = 1): Promise<boolean> => {
+            try {
+                console.log(`[handlePurchaseSuccess] Tentativo ${attempt} per orderId: ${orderId}`)
+
+                const res = await fetch('/api/complete-purchase', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify({
+                        orderId: orderId,
+                        level: course.level
+                    })
+                })
+
                 const data = await res.json()
-                if (data.code === 'TOS_NOT_ACCEPTED') {
+
+                if (res.ok) {
+                    // Successo (anche se già processato)
+                    console.log(`[handlePurchaseSuccess] Successo:`, data)
+                    return true
+                }
+
+                // Errori specifici che non richiedono retry
+                if (data.error === 'tos_not_accepted') {
                     alert('Accetta i Termini per procedere.')
                     setTosAccepted(false)
-                } else if (data.code === 'PAYMENTS_DISABLED') {
-                    alert('Pagamenti temporaneamente non disponibili.')
-                } else if (data.code === 'PAYMENT_VERIFICATION_FAILED') {
-                    alert(`Errore verifica pagamento: ${data.error}`)
-                } else {
-                    throw new Error(data.error || 'Errore sconosciuto')
+                    return false
                 }
-                return
-            }
 
+                if (data.error === 'payments_disabled') {
+                    alert('Pagamenti temporaneamente non disponibili.')
+                    return false
+                }
+
+                // Errori PayPal (ordine non valido, importo errato, ecc.)
+                if (res.status === 402) {
+                    console.error('[handlePurchaseSuccess] Errore verifica PayPal:', data)
+                    alert(`Errore verifica pagamento: ${data.error}`)
+                    return false
+                }
+
+                // Errori server temporanei: retry
+                if (res.status >= 500 && attempt < 3) {
+                    console.log(`[handlePurchaseSuccess] Errore server, retry in 2s...`)
+                    await new Promise(r => setTimeout(r, 2000))
+                    return attemptSave(attempt + 1)
+                }
+
+                // Errore non recuperabile
+                console.error('[handlePurchaseSuccess] Errore non recuperabile:', data)
+                return false
+
+            } catch (err) {
+                console.error(`[handlePurchaseSuccess] Errore rete tentativo ${attempt}:`, err)
+                if (attempt < 3) {
+                    await new Promise(r => setTimeout(r, 2000))
+                    return attemptSave(attempt + 1)
+                }
+                return false
+            }
+        }
+
+        // Tenta il salvataggio
+        const success = await attemptSave()
+
+        if (success) {
             setHasPurchased(true)
             alert(`🎁 Complimenti!\n\nHai sbloccato l'intero Pacchetto ${course.level}.\n\nTrovali tutti nella tua Dashboard!`)
+        } else {
+            // Salva orderId per eventuale retry manuale
+            localStorage.setItem('pendingOrderId', orderId)
+            localStorage.setItem('pendingOrderLevel', course.level)
 
-        } catch (err: any) {
-            console.error("Errore salvataggio acquisto:", err)
-            alert("Pagamento ricevuto, ma errore nel salvataggio. Contatta l'assistenza.")
+            alert(
+                `Pagamento ricevuto.\n\n` +
+                `Stiamo completando l'attivazione.\n` +
+                `Se entro 10 minuti non si sblocca, contattaci indicando:\n` +
+                `ID Ordine: ${orderId}`
+            )
         }
     }
 
