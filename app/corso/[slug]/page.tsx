@@ -2,6 +2,7 @@
 import { useParams } from "next/navigation"
 import { getCourseBySlug, getAllCourses, Course } from "@/lib/coursesData"
 import { getLevelPricing, PRICES } from "@/lib/pricingLogic"
+import { TOS_VERSION } from "@/lib/constants"
 import { PayPalBtn } from "@/components/PayPalBtn"
 import { supabase } from "@/lib/supabaseClient"
 import { useEffect, useState } from "react"
@@ -30,6 +31,7 @@ export default function CorsoPage() {
     const [hasPurchased, setHasPurchased] = useState(false)
     const [purchasedCourses, setPurchasedCourses] = useState<string[]>([])
     const [pricingInfo, setPricingInfo] = useState<ReturnType<typeof getLevelPricing> | null>(null)
+    const [tosAccepted, setTosAccepted] = useState(false)
 
     useEffect(() => {
         const checkUser = async () => {
@@ -74,6 +76,33 @@ export default function CorsoPage() {
         if (!user || !course || !pricingInfo) return
 
         try {
+            // Salva accettazione ToS con upsert (gestisce duplicati automaticamente)
+            const { error: tosError } = await supabase
+                .from('tos_acceptances')
+                .upsert(
+                    { user_id: user.id, tos_version: TOS_VERSION },
+                    { onConflict: 'user_id,tos_version', ignoreDuplicates: true }
+                )
+
+            if (tosError) {
+                console.error('Errore salvataggio accettazione ToS:', tosError)
+                alert('Errore nel salvataggio dell\'accettazione dei Termini. Riprova.')
+                return // BLOCCA ACQUISTO
+            }
+
+            // Verifica che l'accettazione esista (conferma)
+            const { data: tosCheck } = await supabase
+                .from('tos_acceptances')
+                .select('id')
+                .eq('user_id', user.id)
+                .eq('tos_version', TOS_VERSION)
+                .maybeSingle()
+
+            if (!tosCheck) {
+                alert('Errore nel salvataggio dell\'accettazione dei Termini. Riprova.')
+                return // BLOCCA ACQUISTO
+            }
+
             // Sblocca TUTTI i corsi del livello
             const coursesToUnlock = allCourses.filter(c => c.level === course.level)
 
@@ -330,7 +359,29 @@ export default function CorsoPage() {
                                     </div>
                                 ) : (
                                     <div className="space-y-4">
-                                        {/* SUSPENDED STATE */}
+                                        {/* Checkbox accettazione ToS */}
+                                        {user && (
+                                            <label className="flex items-start gap-3 text-sm text-gray-600 cursor-pointer p-3 bg-gray-50 rounded-xl border border-gray-200 hover:border-accent/30 transition-colors">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={tosAccepted}
+                                                    onChange={(e) => setTosAccepted(e.target.checked)}
+                                                    className="mt-0.5 w-4 h-4 accent-accent flex-shrink-0"
+                                                />
+                                                <span className="leading-relaxed">
+                                                    Ho letto e accetto i{' '}
+                                                    <Link href="/termini" target="_blank" className="text-accent underline font-semibold">
+                                                        Termini e Condizioni
+                                                    </Link>
+                                                    {' '}e confermo che questo accesso è per mio uso personale (vedi{' '}
+                                                    <Link href="/licenze" target="_blank" className="text-accent underline font-semibold">
+                                                        Tipi di Licenza
+                                                    </Link>).
+                                                </span>
+                                            </label>
+                                        )}
+
+                                        {/* SUSPENDED STATE - Temporaneamente disabilitato */}
                                         <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 text-center">
                                             <p className="font-bold text-orange-800 mb-1">Acquisti Non Disponibili</p>
                                             <p className="text-xs text-orange-700">
@@ -338,6 +389,22 @@ export default function CorsoPage() {
                                                 Disponibile a breve.
                                             </p>
                                         </div>
+
+                                        {/* Pulsante acquisto - ABILITARE quando pronto */}
+                                        {/* 
+                                        {tosAccepted ? (
+                                            <PayPalBtn
+                                                amount={String(pricingInfo?.amountToPay || 0)}
+                                                courseTitle={`Pacchetto ${course.level}`}
+                                                onSuccess={handlePurchaseSuccess}
+                                            />
+                                        ) : (
+                                            <button disabled className="w-full py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed">
+                                                Accetta i Termini per procedere
+                                            </button>
+                                        )}
+                                        */}
+
                                         <button disabled className="w-full py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed">
                                             Acquista Pacchetto {course.level}
                                         </button>

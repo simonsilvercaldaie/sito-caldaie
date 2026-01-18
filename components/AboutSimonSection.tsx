@@ -88,18 +88,6 @@ export default function AboutSimonSection() {
                     </div>
                 </div>
 
-                {/* CTA YouTube */}
-                <div className="text-center mt-12">
-                    <a
-                        href="https://www.youtube.com/@SimonSilverCaldaie"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors"
-                    >
-                        <Youtube className="w-5 h-5" />
-                        Guarda i Video Gratuiti su YouTube
-                    </a>
-                </div>
             </div>
         </section>
     )
