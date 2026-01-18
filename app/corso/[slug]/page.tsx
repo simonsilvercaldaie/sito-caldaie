@@ -348,17 +348,18 @@ export default function CorsoPage() {
                                             Vai alla Dashboard
                                         </Link>
                                     </div>
-                                ) : user ? (
                                     <div className="space-y-4">
-                                        <PayPalBtn
-                                            amount={pricingInfo?.amountToPay.toFixed(2) || PRICES.SINGLE.toString()}
-                                            courseTitle={pricingInfo?.isBundleUpgrade
-                                                ? `Bundle ${pricingInfo.totalAfterPurchase} Corsi`
-                                                : course.title}
-                                            onSuccess={handlePurchaseSuccess}
-                                        />
-                                        <p className="text-xs text-gray-500 text-center">
-                                            Pagamento sicuro con PayPal
+                                        <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 text-center">
+                                            <p className="font-bold text-orange-800 mb-1">Acquisti Sospesi</p>
+                                            <p className="text-xs text-orange-700">
+                                                Stiamo caricando i nuovi video. Le vendite riapriranno a breve.
+                                            </p>
+                                        </div>
+                                        <button disabled className="w-full py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed">
+                                            Acquista Corso
+                                        </button>
+                                        <p className="text-xs text-gray-400 text-center">
+                                            Torna a trovarci presto!
                                         </p>
                                     </div>
                                 ) : (

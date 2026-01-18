@@ -78,7 +78,7 @@ export default function ProductShowcase() {
                         href="/catalogo"
                         className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:bg-accent/90 transition-all shadow-lg hover:shadow-xl hover:scale-105"
                     >
-                        Vedi Tutti i 10 Corsi
+                        Vedi Tutti i 27 Corsi
                         <span className="text-xl">→</span>
                     </Link>
                 </div>
