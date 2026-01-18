@@ -192,35 +192,82 @@ export default function CorsoPage() {
                         {/* Main Content */}
                         <div className="lg:col-span-2 space-y-8">
 
-                            {/* Video Player */}
-                            <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                                <div className="aspect-video bg-gray-900 relative">
-                                    {course.youtubeId !== "PLACEHOLDER" ? (
-                                        <iframe
-                                            className="w-full h-full"
-                                            src={`https://www.youtube.com/embed/${course.youtubeId}`}
-                                            title={course.title}
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                            allowFullScreen
-                                        />
+                            {/* VIDEO PARTE 1: GRATUITO */}
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded uppercase">Parte 1</div>
+                                    <h2 className="text-xl font-bold text-gray-800">Video Gratuito (YouTube)</h2>
+                                </div>
+                                <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                                    <div className="aspect-video bg-gray-900 relative">
+                                        {course.youtubeId !== "PLACEHOLDER" ? (
+                                            <iframe
+                                                className="w-full h-full"
+                                                src={`https://www.youtube.com/embed/${course.youtubeId}`}
+                                                title={course.title}
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowFullScreen
+                                            />
+                                        ) : (
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-gradient-to-br from-red-600 to-red-700">
+                                                <Youtube className="w-20 h-20 mb-4 opacity-80" />
+                                                <p className="text-xl font-bold mb-2">Parte 1 in arrivo!</p>
+                                                <p className="text-white/70 text-center px-4">
+                                                    Disponibile a breve sul canale YouTube
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="p-4 bg-gray-50 flex items-center gap-2 text-sm text-gray-600">
+                                        <PlayCircle className="w-5 h-5 text-red-600" />
+                                        <span>Durata: <strong>{course.freeDuration}</strong> a disposizione di tutti</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* VIDEO PARTE 2: PREMIUM */}
+                            <div className="space-y-4 pt-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="bg-accent text-white text-xs font-bold px-2 py-1 rounded uppercase">Parte 2</div>
+                                    <h2 className="text-xl font-bold text-gray-800">Video Premium (Corso Completo)</h2>
+                                </div>
+                                <div className="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-accent/20 relative">
+                                    {hasPurchased ? (
+                                        // UTENTE HA ACQUISTATO: MOSTRA IL PLAYER (O Placeholder Premium)
+                                        <div className="aspect-video bg-gray-900 relative">
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-slate-800">
+                                                <Lock className="w-20 h-20 mb-4 text-green-500 opacity-80" />
+                                                <p className="text-xl font-bold mb-2 text-green-400">Accesso Sbloccato!</p>
+                                                <p className="text-slate-300 text-center px-4 max-w-md">
+                                                    Qui apparirà il player video Premium privato (Vimeo/Wistia/YouTube Unlisted).
+                                                    <br /><span className="text-sm opacity-70">(In attesa di caricamento file)</span>
+                                                </p>
+                                            </div>
+                                        </div>
                                     ) : (
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-gradient-to-br from-red-600 to-red-700">
-                                            <Youtube className="w-20 h-20 mb-4 opacity-80" />
-                                            <p className="text-xl font-bold mb-2">Video in arrivo!</p>
-                                            <p className="text-white/70 text-center px-4">
-                                                L'anteprima YouTube sarà disponibile a breve
-                                            </p>
+                                        // UTENTE NON HA ACQUISTATO: MOSTRA IL BLOCCO
+                                        <div className="aspect-video bg-slate-900 relative group cursor-pointer" onClick={() => document.getElementById('purchase-card')?.scrollIntoView({ behavior: 'smooth' })}>
+                                            <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-6 text-center">
+                                                <Lock className="w-16 h-16 text-white mb-4 group-hover:scale-110 transition-transform duration-300" />
+                                                <h3 className="text-2xl font-bold text-white mb-2">Contenuto Riservato</h3>
+                                                <p className="text-gray-200 mb-6 max-w-sm">
+                                                    Guarda la Parte 2 ({course.premiumDuration}) con diagnosi avanzata e casi reali.
+                                                </p>
+                                                <button className="bg-accent text-white font-bold px-6 py-3 rounded-xl hover:bg-accent/90 transition-colors shadow-lg">
+                                                    Sblocca il Corso Completo
+                                                </button>
+                                            </div>
+                                            {/* Sfondo sfocato fake */}
+                                            <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-700 opacity-50"></div>
                                         </div>
                                     )}
-                                </div>
-                                <div className="p-4 bg-gray-50 flex flex-col sm:flex-row items-start sm:items-center gap-3 text-sm">
-                                    <div className="flex items-center gap-2 text-red-600">
-                                        <PlayCircle className="w-5 h-5" />
-                                        <span className="font-bold">{course.freeDuration} GRATIS</span>
-                                    </div>
-                                    <span className="hidden sm:block text-gray-300">|</span>
-                                    <div className="text-gray-600">
-                                        <span className="font-medium">{course.premiumDuration} di contenuto tecnico approfondito</span> a pagamento
+
+                                    <div className="p-4 bg-accent/5 flex items-center justify-between gap-2 text-sm border-t border-accent/10">
+                                        <div className="flex items-center gap-2 text-gray-700">
+                                            <ShieldCheck className="w-5 h-5 text-accent" />
+                                            <span>Durata: <strong>{course.premiumDuration}</strong> di tecnica pura</span>
+                                        </div>
+                                        {hasPurchased && <span className="text-green-600 font-bold flex items-center gap-1"><CheckCircle2 className="w-4 h-4" /> Acquistato</span>}
                                     </div>
                                 </div>
                             </div>
@@ -268,7 +315,7 @@ export default function CorsoPage() {
 
                         {/* Sidebar - Purchase Card */}
                         <div className="lg:col-span-1">
-                            <div className="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
+                            <div id="purchase-card" className="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
 
                                 {/* Pricing Display */}
                                 <div className="text-center mb-6">
