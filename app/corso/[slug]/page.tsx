@@ -348,6 +348,7 @@ export default function CorsoPage() {
                                             Vai alla Dashboard
                                         </Link>
                                     </div>
+                                ) : (
                                     <div className="space-y-4">
                                         <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 text-center">
                                             <p className="font-bold text-orange-800 mb-1">Acquisti Sospesi</p>
@@ -361,18 +362,11 @@ export default function CorsoPage() {
                                         <p className="text-xs text-gray-400 text-center">
                                             Torna a trovarci presto!
                                         </p>
-                                    </div>
-                                ) : (
-                                    <div className="space-y-4">
-                                        <Link
-                                            href="/login"
-                                            className="w-full py-3 bg-accent text-white font-bold rounded-xl hover:bg-accent/90 transition-colors flex items-center justify-center gap-2"
-                                        >
-                                            Accedi per Acquistare
-                                        </Link>
-                                        <p className="text-xs text-gray-500 text-center">
-                                            Devi effettuare l'accesso per completare l'acquisto
-                                        </p>
+                                        {!user && (
+                                            <p className="text-xs text-gray-400 text-center mt-2">
+                                                <Link href="/login" className="underline hover:text-accent">Accedi</Link> se hai già acquistato.
+                                            </p>
+                                        )}
                                     </div>
                                 )}
 
