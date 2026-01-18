@@ -29,9 +29,6 @@ export default function Home() {
                                 <PlayCircle className="w-6 h-6" />
                                 Accedi / Registrati
                             </Link>
-                            <Link href="/catalogo" className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-primary border-2 border-primary/10 rounded-xl text-lg font-bold hover:bg-accent hover:text-white hover:border-accent transition-all">
-                                Catalogo Corsi
-                            </Link>
                         </div>
                     </div>
 

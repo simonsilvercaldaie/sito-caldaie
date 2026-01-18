@@ -112,8 +112,8 @@ export default function CorsoPage() {
                     <div className="text-center">
                         <h1 className="text-3xl font-bold text-primary mb-4">Corso non trovato</h1>
                         <p className="text-gray-600 mb-6">Il corso che stai cercando non esiste.</p>
-                        <Link href="/catalogo" className="text-accent hover:underline font-semibold">
-                            ← Torna al catalogo
+                        <Link href="/" className="text-accent hover:underline font-semibold">
+                            ← Torna alla Home
                         </Link>
                     </div>
                 </main>
@@ -146,9 +146,9 @@ export default function CorsoPage() {
                 {/* Hero Section */}
                 <section className="bg-gradient-to-br from-primary via-primary to-slate-800 text-white py-12 px-4">
                     <div className="max-w-5xl mx-auto">
-                        <Link href="/catalogo" className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-6 transition-colors">
+                        <Link href={`/catalogo/${course.level.toLowerCase()}`} className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-6 transition-colors">
                             <ArrowLeft className="w-4 h-4" />
-                            Torna al catalogo
+                            Torna ai corsi {course.level}
                         </Link>
 
                         <div className="flex flex-wrap items-center gap-3 mb-4">
