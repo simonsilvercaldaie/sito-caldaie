@@ -218,15 +218,8 @@ export default function CorsoPage() {
                                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-accent/20 relative">
                                     {hasPurchased ? (
                                         // UTENTE HA ACQUISTATO: MOSTRA IL PLAYER (O Placeholder Premium)
-                                        <div className="aspect-video bg-gray-900 relative overflow-hidden">
-                                            {course.coverImage && (
-                                                <img
-                                                    src={course.coverImage}
-                                                    alt={`Copertina ${course.title}`}
-                                                    className="absolute inset-0 w-full h-full object-cover opacity-40"
-                                                />
-                                            )}
-                                            <div className={`absolute inset-0 flex flex-col items-center justify-center text-white ${course.coverImage ? 'bg-slate-900/60 backdrop-blur-sm' : 'bg-slate-800'}`}>
+                                        <div className="aspect-video bg-gray-900 relative">
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-slate-800">
                                                 <Lock className="w-20 h-20 mb-4 text-green-500 opacity-80" />
                                                 <p className="text-xl font-bold mb-2 text-green-400">Accesso Sbloccato!</p>
                                                 <p className="text-slate-300 text-center px-4 max-w-md">
@@ -237,18 +230,7 @@ export default function CorsoPage() {
                                         </div>
                                     ) : (
                                         // UTENTE NON HA ACQUISTATO: MOSTRA IL BLOCCO
-                                        <div className="aspect-video bg-slate-900 relative group cursor-pointer overflow-hidden" onClick={() => document.getElementById('purchase-card')?.scrollIntoView({ behavior: 'smooth' })}>
-                                            {course.coverImage ? (
-                                                <img
-                                                    src={course.coverImage}
-                                                    alt={`Copertina ${course.title}`}
-                                                    className="absolute inset-0 w-full h-full object-cover opacity-50 group-hover:scale-105 transition-transform duration-700"
-                                                />
-                                            ) : (
-                                                /* Sfondo sfocato fake solo se non c'è immagine */
-                                                <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-700 opacity-50"></div>
-                                            )}
-
+                                        <div className="aspect-video bg-slate-900 relative group cursor-pointer" onClick={() => document.getElementById('purchase-card')?.scrollIntoView({ behavior: 'smooth' })}>
                                             <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-6 text-center">
                                                 <Lock className="w-16 h-16 text-white mb-4 group-hover:scale-110 transition-transform duration-300" />
                                                 <h3 className="text-2xl font-bold text-white mb-2">Contenuto Riservato</h3>
@@ -259,6 +241,8 @@ export default function CorsoPage() {
                                                     Sblocca il Livello Completo
                                                 </button>
                                             </div>
+                                            {/* Sfondo sfocato fake */}
+                                            <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-slate-700 opacity-50"></div>
                                         </div>
                                     )}
 
