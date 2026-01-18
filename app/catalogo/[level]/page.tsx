@@ -16,13 +16,13 @@ export default function LivelloPage() {
             title: "FONDAMENTA",
             dbLevel: "Base",
             description: "Per chi viene dall’idraulica o è alle prime armi. Capire cosa si sta guardando.",
-            color: "bg-green-100 text-green-800 border-green-200"
+            color: "bg-blue-100 text-blue-800 border-blue-200"
         },
         "intermedio": {
             title: "RIPARARE SUL SERIO",
             dbLevel: "Intermedio",
             description: "Qui entri nel lavoro vero. Smetti di andare a tentativi.",
-            color: "bg-yellow-100 text-yellow-800 border-yellow-200"
+            color: "bg-green-100 text-green-800 border-green-200"
         },
         "avanzato": {
             title: "TECNICO CHE DECIDE",

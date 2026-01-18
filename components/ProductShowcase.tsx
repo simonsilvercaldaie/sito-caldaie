@@ -5,11 +5,11 @@ import Link from "next/link"
 export default function ProductShowcase() {
 
     // LevelCard component definition (copied from Catalogo logic)
-    const LevelCard = ({ title, description, level, link, colorClass, icon }: { title: string, description: string, level: string, link: string, colorClass: string, icon: any }) => (
+    const LevelCard = ({ title, description, level, link, colorClass, badgeClass, icon }: { title: string, description: string, level: string, link: string, colorClass: string, badgeClass: string, icon: any }) => (
         <Link href={link} className="block group">
             <div className={`rounded-3xl p-8 border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 h-full flex flex-col ${colorClass} bg-white hover:bg-gray-50`}>
                 <div className="flex items-center justify-between mb-6">
-                    <span className="px-4 py-2 rounded-full font-bold text-sm uppercase tracking-wider bg-white border shadow-sm">
+                    <span className={`px-4 py-2 rounded-full font-bold text-sm uppercase tracking-wider border shadow-sm ${badgeClass}`}>
                         {level}
                     </span>
                     <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
@@ -52,8 +52,9 @@ export default function ProductShowcase() {
                         description="Smetti di andare a caso. Capisci la logica, lo schema e le decisioni della caldaia."
                         level="Base"
                         link="/catalogo/base"
-                        colorClass="border-green-200 hover:border-green-400"
-                        icon={<ShieldCheck className="w-6 h-6 text-green-600" />}
+                        colorClass="border-blue-200 hover:border-blue-400"
+                        badgeClass="bg-blue-100 text-blue-800 border-blue-200"
+                        icon={<ShieldCheck className="w-6 h-6 text-blue-600" />}
                     />
 
                     <LevelCard
@@ -61,8 +62,9 @@ export default function ProductShowcase() {
                         description="Risolvi guasti reali con metodo. Scambiatori, valvole, sensori e scheda."
                         level="Intermedio"
                         link="/catalogo/intermedio"
-                        colorClass="border-yellow-200 hover:border-yellow-400"
-                        icon={<MonitorPlay className="w-6 h-6 text-yellow-600" />}
+                        colorClass="border-green-200 hover:border-green-400"
+                        badgeClass="bg-green-100 text-green-800 border-green-200"
+                        icon={<MonitorPlay className="w-6 h-6 text-green-600" />}
                     />
 
                     <LevelCard
@@ -71,6 +73,7 @@ export default function ProductShowcase() {
                         level="Avanzato"
                         link="/catalogo/avanzato"
                         colorClass="border-red-200 hover:border-red-400"
+                        badgeClass="bg-red-100 text-red-800 border-red-200"
                         icon={<ShieldCheck className="w-6 h-6 text-red-600" />}
                     />
                 </div>
