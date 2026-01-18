@@ -1,83 +1,88 @@
 'use client'
-import { MonitorPlay, ShieldCheck, PlayCircle } from "lucide-react"
-import { getFeaturedCourses } from "@/lib/coursesData"
+import { Lock, MonitorPlay, ShieldCheck } from "lucide-react"
 import Link from "next/link"
 
 export default function ProductShowcase() {
-    const featuredCourses = getFeaturedCourses()
 
-    const levelColors: Record<string, string> = {
-        "Base": "bg-green-100 text-green-800",
-        "Intermedio": "bg-yellow-100 text-yellow-800",
-        "Avanzato": "bg-red-100 text-red-800"
-    }
+    // LevelCard component definition (copied from Catalogo logic)
+    const LevelCard = ({ title, description, level, link, colorClass, icon }: { title: string, description: string, level: string, link: string, colorClass: string, icon: any }) => (
+        <Link href={link} className="block group">
+            <div className={`rounded-3xl p-8 border-2 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 h-full flex flex-col ${colorClass} bg-white hover:bg-gray-50`}>
+                <div className="flex items-center justify-between mb-6">
+                    <span className="px-4 py-2 rounded-full font-bold text-sm uppercase tracking-wider bg-white border shadow-sm">
+                        {level}
+                    </span>
+                    <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                        {icon}
+                    </div>
+                </div>
+
+                <h2 className="text-3xl font-extrabold text-gray-900 mb-4 group-hover:text-primary transition-colors">
+                    {title}
+                </h2>
+                <p className="text-gray-600 text-lg mb-8 leading-relaxed flex-grow">
+                    {description}
+                </p>
+
+                <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
+                    <span className="font-bold text-gray-900 flex items-center gap-2">
+                        Esplora i 9 Corsi
+                    </span>
+                    <span className="text-xl group-hover:translate-x-2 transition-transform">→</span>
+                </div>
+            </div>
+        </Link>
+    )
 
     return (
         <section className="py-20 px-4 md:px-8 bg-slate-50">
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-16 space-y-4">
-                    <h2 className="text-3xl md:text-4xl font-bold text-primary">I Nostri Percorsi Formativi</h2>
-                    <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-                        Un metodo strutturato in 3 livelli: dalle basi fondamentali alla diagnosi avanzata.
-                        Scegli il tuo punto di partenza.
+                    <h2 className="text-3xl md:text-5xl font-extrabold text-primary">
+                        Scegli il tuo <span className="text-accent">Livello</span>
+                    </h2>
+                    <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
+                        Un percorso strutturato step-by-step per portarti da principiante a esperto.
                     </p>
                 </div>
 
                 <div className="grid md:grid-cols-3 gap-8">
-                    {featuredCourses.map((course) => (
-                        <Link
-                            key={course.id}
-                            href={`/corso/${course.id}`}
-                            className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-2xl hover:border-accent/30 transition-all group flex flex-col"
-                        >
-                            <div className="relative aspect-video bg-gradient-to-br from-primary to-slate-700">
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center group-hover:bg-white/30 group-hover:scale-110 transition-all">
-                                        <PlayCircle className="w-10 h-10 text-white" />
-                                    </div>
-                                </div>
-                                {/* Badge Prezzo Rimosso */}
-                                <div className="absolute top-4 left-4">
-                                    <span className={`px-2 py-1 rounded-full text-xs font-semibold ${levelColors[course.level]}`}>
-                                        {course.level}
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="p-6 space-y-4 flex-grow flex flex-col">
-                                <h3 className="text-xl font-bold text-primary leading-tight group-hover:text-accent transition-colors">
-                                    {course.title}
-                                </h3>
-                                <p className="text-sm text-gray-500 line-clamp-2 flex-grow">
-                                    {course.shortDescription}
-                                </p>
-                                <div className="flex items-center gap-4 text-sm text-gray-500 pt-2 border-t border-gray-100">
-                                    <span className="flex items-center gap-1">
-                                        <MonitorPlay className="w-4 h-4 text-red-500" />
-                                        <strong>{course.freeDuration} gratis</strong> + {course.premiumDuration}
-                                    </span>
-                                    <span className="flex items-center gap-1">
-                                        <ShieldCheck className="w-4 h-4" />
-                                        {course.level}
-                                    </span>
-                                </div>
-                                <div className="pt-2">
-                                    <span className="w-full py-3 bg-primary/10 text-primary font-semibold rounded-xl hover:bg-primary/20 transition-colors flex items-center justify-center gap-2 group-hover:bg-accent group-hover:text-white">
-                                        Scopri di più →
-                                    </span>
-                                </div>
-                            </div>
-                        </Link>
-                    ))}
+                    <LevelCard
+                        title="FONDAMENTA"
+                        description="Smetti di andare a caso. Capisci la logica, lo schema e le decisioni della caldaia."
+                        level="Base"
+                        link="/catalogo/base"
+                        colorClass="border-green-200 hover:border-green-400"
+                        icon={<ShieldCheck className="w-6 h-6 text-green-600" />}
+                    />
+
+                    <LevelCard
+                        title="RIPARARE SUL SERIO"
+                        description="Risolvi guasti reali con metodo. Scambiatori, valvole, sensori e scheda."
+                        level="Intermedio"
+                        link="/catalogo/intermedio"
+                        colorClass="border-yellow-200 hover:border-yellow-400"
+                        icon={<MonitorPlay className="w-6 h-6 text-yellow-600" />}
+                    />
+
+                    <LevelCard
+                        title="TECNICO CHE DECIDE"
+                        description="Diagnosi avanzata e mindset. Gestione del cliente e guasti impossibili."
+                        level="Avanzato"
+                        link="/catalogo/avanzato"
+                        colorClass="border-red-200 hover:border-red-400"
+                        icon={<ShieldCheck className="w-6 h-6 text-red-600" />}
+                    />
                 </div>
 
                 {/* CTA to Full Catalog */}
                 <div className="text-center mt-12">
+                    <p className="text-gray-500 mb-4">Oppure vedi l'elenco completo</p>
                     <Link
                         href="/catalogo"
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-accent text-white font-bold rounded-xl hover:bg-accent/90 transition-all shadow-lg hover:shadow-xl hover:scale-105"
+                        className="inline-flex items-center gap-2 px-8 py-3 bg-white text-primary border border-gray-200 font-bold rounded-xl hover:bg-gray-50 transition-all shadow-sm"
                     >
-                        Vedi Tutti i 27 Corsi
-                        <span className="text-xl">→</span>
+                        Vai al Catalogo Generale
                     </Link>
                 </div>
             </div>
