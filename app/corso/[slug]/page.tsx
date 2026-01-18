@@ -2,7 +2,6 @@
 import { useParams } from "next/navigation"
 import { getCourseBySlug, getAllCourses, Course } from "@/lib/coursesData"
 import { getLevelPricing, PRICES } from "@/lib/pricingLogic"
-import { TOS_VERSION } from "@/lib/constants"
 import { PayPalBtn } from "@/components/PayPalBtn"
 import { supabase } from "@/lib/supabaseClient"
 import { useEffect, useState } from "react"
@@ -32,6 +31,7 @@ export default function CorsoPage() {
     const [purchasedCourses, setPurchasedCourses] = useState<string[]>([])
     const [pricingInfo, setPricingInfo] = useState<ReturnType<typeof getLevelPricing> | null>(null)
     const [tosAccepted, setTosAccepted] = useState(false)
+    const [tosLoading, setTosLoading] = useState(false)
 
     useEffect(() => {
         const checkUser = async () => {
@@ -72,63 +72,71 @@ export default function CorsoPage() {
         return () => subscription.unsubscribe()
     }, [course])
 
-    const handlePurchaseSuccess = async () => {
+    // Handler checkbox ToS: chiama API server-side
+    const handleTosCheckbox = async (checked: boolean) => {
+        if (!checked) {
+            setTosAccepted(false)
+            return
+        }
+
+        setTosLoading(true)
+        try {
+            const res = await fetch('/api/accept-tos', { method: 'POST' })
+
+            if (res.ok || res.status === 409) {
+                // 200 = salvato, 409 = già accettato
+                setTosAccepted(true)
+            } else {
+                const data = await res.json()
+                console.error('Errore accept-tos:', data)
+                alert('Non sono riuscito a registrare l\'accettazione. Riprova.')
+                setTosAccepted(false)
+            }
+        } catch (err) {
+            console.error('Errore accept-tos:', err)
+            alert('Non sono riuscito a registrare l\'accettazione. Riprova.')
+            setTosAccepted(false)
+        } finally {
+            setTosLoading(false)
+        }
+    }
+
+    const handlePurchaseSuccess = async (orderId: string) => {
         if (!user || !course || !pricingInfo) return
 
         try {
-            // Salva accettazione ToS con upsert (gestisce duplicati automaticamente)
-            const { error: tosError } = await supabase
-                .from('tos_acceptances')
-                .upsert(
-                    { user_id: user.id, tos_version: TOS_VERSION },
-                    { onConflict: 'user_id,tos_version', ignoreDuplicates: true }
-                )
+            // Chiama API server-side per completare acquisto
+            // Il server calcola prezzo e corsi da sbloccare (non fidarsi del client)
+            const res = await fetch('/api/complete-purchase', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    orderId: orderId,
+                    level: course.level
+                })
+            })
 
-            if (tosError) {
-                console.error('Errore salvataggio accettazione ToS:', tosError)
-                alert('Errore nel salvataggio dell\'accettazione dei Termini. Riprova.')
-                return // BLOCCA ACQUISTO
-            }
-
-            // Verifica che l'accettazione esista (conferma)
-            const { data: tosCheck } = await supabase
-                .from('tos_acceptances')
-                .select('id')
-                .eq('user_id', user.id)
-                .eq('tos_version', TOS_VERSION)
-                .maybeSingle()
-
-            if (!tosCheck) {
-                alert('Errore nel salvataggio dell\'accettazione dei Termini. Riprova.')
-                return // BLOCCA ACQUISTO
-            }
-
-            // Sblocca TUTTI i corsi del livello
-            const coursesToUnlock = allCourses.filter(c => c.level === course.level)
-
-            // Filtra quelli che non ha già (per evitare duplicati, anche se il DB dovrebbe gestirlo)
-            const newPurchaseRecords = coursesToUnlock
-                .filter(c => !purchasedCourses.includes(c.title))
-                .map(c => ({
-                    user_id: user.id,
-                    course_id: c.title,
-                    amount: pricingInfo.amountToPay / coursesToUnlock.length // Prezzo spalmato (simbolico)
-                }))
-
-            if (newPurchaseRecords.length > 0) {
-                const { error } = await supabase
-                    .from('purchases')
-                    .insert(newPurchaseRecords)
-
-                if (error) throw error
+            if (!res.ok) {
+                const data = await res.json()
+                if (data.code === 'TOS_NOT_ACCEPTED') {
+                    alert('Accetta i Termini per procedere.')
+                    setTosAccepted(false)
+                } else if (data.code === 'PAYMENTS_DISABLED') {
+                    alert('Pagamenti temporaneamente non disponibili.')
+                } else if (data.code === 'PAYMENT_VERIFICATION_FAILED') {
+                    alert(`Errore verifica pagamento: ${data.error}`)
+                } else {
+                    throw new Error(data.error || 'Errore sconosciuto')
+                }
+                return
             }
 
             setHasPurchased(true)
-            alert(`🎁 Complimenti!\n\nHai sbloccato l'intero Pacchetto ${course.level} (${coursesToUnlock.length} corsi).\n\nTrovali tutti nella tua Dashboard!`)
+            alert(`🎁 Complimenti!\n\nHai sbloccato l'intero Pacchetto ${course.level}.\n\nTrovali tutti nella tua Dashboard!`)
 
         } catch (err: any) {
             console.error("Errore salvataggio acquisto:", err)
-            alert("Pagamento ricevuto su PayPal, ma errore nel salvataggio. Contatta l'assistenza.")
+            alert("Pagamento ricevuto, ma errore nel salvataggio. Contatta l'assistenza.")
         }
     }
 
@@ -361,37 +369,32 @@ export default function CorsoPage() {
                                     <div className="space-y-4">
                                         {/* Checkbox accettazione ToS */}
                                         {user && (
-                                            <label className="flex items-start gap-3 text-sm text-gray-600 cursor-pointer p-3 bg-gray-50 rounded-xl border border-gray-200 hover:border-accent/30 transition-colors">
+                                            <label className={`flex items-start gap-3 text-sm text-gray-600 cursor-pointer p-3 bg-gray-50 rounded-xl border border-gray-200 hover:border-accent/30 transition-colors ${tosLoading ? 'opacity-50 pointer-events-none' : ''}`}>
                                                 <input
                                                     type="checkbox"
                                                     checked={tosAccepted}
-                                                    onChange={(e) => setTosAccepted(e.target.checked)}
+                                                    onChange={(e) => handleTosCheckbox(e.target.checked)}
+                                                    disabled={tosLoading}
                                                     className="mt-0.5 w-4 h-4 accent-accent flex-shrink-0"
                                                 />
                                                 <span className="leading-relaxed">
-                                                    Ho letto e accetto i{' '}
-                                                    <Link href="/termini" target="_blank" className="text-accent underline font-semibold">
-                                                        Termini e Condizioni
-                                                    </Link>
-                                                    {' '}e confermo che questo accesso è per mio uso personale (vedi{' '}
-                                                    <Link href="/licenze" target="_blank" className="text-accent underline font-semibold">
-                                                        Tipi di Licenza
-                                                    </Link>).
+                                                    {tosLoading ? 'Registrazione in corso...' : (
+                                                        <>
+                                                            Ho letto e accetto i{' '}
+                                                            <Link href="/termini" target="_blank" className="text-accent underline font-semibold">
+                                                                Termini e Condizioni
+                                                            </Link>
+                                                            {' '}e confermo che questo accesso è per mio uso personale (vedi{' '}
+                                                            <Link href="/licenze" target="_blank" className="text-accent underline font-semibold">
+                                                                Tipi di Licenza
+                                                            </Link>).
+                                                        </>
+                                                    )}
                                                 </span>
                                             </label>
                                         )}
 
-                                        {/* SUSPENDED STATE - Temporaneamente disabilitato */}
-                                        <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 text-center">
-                                            <p className="font-bold text-orange-800 mb-1">Acquisti Non Disponibili</p>
-                                            <p className="text-xs text-orange-700">
-                                                Stiamo caricando i video del Pacchetto {course.level}. <br />
-                                                Disponibile a breve.
-                                            </p>
-                                        </div>
-
-                                        {/* Pulsante acquisto - ABILITARE quando pronto */}
-                                        {/* 
+                                        {/* Pulsante acquisto - gestito da PayPalBtn con PAYMENTS_ENABLED */}
                                         {tosAccepted ? (
                                             <PayPalBtn
                                                 amount={String(pricingInfo?.amountToPay || 0)}
@@ -403,11 +406,6 @@ export default function CorsoPage() {
                                                 Accetta i Termini per procedere
                                             </button>
                                         )}
-                                        */}
-
-                                        <button disabled className="w-full py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed">
-                                            Acquista Pacchetto {course.level}
-                                        </button>
 
                                         {!user && (
                                             <p className="text-xs text-gray-400 text-center mt-2">

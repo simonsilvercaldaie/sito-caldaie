@@ -1,16 +1,29 @@
 'use client'
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+import { PAYMENTS_ENABLED, PAYPAL_CLIENT_ID, PAYPAL_ENV } from "@/lib/constants";
 
 interface PayPalBtnProps {
     amount: string;
     courseTitle: string;
-    onSuccess: () => void;
+    onSuccess: (orderId: string) => void;
 }
 
 export function PayPalBtn({ amount, courseTitle, onSuccess }: PayPalBtnProps) {
 
+    // Pagamenti disabilitati: mostra messaggio
+    if (!PAYMENTS_ENABLED) {
+        return (
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 text-center">
+                <p className="font-bold text-orange-800 mb-1">Pagamenti temporaneamente non disponibili</p>
+                <p className="text-xs text-orange-700">
+                    Stiamo configurando il sistema. Riprova più tardi.
+                </p>
+            </div>
+        );
+    }
+
     const initialOptions = {
-        clientId: process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID || "test",
+        clientId: PAYPAL_CLIENT_ID || "test",
         currency: "EUR",
         intent: "capture",
     };
@@ -38,7 +51,13 @@ export function PayPalBtn({ amount, courseTitle, onSuccess }: PayPalBtnProps) {
                         if (actions.order) {
                             const order = await actions.order.capture();
                             console.log("Order Successful:", order);
-                            onSuccess();
+                            // Passa l'orderId al callback per verifica server-side
+                            if (order.id) {
+                                onSuccess(order.id);
+                            } else {
+                                console.error("Order ID mancante");
+                                alert("Errore: ID ordine non ricevuto da PayPal.");
+                            }
                         }
                     }}
                     onError={(err) => {
@@ -54,6 +73,11 @@ export function PayPalBtn({ amount, courseTitle, onSuccess }: PayPalBtnProps) {
             <p className="text-xs text-gray-400 text-center">
                 Procedendo acconsenti all'accesso immediato al contenuto.
             </p>
+            {PAYPAL_ENV === 'sandbox' && (
+                <p className="text-xs text-amber-600 text-center font-semibold">
+                    ⚠️ Ambiente di test (sandbox)
+                </p>
+            )}
         </div>
     );
 }
