@@ -199,20 +199,15 @@ export default function CorsoPage() {
         // Tenta il salvataggio
         const success = await attemptSave()
 
+        // Redirect sempre a pagina stato ordine (funziona anche se ricarica)
         if (success) {
-            setHasPurchased(true)
-            alert(`🎁 Complimenti!\n\nHai sbloccato l'intero Pacchetto ${course.level}.\n\nTrovali tutti nella tua Dashboard!`)
+            // Successo immediato: redirect con parametro per mostrare messaggio
+            window.location.href = `/ordine/${orderId}`
         } else {
-            // Salva orderId per eventuale retry manuale
+            // Fallimento: redirect comunque, la pagina ordine riproverà
             localStorage.setItem('pendingOrderId', orderId)
             localStorage.setItem('pendingOrderLevel', course.level)
-
-            alert(
-                `Pagamento ricevuto.\n\n` +
-                `Stiamo completando l'attivazione.\n` +
-                `Se entro 10 minuti non si sblocca, contattaci indicando:\n` +
-                `ID Ordine: ${orderId}`
-            )
+            window.location.href = `/ordine/${orderId}`
         }
     }
 
