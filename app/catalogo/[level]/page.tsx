@@ -87,9 +87,7 @@ export default function LivelloPage() {
                                         <PlayCircle className="w-12 h-12 text-white/50 group-hover:text-white group-hover:scale-110 transition-all duration-300" />
                                     </div>
 
-                                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm text-primary font-bold px-3 py-1 rounded-lg text-sm shadow-sm">
-                                        € {course.price}
-                                    </div>
+                                    {/* Badge Prezzo Rimosso */}
                                     <div className="absolute bottom-3 left-3 flex gap-2">
                                         <span className="px-2 py-1 bg-black/50 backdrop-blur-md rounded text-white text-xs font-medium flex items-center gap-1">
                                             <MonitorPlay className="w-3 h-3" /> {course.freeDuration}

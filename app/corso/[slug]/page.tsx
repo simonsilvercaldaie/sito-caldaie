@@ -1,7 +1,7 @@
 'use client'
 import { useParams } from "next/navigation"
 import { getCourseBySlug, getAllCourses, Course } from "@/lib/coursesData"
-import { calculateNextPurchase, PRICES } from "@/lib/pricingLogic"
+import { getLevelPricing, PRICES } from "@/lib/pricingLogic"
 import { PayPalBtn } from "@/components/PayPalBtn"
 import { supabase } from "@/lib/supabaseClient"
 import { useEffect, useState } from "react"
@@ -15,7 +15,8 @@ import {
     Lock,
     Youtube,
     ArrowLeft,
-    Star
+    Star,
+    Package
 } from "lucide-react"
 
 export default function CorsoPage() {
@@ -28,8 +29,7 @@ export default function CorsoPage() {
     const [loading, setLoading] = useState(true)
     const [hasPurchased, setHasPurchased] = useState(false)
     const [purchasedCourses, setPurchasedCourses] = useState<string[]>([])
-    const [totalSpent, setTotalSpent] = useState(0)
-    const [pricingInfo, setPricingInfo] = useState<ReturnType<typeof calculateNextPurchase> | null>(null)
+    const [pricingInfo, setPricingInfo] = useState<ReturnType<typeof getLevelPricing> | null>(null)
 
     useEffect(() => {
         const checkUser = async () => {
@@ -37,26 +37,24 @@ export default function CorsoPage() {
             const currentUser = session?.user || null
             setUser(currentUser)
 
+            if (course) {
+                // Calcola il prezzo del pacchetto livello
+                const pricing = getLevelPricing(course.level)
+                setPricingInfo(pricing)
+            }
+
             if (currentUser) {
                 // Carica tutti gli acquisti dell'utente
                 const { data: purchases } = await supabase
                     .from('purchases')
-                    .select('course_id, amount')
+                    .select('course_id')
                     .eq('user_id', currentUser.id)
 
                 if (purchases) {
                     const courseIds = purchases.map(p => p.course_id)
-                    const spent = purchases.reduce((sum, p) => sum + (p.amount || 0), 0)
-
                     setPurchasedCourses(courseIds)
-                    setTotalSpent(spent)
-
-                    // Verifica se ha acquistato questo corso specifico
+                    // Verifica se ha acquistato questo corso
                     setHasPurchased(course ? courseIds.includes(course.title) : false)
-
-                    // Calcola il pricing per il prossimo acquisto
-                    const pricing = calculateNextPurchase(courseIds.length, spent)
-                    setPricingInfo(pricing)
                 }
             }
 
@@ -76,43 +74,29 @@ export default function CorsoPage() {
         if (!user || !course || !pricingInfo) return
 
         try {
-            // Se è un bundle upgrade, sblocca più corsi
-            if (pricingInfo.isBundleUpgrade && pricingInfo.coursesToUnlock > 1) {
-                // Trova i corsi non ancora acquistati
-                const unpurchasedCourses = allCourses
-                    .filter(c => !purchasedCourses.includes(c.title))
-                    .slice(0, pricingInfo.coursesToUnlock)
+            // Sblocca TUTTI i corsi del livello
+            const coursesToUnlock = allCourses.filter(c => c.level === course.level)
 
-                // Inserisci tutti i corsi sbloccati
-                const purchaseRecords = unpurchasedCourses.map(c => ({
+            // Filtra quelli che non ha già (per evitare duplicati, anche se il DB dovrebbe gestirlo)
+            const newPurchaseRecords = coursesToUnlock
+                .filter(c => !purchasedCourses.includes(c.title))
+                .map(c => ({
                     user_id: user.id,
                     course_id: c.title,
-                    amount: pricingInfo.amountToPay / pricingInfo.coursesToUnlock // Dividi equamente
+                    amount: pricingInfo.amountToPay / coursesToUnlock.length // Prezzo spalmato (simbolico)
                 }))
 
+            if (newPurchaseRecords.length > 0) {
                 const { error } = await supabase
                     .from('purchases')
-                    .insert(purchaseRecords)
+                    .insert(newPurchaseRecords)
 
                 if (error) throw error
-
-                setHasPurchased(true)
-                alert(`🎁 OFFERTA BUNDLE!\n\nHai sbloccato ${pricingInfo.coursesToUnlock} corsi:\n${unpurchasedCourses.map(c => '• ' + c.title).join('\n')}\n\nTrovali tutti nella tua Dashboard!`)
-            } else {
-                // Acquisto singolo normale
-                const { error } = await supabase
-                    .from('purchases')
-                    .insert([{
-                        user_id: user.id,
-                        course_id: course.title,
-                        amount: pricingInfo.amountToPay
-                    }])
-
-                if (error) throw error
-
-                setHasPurchased(true)
-                alert(`🎉 Acquisto completato!\n\nIl corso "${course.title}" è ora disponibile nella tua Dashboard.`)
             }
+
+            setHasPurchased(true)
+            alert(`🎁 Complimenti!\n\nHai sbloccato l'intero Pacchetto ${course.level} (${coursesToUnlock.length} corsi).\n\nTrovali tutti nella tua Dashboard!`)
+
         } catch (err: any) {
             console.error("Errore salvataggio acquisto:", err)
             alert("Pagamento ricevuto su PayPal, ma errore nel salvataggio. Contatta l'assistenza.")
@@ -229,7 +213,7 @@ export default function CorsoPage() {
                             <div className="space-y-4 pt-4">
                                 <div className="flex items-center gap-2 mb-2">
                                     <div className="bg-accent text-white text-xs font-bold px-2 py-1 rounded uppercase">Parte 2</div>
-                                    <h2 className="text-xl font-bold text-gray-800">Video Premium (Corso Completo)</h2>
+                                    <h2 className="text-xl font-bold text-gray-800">Video Premium (Esclusiva)</h2>
                                 </div>
                                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-accent/20 relative">
                                     {hasPurchased ? (
@@ -251,10 +235,10 @@ export default function CorsoPage() {
                                                 <Lock className="w-16 h-16 text-white mb-4 group-hover:scale-110 transition-transform duration-300" />
                                                 <h3 className="text-2xl font-bold text-white mb-2">Contenuto Riservato</h3>
                                                 <p className="text-gray-200 mb-6 max-w-sm">
-                                                    Guarda la Parte 2 ({course.premiumDuration}) con diagnosi avanzata e casi reali.
+                                                    Fa parte del <strong>Pacchetto {course.level}</strong>. Sbloccalo per accedere.
                                                 </p>
                                                 <button className="bg-accent text-white font-bold px-6 py-3 rounded-xl hover:bg-accent/90 transition-colors shadow-lg">
-                                                    Sblocca il Corso Completo
+                                                    Sblocca il Livello Completo
                                                 </button>
                                             </div>
                                             {/* Sfondo sfocato fake */}
@@ -265,9 +249,9 @@ export default function CorsoPage() {
                                     <div className="p-4 bg-accent/5 flex items-center justify-between gap-2 text-sm border-t border-accent/10">
                                         <div className="flex items-center gap-2 text-gray-700">
                                             <ShieldCheck className="w-5 h-5 text-accent" />
-                                            <span>Durata: <strong>{course.premiumDuration}</strong> di tecnica pura</span>
+                                            <span>Solo per i membri del <strong>Livello {course.level}</strong></span>
                                         </div>
-                                        {hasPurchased && <span className="text-green-600 font-bold flex items-center gap-1"><CheckCircle2 className="w-4 h-4" /> Acquistato</span>}
+                                        {hasPurchased && <span className="text-green-600 font-bold flex items-center gap-1"><CheckCircle2 className="w-4 h-4" /> Incluso</span>}
                                     </div>
                                 </div>
                             </div>
@@ -297,10 +281,10 @@ export default function CorsoPage() {
                             <div className="bg-gradient-to-br from-accent/10 to-orange-50 rounded-2xl shadow-lg p-6 md:p-8 border-2 border-accent/20">
                                 <div className="flex items-center gap-2 mb-6">
                                     <Star className="w-6 h-6 text-accent" />
-                                    <h2 className="text-2xl font-bold text-primary">Contenuto Premium Esclusivo</h2>
+                                    <h2 className="text-2xl font-bold text-primary">Contenuto Premium (Solo nel Pack)</h2>
                                 </div>
                                 <p className="text-gray-600 mb-6">
-                                    Acquistando il corso completo, avrai accesso a:
+                                    Acquistando il pacchetto {course.level}, potrai vedere:
                                 </p>
                                 <ul className="space-y-3">
                                     {course.premiumContent.map((item, index) => (
@@ -319,27 +303,23 @@ export default function CorsoPage() {
 
                                 {/* Pricing Display */}
                                 <div className="text-center mb-6">
-                                    <div className="text-4xl font-extrabold text-primary mb-2">
-                                        € {pricingInfo?.amountToPay.toFixed(2) || PRICES.SINGLE + '.00'}
+                                    <div className="inline-block p-3 bg-accent/10 text-accent rounded-full mb-3">
+                                        <Package className="w-8 h-8 mx-auto" />
                                     </div>
-                                    <p className="text-gray-500 text-sm">Accesso illimitato per sempre</p>
-
-                                    {/* Info risparmio - solo se bundle upgrade */}
-                                    {pricingInfo?.isBundleUpgrade && (
-                                        <div className="mt-4 p-3 bg-gray-50 rounded-xl text-sm text-gray-600">
-                                            <p>
-                                                Con questo acquisto sblocchi <strong>{pricingInfo.coursesToUnlock} corsi</strong> e
-                                                arrivi a {pricingInfo.totalAfterPurchase} corsi totali.
-                                            </p>
-                                        </div>
-                                    )}
+                                    <h3 className="font-bold text-gray-500 uppercase tracking-wider text-sm mb-1">
+                                        PACCHETTO {course.level.toUpperCase()}
+                                    </h3>
+                                    <div className="text-4xl font-extrabold text-primary mb-2">
+                                        € {pricingInfo?.amountToPay}.00
+                                    </div>
+                                    <p className="text-gray-500 text-sm">Include tutti i 9 corsi del livello</p>
                                 </div>
 
                                 {hasPurchased ? (
                                     <div className="space-y-4">
                                         <div className="bg-green-50 text-green-800 p-4 rounded-xl text-center">
                                             <CheckCircle2 className="w-8 h-8 mx-auto mb-2" />
-                                            <p className="font-bold">Corso Acquistato!</p>
+                                            <p className="font-bold">Pacchetto Attivo!</p>
                                         </div>
                                         <Link
                                             href="/dashboard"
@@ -350,18 +330,18 @@ export default function CorsoPage() {
                                     </div>
                                 ) : (
                                     <div className="space-y-4">
+                                        {/* SUSPENDED STATE */}
                                         <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 text-center">
-                                            <p className="font-bold text-orange-800 mb-1">Acquisti Sospesi</p>
+                                            <p className="font-bold text-orange-800 mb-1">Acquisti Non Disponibili</p>
                                             <p className="text-xs text-orange-700">
-                                                Stiamo caricando i nuovi video. Le vendite riapriranno a breve.
+                                                Stiamo caricando i video del Pacchetto {course.level}. <br />
+                                                Disponibile a breve.
                                             </p>
                                         </div>
                                         <button disabled className="w-full py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed">
-                                            Acquista Corso
+                                            Acquista Pacchetto {course.level}
                                         </button>
-                                        <p className="text-xs text-gray-400 text-center">
-                                            Torna a trovarci presto!
-                                        </p>
+
                                         {!user && (
                                             <p className="text-xs text-gray-400 text-center mt-2">
                                                 <Link href="/login" className="underline hover:text-accent">Accedi</Link> se hai già acquistato.
@@ -375,37 +355,23 @@ export default function CorsoPage() {
                                 {/* Info prezzi - nascosto su mobile */}
                                 <div className="hidden lg:block text-sm text-gray-500 mb-6">
                                     <p className="mb-2">
-                                        <strong>Come funziona:</strong>
+                                        <strong>Cosa include il pack:</strong>
                                     </p>
-                                    <ul className="space-y-1 text-xs">
-                                        <li>• Ogni corso costa €{PRICES.SINGLE}</li>
-                                        <li>• Con 5 corsi paghi max €{PRICES.BUNDLE_5}</li>
-                                        <li>• Con tutti i 10 corsi paghi max €{PRICES.BUNDLE_10}</li>
+                                    <ul className="space-y-2 text-xs">
+                                        <li className="flex items-center gap-2">
+                                            <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                            Accesso a tutti i 9 corsi {course.level}
+                                        </li>
+                                        <li className="flex items-center gap-2">
+                                            <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                            Materiali e checklist scaricabili
+                                        </li>
+                                        <li className="flex items-center gap-2">
+                                            <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                            Aggiornamenti futuri inclusi
+                                        </li>
                                     </ul>
-                                    <p className="text-xs mt-2 text-gray-400">
-                                        Il risparmio si applica automaticamente.
-                                    </p>
                                 </div>
-
-                                {/* Lista benefici - nascosta su mobile */}
-                                <ul className="hidden lg:block space-y-3 text-sm text-gray-600">
-                                    <li className="flex items-center gap-2">
-                                        <ShieldCheck className="w-4 h-4 text-green-500" />
-                                        Accesso immediato dopo l'acquisto
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <ShieldCheck className="w-4 h-4 text-green-500" />
-                                        Video in alta qualità
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <ShieldCheck className="w-4 h-4 text-green-500" />
-                                        Accesso da qualsiasi dispositivo
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <ShieldCheck className="w-4 h-4 text-green-500" />
-                                        Materiali scaricabili inclusi
-                                    </li>
-                                </ul>
                             </div>
                         </div>
                     </div>

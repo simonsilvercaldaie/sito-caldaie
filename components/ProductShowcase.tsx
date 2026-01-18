@@ -36,9 +36,7 @@ export default function ProductShowcase() {
                                         <PlayCircle className="w-10 h-10 text-white" />
                                     </div>
                                 </div>
-                                <div className="absolute top-4 right-4 bg-accent text-white font-bold px-3 py-1 rounded-full text-sm shadow-md">
-                                    € {course.price}
-                                </div>
+                                {/* Badge Prezzo Rimosso */}
                                 <div className="absolute top-4 left-4">
                                     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${levelColors[course.level]}`}>
                                         {course.level}
