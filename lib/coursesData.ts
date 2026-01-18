@@ -296,7 +296,8 @@ export const courses: Course[] = [
         level: "Avanzato",
         price: "49.00",
         learnings: ["Analisi fumi avanzata", "Eccesso d'aria nascosto", "CO2 instabile", "Punti di rugiada"],
-        premiumContent: ["Tarare valvole gas elettroniche", "Lettura critica scontrino analizzatore", "Combustione condensazione vs premiscelata"]
+        premiumContent: ["Tarare valvole gas elettroniche", "Lettura critica scontrino analizzatore", "Combustione condensazione vs premiscelata"],
+        coverImage: "/images/courses/19-combustione-falsa.png"
     },
     {
         id: "20-guasti-intermittenti",
@@ -309,7 +310,8 @@ export const courses: Course[] = [
         level: "Avanzato",
         price: "49.00",
         learnings: ["Strategia di monitoraggio", "Replicare le condizioni del guasto", "Fattori ambientali (vento, tensione)", "Pazienza metodica"],
-        premiumContent: ["Strumenti di logging", "Intervistare il cliente come un detective", "Il metodo 'Trappola'"]
+        premiumContent: ["Strumenti di logging", "Intervistare il cliente come un detective", "Il metodo 'Trappola'"],
+        coverImage: "/images/courses/20-guasti-intermittenti.png"
     },
     {
         id: "21-cinque-domande",
@@ -322,7 +324,8 @@ export const courses: Course[] = [
         level: "Avanzato",
         price: "49.00",
         learnings: ["L'anamnesi tecnica", "Cosa è cambiato da ieri?", "Lo fa sempre o solo quando...?", "Chi l'ha toccata per ultimo?"],
-        premiumContent: ["Script di intervista completo", "Decodificare le risposte dei clienti", "Trovare la bugia innocente"]
+        premiumContent: ["Script di intervista completo", "Decodificare le risposte dei clienti", "Trovare la bugia innocente"],
+        coverImage: "/images/courses/21-cinque-domande.png"
     },
     {
         id: "22-parametri-corretti-guasto",
@@ -335,7 +338,8 @@ export const courses: Course[] = [
         level: "Avanzato",
         price: "49.00",
         learnings: ["Conflitti software", "Problemi di messa a terra/neutro", "Interferenze elettromagnetiche", "Bug del firmware"],
-        premiumContent: ["Uso dell'oscilloscopio (base)", "Verifica terra e polarità avanzata", "Reset di fabbrica e riconfigurazione"]
+        premiumContent: ["Uso dell'oscilloscopio (base)", "Verifica terra e polarità avanzata", "Reset di fabbrica e riconfigurazione"],
+        coverImage: "/images/courses/22-parametri-corretti-guasto.png"
     },
     {
         id: "23-perdite-invisibili",
@@ -348,7 +352,8 @@ export const courses: Course[] = [
         level: "Avanzato",
         price: "49.00",
         learnings: ["Perdite nello scambiatore primario (evaporano)", "Valvole sicurezza che gocciolano solo a caldo", "Vaso scarico ma non rotto", "Perdite sottotraccia"],
-        premiumContent: ["Tecniche di ricerca perdite", "Isolare caldaia vs impianto", "Gestione del vaso espansione problematica"]
+        premiumContent: ["Tecniche di ricerca perdite", "Isolare caldaia vs impianto", "Gestione del vaso espansione problematica"],
+        coverImage: "/images/courses/23-perdite-invisibili.png"
     },
     {
         id: "24-problema-insieme",
@@ -361,7 +366,8 @@ export const courses: Course[] = [
         level: "Avanzato",
         price: "49.00",
         learnings: ["Compatibilità caldaia/impianto", "Pendolamenti dovuti ai termostati", "Portate minime non rispettate", "Problemi idraulici complessi"],
-        premiumContent: ["Analisi sistemica", "Risolvere senza cambiare caldaia", "Modifiche impiantistiche correttive"]
+        premiumContent: ["Analisi sistemica", "Risolvere senza cambiare caldaia", "Modifiche impiantistiche correttive"],
+        coverImage: "/images/courses/24-problema-insieme.png"
     },
     {
         id: "25-decisione-finale",
@@ -374,7 +380,8 @@ export const courses: Course[] = [
         level: "Avanzato",
         price: "49.00",
         learnings: ["Valutazione del rischio", "Preventivazione onesta", "Responsabilità civile e penale", "Dormire sonni tranquilli"],
-        premiumContent: ["Procedure di messa fuori servizio", "Documentazione da lasciare", "Gestire il cliente arrabbiato"]
+        premiumContent: ["Procedure di messa fuori servizio", "Documentazione da lasciare", "Gestire il cliente arrabbiato"],
+        coverImage: "/images/courses/25-decisione-finale.png"
     },
     {
         id: "26-gestire-cliente",
@@ -387,7 +394,8 @@ export const courses: Course[] = [
         level: "Avanzato",
         price: "49.00",
         learnings: ["Comunicazione assertiva", "Spiegare il guasto in parole semplici", "Giustificare il prezzo", "Farsi rispettare come professionista"],
-        premiumContent: ["Frasi da dire e da non dire", "Gestire l'obiezione 'è troppo caro'", "Costruire fiducia immediata"]
+        premiumContent: ["Frasi da dire e da non dire", "Gestire l'obiezione 'è troppo caro'", "Costruire fiducia immediata"],
+        coverImage: "/images/courses/26-gestire-cliente.png"
     },
     {
         id: "27-pensare-primario",
@@ -400,7 +408,8 @@ export const courses: Course[] = [
         level: "Avanzato",
         price: "49.00",
         learnings: ["Visione d'insieme", "Mindset diagnostico superiore", "L'esperienza codificata", "Diventare un riferimento"],
-        premiumContent: ["Il manifesto del tecnico evoluto", "Next steps per la carriera", "Saluti finali e augurio"]
+        premiumContent: ["Il manifesto del tecnico evoluto", "Next steps per la carriera", "Saluti finali e augurio"],
+        coverImage: "/images/courses/27-pensare-primario.jpg"
     }
 ]
 
