@@ -168,7 +168,8 @@ export const courses: Course[] = [
         level: "Intermedio",
         price: "39.00",
         learnings: ["Ciclo di accensione interrotto", "Fiamma che non tiene", "Salita temperatura troppo rapida", "Caduta di pressione immediata"],
-        premiumContent: ["Analisi curve di temperatura", "Problemi di ionizzazione a caldo", "Diagnosi predittiva durante l'accensione"]
+        premiumContent: ["Analisi curve di temperatura", "Problemi di ionizzazione a caldo", "Diagnosi predittiva durante l'accensione"],
+        coverImage: "/images/courses/10-blocchi-prevedibili.png"
     },
     {
         id: "11-problema-impianto",
@@ -181,7 +182,8 @@ export const courses: Course[] = [
         level: "Intermedio",
         price: "39.00",
         learnings: ["Mancanza di circolazione", "Aria nell'impianto", "Sporcizia e fanghi esterni", "Dimensionamento tubi errato"],
-        premiumContent: ["Test a 'caldaia chiusa'", "Verifica prevalenza pompa", "Bilanciamento impianto base"]
+        premiumContent: ["Test a 'caldaia chiusa'", "Verifica prevalenza pompa", "Bilanciamento impianto base"],
+        coverImage: "/images/courses/11-problema-impianto.png"
     },
     {
         id: "12-scambiatori-colpevoli",
@@ -194,7 +196,8 @@ export const courses: Course[] = [
         level: "Intermedio",
         price: "39.00",
         learnings: ["Scambio termico inefficiente", "Sintomi calcare lato acqua", "Intasamento lato fumi", "Sostituire o lavare?"],
-        premiumContent: ["Lavaggio chimico sicuro", "Calcolo delta T per diagnosi", "Casi reali di scambiatori 'finti guasti'"]
+        premiumContent: ["Lavaggio chimico sicuro", "Calcolo delta T per diagnosi", "Casi reali di scambiatori 'finti guasti'"],
+        coverImage: "/images/courses/12-scambiatori-colpevoli.png"
     },
     {
         id: "13-valvola-tre-vie",
@@ -207,7 +210,8 @@ export const courses: Course[] = [
         level: "Intermedio",
         price: "39.00",
         learnings: ["Trafilamento interno", "Blocco meccanico", "Motore vs Corpo valvola", "Diagnosi certa al 100%"],
-        premiumContent: ["Revisione cartuccia", "Test motore elettrico", "Bypassare temporaneamente per diagnosi"]
+        premiumContent: ["Revisione cartuccia", "Test motore elettrico", "Bypassare temporaneamente per diagnosi"],
+        coverImage: "/images/courses/13-valvola-tre-vie.png"
     },
     {
         id: "14-sensori-ntc",
@@ -220,7 +224,8 @@ export const courses: Course[] = [
         level: "Intermedio",
         price: "39.00",
         learnings: ["Deriva termica NTC", "Isteresi pressostati", " falsi contatti", "Leggere col multimetro vs leggere dalla scheda"],
-        premiumContent: ["Tabella valori Ohm/Temp universale", "Costruire un simulatore di sensori", "Casi di sensori 'bugiardi'"]
+        premiumContent: ["Tabella valori Ohm/Temp universale", "Costruire un simulatore di sensori", "Casi di sensori 'bugiardi'"],
+        coverImage: "/images/courses/14-sensori-ntc.png"
     },
     {
         id: "15-scheda-elettronica",
@@ -233,7 +238,8 @@ export const courses: Course[] = [
         level: "Intermedio",
         price: "39.00",
         learnings: ["Codici generici vs specifici", "La scheda come 'vittima' di altri guasti", "Reset software vs Guasto hardware", "Quando sostituirla davvero"],
-        premiumContent: ["Verifica alimentazioni a bordo", "Relè incollati", "Tracce bruciate o saldature fredde"]
+        premiumContent: ["Verifica alimentazioni a bordo", "Relè incollati", "Tracce bruciate o saldature fredde"],
+        coverImage: "/images/courses/15-scheda-elettronica.png"
     },
     {
         id: "16-calcare-magnetite",
@@ -246,7 +252,8 @@ export const courses: Course[] = [
         level: "Intermedio",
         price: "39.00",
         learnings: ["Differenza Calcare vs Magnetite", "Danni alle pompe modulanti", "Surriscaldamenti localizzati", "Prevenzione efficace"],
-        premiumContent: ["Analisi acqua impianto", "Installazione filtri defangatori", "Lavaggio risanante: quando e come"]
+        premiumContent: ["Analisi acqua impianto", "Installazione filtri defangatori", "Lavaggio risanante: quando e come"],
+        coverImage: "/images/courses/16-calcare-magnetite.png"
     },
     {
         id: "17-errori-installazione",
@@ -259,7 +266,8 @@ export const courses: Course[] = [
         level: "Intermedio",
         price: "39.00",
         learnings: ["Scarichi fumi non a norma", "Mancanza prese d'aria", "Diametri gas insufficienti", "Assenza vasi espansione sanitari"],
-        premiumContent: ["Gestire l'errore altrui col cliente", "Normative UNI essenziali", "Correggere senza rifare tutto"]
+        premiumContent: ["Gestire l'errore altrui col cliente", "Normative UNI essenziali", "Correggere senza rifare tutto"],
+        coverImage: "/images/courses/17-errori-installazione.png"
     },
     {
         id: "18-riparare-senza-cambiare",
@@ -272,7 +280,8 @@ export const courses: Course[] = [
         level: "Intermedio",
         price: "39.00",
         learnings: ["Sbloccare pompe e valvole", "Pulire contatti ed elettrodi", "Ricaricare vasi", "Tarare anziché sostituire"],
-        premiumContent: ["Kit di sopravvivenza (paglietta, spray, ecc.)", "Interventi 'Mondo Reale'", "Quando la pulizia vale più del ricambio"]
+        premiumContent: ["Kit di sopravvivenza (paglietta, spray, ecc.)", "Interventi 'Mondo Reale'", "Quando la pulizia vale più del ricambio"],
+        coverImage: "/images/courses/18-riparare-senza-cambiare.png"
     },
 
     // --- LIVELLO AVANZATO (9 Video) ---
