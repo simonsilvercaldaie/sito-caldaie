@@ -16,8 +16,10 @@ import {
     Youtube,
     ArrowLeft,
     Star,
-    Package
+    Package,
+    BookOpen
 } from "lucide-react"
+import { EducationalPanel } from "@/components/educational/EducationalPanel"
 
 export default function CorsoPage() {
     const params = useParams()
@@ -242,8 +244,9 @@ export default function CorsoPage() {
 
     const levelColors = {
         "Base": "bg-green-100 text-green-800",
-        "Intermedio": "bg-yellow-100 text-yellow-800",
-        "Avanzato": "bg-red-100 text-red-800"
+        "Intermedio": "bg-blue-100 text-blue-800",
+        "Avanzato": "bg-purple-100 text-purple-800",
+        "Laboratorio": "bg-yellow-100 text-yellow-800"
     }
 
     return (
@@ -362,6 +365,15 @@ export default function CorsoPage() {
                                         {hasPurchased && <span className="text-green-600 font-bold flex items-center gap-1"><CheckCircle2 className="w-4 h-4" /> Incluso</span>}
                                     </div>
                                 </div>
+                            </div>
+
+                            {/* Educational Panel (Schede, Quiz, ecc.) */}
+                            <div className="pt-8">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <BookOpen className="w-6 h-6 text-primary" />
+                                    <h2 className="text-2xl font-bold text-primary">Materiali Didattici</h2>
+                                </div>
+                                <EducationalPanel videoId={course.id.split('-')[0]} />
                             </div>
 
                             {/* Description */}

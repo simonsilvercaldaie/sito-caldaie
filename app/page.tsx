@@ -1,11 +1,28 @@
+'use client'
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { PlayCircle, MonitorPlay, Lock, ShieldCheck } from "lucide-react";
+import { PlayCircle, MonitorPlay, Lock, ShieldCheck, UserCheck } from "lucide-react";
 import ProductShowcase from "@/components/ProductShowcase";
 import AboutSimonSection from "@/components/AboutSimonSection";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
+import { supabase } from "@/lib/supabaseClient";
 
 export default function Home() {
+    const [session, setSession] = useState<any>(null)
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session)
+        })
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session)
+        })
+
+        return () => subscription.unsubscribe()
+    }, [])
+
     return (
         <div className="min-h-screen flex flex-col font-sans">
             <Navbar />
@@ -25,10 +42,17 @@ export default function Home() {
                         </p>
 
                         <div className="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-                            <Link href="/login" className="flex items-center justify-center gap-2 px-8 py-4 bg-accent text-white rounded-xl text-lg font-bold hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/20">
-                                <PlayCircle className="w-6 h-6" />
-                                Accedi / Registrati
-                            </Link>
+                            {session ? (
+                                <button disabled className="flex items-center justify-center gap-2 px-8 py-4 bg-green-600/80 text-white rounded-xl text-lg font-bold cursor-not-allowed shadow-none opacity-90 hover:bg-green-600/80">
+                                    <UserCheck className="w-6 h-6" />
+                                    Sei già loggato
+                                </button>
+                            ) : (
+                                <Link href="/login" className="flex items-center justify-center gap-2 px-8 py-4 bg-accent text-white rounded-xl text-lg font-bold hover:bg-orange-600 transition-all shadow-xl shadow-orange-500/20">
+                                    <PlayCircle className="w-6 h-6" />
+                                    Accedi / Registrati
+                                </Link>
+                            )}
                         </div>
                     </div>
 

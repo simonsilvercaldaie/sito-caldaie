@@ -11,7 +11,7 @@ export default function LivelloPage() {
     const levelSlug = params.level as string // "base", "intermedio", "avanzato"
 
     // Mappa slug -> Titolo "ufficiale"
-    const levelMap: Record<string, { title: string, dbLevel: "Base" | "Intermedio" | "Avanzato", description: string, color: string }> = {
+    const levelMap: Record<string, { title: string, dbLevel: "Base" | "Intermedio" | "Avanzato" | "Laboratorio", description: string, color: string }> = {
         "base": {
             title: "FONDAMENTA",
             dbLevel: "Base",
@@ -29,6 +29,12 @@ export default function LivelloPage() {
             dbLevel: "Avanzato",
             description: "Diagnosi avanzata, elettronica e mindset. Il livello che ti differenzia.",
             color: "bg-red-100 text-red-800 border-red-200"
+        },
+        "laboratorio": {
+            title: "LABORATORIO",
+            dbLevel: "Laboratorio",
+            description: "Casi studio reali, video extra e approfondimenti. Contenuti fuori schema per tecnici curiosi.",
+            color: "bg-yellow-100 text-yellow-800 border-yellow-200"
         }
     }
 
@@ -58,7 +64,7 @@ export default function LivelloPage() {
             <main className="flex-grow py-12 px-4 md:px-8">
                 <div className="max-w-7xl mx-auto">
 
-                    <Link href="/catalogo" className="inline-flex items-center gap-2 text-gray-500 hover:text-primary mb-8 transition-colors">
+                    <Link href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-primary mb-8 transition-colors">
                         <ArrowLeft className="w-4 h-4" />
                         Torna ai Livelli
                     </Link>

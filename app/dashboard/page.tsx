@@ -2,20 +2,41 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
-import { LogOut, User, Video, ShoppingBag, PlayCircle, Loader2 } from 'lucide-react'
+import { LogOut, User, Lock, Save, Loader2, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 
 export default function DashboardPage() {
     const [user, setUser] = useState<any>(null)
-    const [purchases, setPurchases] = useState<any[]>([])
     const [loading, setLoading] = useState(true)
-    const [stats, setStats] = useState({ count: 0, totalSpent: 0 })
+
+    // Form States
+    const [fullName, setFullName] = useState('')
+    const [address, setAddress] = useState('')
+    const [city, setCity] = useState('')
+    const [cap, setCap] = useState('')
+    const [cf, setCf] = useState('')
+    const [piva, setPiva] = useState('')
+    const [sdi, setSdi] = useState('')
+    const [pec, setPec] = useState('')
+
+    const [updatingProfile, setUpdatingProfile] = useState(false)
+    const [updatingPassword, setUpdatingPassword] = useState(false)
+
+    // Password change state
+    const [newPassword, setNewPassword] = useState('')
+    const [confirmPassword, setConfirmPassword] = useState('')
+    const [showPassword, setShowPassword] = useState(false)
+
+    // Delete Account State
+    const [showDeleteModal, setShowDeleteModal] = useState(false)
+    const [deleteConfirmChecked, setDeleteConfirmChecked] = useState(false)
+    const [deletingAccount, setDeletingAccount] = useState(false)
+
     const router = useRouter()
 
     useEffect(() => {
-        const checkUserAndData = async () => {
-            // 1. Check Auth
+        const checkUser = async () => {
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) {
                 router.push('/login')
@@ -23,29 +44,20 @@ export default function DashboardPage() {
             }
             setUser(session.user)
 
-            // 2. Fetch Purchases
-            try {
-                const { data, error } = await supabase
-                    .from('purchases')
-                    .select('*')
-                    .eq('user_id', session.user.id)
-                    .order('created_at', { ascending: false })
+            // Carica metadati
+            const meta = session.user.user_metadata || {}
+            setFullName(meta.full_name || '')
+            setAddress(meta.address || '')
+            setCity(meta.city || '')
+            setCap(meta.cap || '')
+            setCf(meta.cf || '')
+            setPiva(meta.piva || '') // Se azienda
+            setSdi(meta.sdi || '')
+            setPec(meta.pec || '')
 
-                if (error) throw error
-
-                if (data) {
-                    setPurchases(data)
-                    // Calcola statistiche
-                    const total = data.reduce((acc, curr) => acc + Number(curr.amount), 0)
-                    setStats({ count: data.length, totalSpent: total })
-                }
-            } catch (err) {
-                console.error("Errore caricamento dati:", err)
-            } finally {
-                setLoading(false)
-            }
+            setLoading(false)
         }
-        checkUserAndData()
+        checkUser()
     }, [router])
 
     const handleLogout = async () => {
@@ -53,17 +65,107 @@ export default function DashboardPage() {
         router.push('/')
     }
 
+    const handleUpdateProfile = async (e: React.FormEvent) => {
+        e.preventDefault()
+        setUpdatingProfile(true)
+        try {
+            const updates = {
+                full_name: fullName,
+                address,
+                city,
+                cap,
+                cf,
+                piva,
+                sdi,
+                pec
+            }
+
+            const { error } = await supabase.auth.updateUser({
+                data: updates
+            })
+            if (error) throw error
+            alert('Profilo aggiornato con successo!')
+        } catch (error: any) {
+            alert('Errore: ' + error.message)
+        } finally {
+            setUpdatingProfile(false)
+        }
+    }
+
+    const handleUpdatePassword = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (newPassword !== confirmPassword) {
+            alert('Le password non coincidono')
+            return
+        }
+        if (newPassword.length < 6) {
+            alert('La password deve essere di almeno 6 caratteri')
+            return
+        }
+
+        setUpdatingPassword(true)
+        try {
+            const { error } = await supabase.auth.updateUser({
+                password: newPassword
+            })
+            if (error) throw error
+            alert('Password aggiornata con successo!')
+            setNewPassword('')
+            setConfirmPassword('')
+        } catch (error: any) {
+            alert('Errore: ' + error.message)
+        } finally {
+            setUpdatingPassword(false)
+        }
+    }
+
+    const handleDeleteAccount = async () => {
+        if (!deleteConfirmChecked) return
+
+        setDeletingAccount(true)
+        try {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (!session) throw new Error("No session")
+
+            const response = await fetch('/api/delete-account', {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${session.access_token}`
+                }
+            })
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Errore durante l\'eliminazione')
+            }
+
+            // Logout steps
+            await supabase.auth.signOut()
+            alert('Account eliminato correttamente.')
+            router.push('/')
+
+        } catch (error: any) {
+            alert('Errore: ' + error.message)
+        } finally {
+            setDeletingAccount(false)
+            setShowDeleteModal(false)
+        }
+    }
+
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 gap-2 text-primary">
-            <Loader2 className="animate-spin" /> Caricamento Dashboard...
+            <Loader2 className="animate-spin" /> Caricamento Area Riservata...
         </div>
     )
 
+    const isCompany = !!piva // Semplice check se ha piva salvata
+
     return (
-        <div className="min-h-screen bg-gray-50 font-sans">
+        <div className="min-h-screen bg-gray-50 font-sans pb-20">
 
             {/* Navbar Dashboard */}
-            <header className="bg-white shadow-sm px-4 md:px-8 py-4 flex justify-between items-center sticky top-0 z-10">
+            <header className="bg-white shadow-sm px-4 md:px-8 py-4 flex justify-between items-center sticky top-0 z-10 mb-8 max-w-7xl mx-auto rounded-b-2xl">
                 <div className="flex items-center gap-3">
                     <Link href="/">
                         <div className="relative w-8 h-8">
@@ -77,13 +179,7 @@ export default function DashboardPage() {
                         <User className="w-4 h-4" />
                         {user?.email}
                     </div>
-                    <Link
-                        href="/dashboard/account"
-                        className="flex items-center gap-2 px-4 py-2 text-primary border border-primary/20 hover:bg-primary/5 rounded-lg transition-colors text-sm font-bold"
-                    >
-                        <User className="w-4 h-4" />
-                        Account
-                    </Link>
+
                     <button
                         onClick={handleLogout}
                         className="flex items-center gap-2 px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors text-sm font-medium border border-transparent hover:border-red-100"
@@ -94,105 +190,277 @@ export default function DashboardPage() {
                 </div>
             </header>
 
-            <main className="max-w-6xl mx-auto px-4 py-8">
+            <main className="max-w-4xl mx-auto px-4 space-y-8">
 
-                <div className="grid md:grid-cols-2 gap-6 mb-8">
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div className="flex items-center gap-3 mb-2 text-primary">
-                            <Video className="w-6 h-6" />
-                            <h3 className="font-bold">I Miei Corsi</h3>
-                        </div>
-                        <p className="text-3xl font-bold text-gray-800">{stats.count}</p>
-                        <p className="text-sm text-gray-500">Video pronti da guardare</p>
-                    </div>
-
-                    {/* Bundle Progress Card */}
-                    <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                        <div className="flex items-center gap-3 mb-2 text-primary">
-                            <ShoppingBag className="w-6 h-6" />
-                            <h3 className="font-bold">Progresso Libreria</h3>
-                        </div>
-                        {stats.count >= 10 ? (
-                            <div>
-                                <p className="text-xl font-bold text-green-600">Libreria Completa! 🎉</p>
-                                <p className="text-sm text-gray-500">Hai accesso a tutti i 10 corsi</p>
-                            </div>
-                        ) : stats.count >= 5 ? (
-                            <div>
-                                <p className="text-xl font-bold text-gray-800">{stats.count}/10 corsi</p>
-                                <p className="text-sm text-gray-500">
-                                    Ti mancano {10 - stats.count} corsi per completare la libreria
-                                </p>
-                                <p className="text-xs text-green-600 mt-1">
-                                    Con il prossimo acquisto paghi max €298 totali
-                                </p>
-                            </div>
-                        ) : (
-                            <div>
-                                <p className="text-xl font-bold text-gray-800">{stats.count}/5 corsi</p>
-                                <p className="text-sm text-gray-500">
-                                    {stats.count > 0
-                                        ? `Ti mancano ${5 - stats.count} corsi per il bundle da 5`
-                                        : 'Inizia la tua libreria professionale'
-                                    }
-                                </p>
-                                {stats.count >= 3 && (
-                                    <p className="text-xs text-green-600 mt-1">
-                                        Con il prossimo acquisto paghi max €149 per 5 corsi!
-                                    </p>
-                                )}
-                            </div>
-                        )}
-                    </div>
+                <div className="flex items-center justify-between">
+                    <h1 className="text-3xl font-bold text-gray-800">Il Mio Account</h1>
+                    <Link href="/" className="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 hover:text-primary transition-colors text-sm font-medium shadow-sm">
+                        → Home page
+                    </Link>
                 </div>
 
-                <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-primary">I Tuoi Contenuti</h2>
+                {/* Sezione Profilo */}
+                <section className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                            <User className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-primary">Dati Fatturazione</h2>
+                            <p className="text-sm text-gray-500">I dati per le fatture dei tuoi acquisti</p>
+                        </div>
+                    </div>
 
-                    {purchases.length === 0 ? (
-                        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 text-center py-20">
-                            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
-                                <Video className="w-8 h-8" />
+                    <form onSubmit={handleUpdateProfile} className="space-y-6">
+
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input type="text" value={user?.email} disabled className="w-full px-4 py-2 bg-gray-50 border rounded-lg text-gray-500 cursor-not-allowed" />
                             </div>
-                            <h2 className="text-xl font-bold text-gray-800 mb-2">Nessun corso attivo</h2>
-                            <p className="text-gray-500 max-w-md mx-auto mb-6">
-                                Non hai ancora acquistato nessun corso. Torna alla vetrina per sbloccare i contenuti premium.
-                            </p>
-                            <Link href="/#corsi" className="inline-block px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors">
-                                Vai al Catalogo
-                            </Link>
-                        </div>
-                    ) : (
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {purchases.map((purchase) => (
-                                <div key={purchase.id} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                                    <div className="h-40 bg-gray-200 relative">
-                                        {/* Placeholder per thumbnail dinamica in futuro */}
-                                        <div className="absolute inset-0 flex items-center justify-center text-gray-400">
-                                            <Video className="w-12 h-12" />
-                                        </div>
-                                        <div className="absolute top-2 right-2 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-sm">
-                                            <PlayCircle className="w-3 h-3" /> ATTIVO
-                                        </div>
-                                    </div>
-                                    <div className="p-5">
-                                        <h3 className="font-bold text-lg text-primary mb-2 line-clamp-2">{purchase.course_id}</h3>
-                                        <p className="text-xs text-gray-400 mb-4">Acquistato il {new Date(purchase.created_at).toLocaleDateString('it-IT')}</p>
 
-                                        <Link
-                                            href={`/watch/${encodeURIComponent(purchase.course_id)}`}
-                                            className="w-full py-2 bg-primary text-white font-medium rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
-                                        >
-                                            <PlayCircle className="w-4 h-4" />
-                                            Guarda Ora
-                                        </Link>
-                                    </div>
-                                </div>
-                            ))}
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    {isCompany ? 'Ragione Sociale' : 'Nome e Cognome'}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={fullName}
+                                    onChange={(e) => setFullName(e.target.value)}
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                />
+                            </div>
+
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Indirizzo</label>
+                                <input
+                                    type="text"
+                                    value={address}
+                                    onChange={(e) => setAddress(e.target.value)}
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                    placeholder="Via Roma 10"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Città</label>
+                                <input
+                                    type="text"
+                                    value={city}
+                                    onChange={(e) => setCity(e.target.value)}
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">CAP</label>
+                                <input
+                                    type="text"
+                                    value={cap}
+                                    onChange={(e) => setCap(e.target.value)}
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Codice Fiscale</label>
+                                <input
+                                    type="text"
+                                    value={cf}
+                                    onChange={(e) => setCf(e.target.value)}
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none uppercase"
+                                />
+                            </div>
+
+                            <div className="md:col-span-2 border-t pt-4 mt-2">
+                                <p className="text-sm font-bold text-gray-500 mb-4">Dati Aziendali (Opzionali)</p>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Partita IVA</label>
+                                <input
+                                    type="text"
+                                    value={piva}
+                                    onChange={(e) => setPiva(e.target.value)}
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                    placeholder="Solo se richiedi fattura"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Codice SDI / PEC</label>
+                                <input
+                                    type="text"
+                                    value={sdi || pec}
+                                    onChange={(e) => {
+                                        // Semplificazione: salviamo nello stesso campo sdi o entrambi se l'utente li scrive
+                                        setSdi(e.target.value)
+                                    }}
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                    placeholder="Codice Univoco o PEC"
+                                />
+                            </div>
                         </div>
-                    )}
-                </div>
+
+                        <div className="flex justify-end pt-4">
+                            <button
+                                type="submit"
+                                disabled={updatingProfile}
+                                className="flex items-center gap-2 px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 shadow-lg shadow-primary/20"
+                            >
+                                {updatingProfile ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                                Salva Dati
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                {/* Sezione password */}
+                <section className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                        <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center text-red-500">
+                            <Lock className="w-5 h-5" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-primary">Sicurezza</h2>
+                            <p className="text-sm text-gray-500">Modifica la passowrd del tuo account</p>
+                        </div>
+                    </div>
+
+                    <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-md">
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Nuova Password</label>
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none pr-12"
+                                    placeholder="Nuova password sicura"
+                                    minLength={6}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
+                                >
+                                    {showPassword ? (
+                                        <EyeOff className="w-5 h-5" />
+                                    ) : (
+                                        <Eye className="w-5 h-5" />
+                                    )}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Conferma Password</label>
+                            <div className="relative">
+                                <input
+                                    type={showPassword ? "text" : "password"}
+                                    value={confirmPassword}
+                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none pr-12"
+                                    placeholder="Ripeti la password"
+                                    minLength={6}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex justify-end">
+                            <button
+                                type="submit"
+                                disabled={updatingPassword}
+                                className="flex items-center gap-2 px-6 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                            >
+                                {updatingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                                Aggiorna Password
+                            </button>
+                        </div>
+                    </form>
+                </section>
+
+                {/* Zona Pericolo - Eliminazione Account */}
+                <section className="bg-red-50 p-6 md:p-8 rounded-2xl shadow-sm border border-red-100">
+                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-red-100">
+                        <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-600">
+                            <LogOut className="w-5 h-5 rotate-180" />
+                        </div>
+                        <div>
+                            <h2 className="text-xl font-bold text-red-700">Zona Pericolo</h2>
+                            <p className="text-sm text-red-500">Gestione eliminazione account</p>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                        <p className="text-gray-600 text-sm">
+                            Vuoi eliminare il tuo account? Questa azione è irreversibile e perderai l'accesso a tutti i contenuti.
+                        </p>
+                        <button
+                            onClick={() => setShowDeleteModal(true)}
+                            className="px-6 py-2 bg-white border border-red-200 text-red-600 font-bold rounded-lg hover:bg-red-600 hover:text-white transition-colors text-sm shadow-sm whitespace-nowrap"
+                        >
+                            Elimina Account
+                        </button>
+                    </div>
+                </section>
+
             </main>
+
+            {/* Modal Conferma Eliminazione */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
+                        <h3 className="text-2xl font-bold text-gray-900 mb-4">Eliminazione Account</h3>
+
+                        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
+                            <p className="text-red-700 font-medium">
+                                Attenzione: Azione Irreversibile
+                            </p>
+                            <p className="text-red-600 text-sm mt-1">
+                                Eliminando l'account perderai permanentemente l'accesso a tutti i corsi acquistati e allo storico ordini.
+                            </p>
+                        </div>
+
+                        <p className="text-gray-600 mb-6">
+                            Sei sicuro di voler procedere? Per confermare, devi accettare esplicitamente la rinuncia ai tuoi diritti sui contenuti acquistati.
+                        </p>
+
+                        <div className="flex items-start gap-3 mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                            <input
+                                type="checkbox"
+                                id="confirm-delete"
+                                checked={deleteConfirmChecked}
+                                onChange={(e) => setDeleteConfirmChecked(e.target.checked)}
+                                className="mt-1 w-5 h-5 text-red-600 rounded border-gray-300 focus:ring-red-500"
+                            />
+                            <label htmlFor="confirm-delete" className="text-sm text-gray-700 font-medium cursor-pointer select-none">
+                                Dichiaro di essere consapevole che eliminando l'account rinuncio ai diritti sugli acquisti fatti e perdo l'accesso ai corsi.
+                            </label>
+                        </div>
+
+                        <div className="flex justify-end gap-3">
+                            <button
+                                onClick={() => {
+                                    setShowDeleteModal(false)
+                                    setDeleteConfirmChecked(false)
+                                }}
+                                className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
+                            >
+                                Annulla
+                            </button>
+                            <button
+                                onClick={handleDeleteAccount}
+                                disabled={!deleteConfirmChecked || deletingAccount}
+                                className="px-6 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            >
+                                {deletingAccount ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                                Conferma Eliminazione
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }

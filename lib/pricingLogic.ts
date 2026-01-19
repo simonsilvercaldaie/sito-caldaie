@@ -17,7 +17,7 @@ export interface LevelPricingResult {
 /**
  * Restituisce il prezzo del pacchetto per un determinato livello
  */
-export function getLevelPricing(level: "Base" | "Intermedio" | "Avanzato"): LevelPricingResult {
+export function getLevelPricing(level: "Base" | "Intermedio" | "Avanzato" | "Laboratorio"): LevelPricingResult {
     switch (level) {
         case "Base":
             return {
@@ -36,6 +36,12 @@ export function getLevelPricing(level: "Base" | "Intermedio" | "Avanzato"): Leve
                 amountToPay: PRICES.PACK_AVANZATO,
                 levelName: "Avanzato",
                 courseCount: 9
+            }
+        case "Laboratorio":
+            return {
+                amountToPay: 0, // Da definire
+                levelName: "Laboratorio",
+                courseCount: 0
             }
         default:
             // Fallback di sicurezza

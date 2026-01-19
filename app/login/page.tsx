@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { Lock, Mail, Loader2, KeyRound, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+import emailjs from '@emailjs/browser'
 
 export default function LoginPage() {
     const [email, setEmail] = useState('')
@@ -14,6 +15,16 @@ export default function LoginPage() {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
     const [mode, setMode] = useState<'login' | 'signup'>('login')
+    const [isCompany, setIsCompany] = useState(false)
+    const [fullName, setFullName] = useState('')
+    const [address, setAddress] = useState('')
+    const [city, setCity] = useState('')
+    const [cap, setCap] = useState('')
+    const [cf, setCf] = useState('')
+    const [piva, setPiva] = useState('')
+    const [sdi, setSdi] = useState('')
+    const [registrationSuccess, setRegistrationSuccess] = useState(false)
+
     const router = useRouter()
 
     const handleAuth = async (e: React.FormEvent) => {
@@ -33,9 +44,60 @@ export default function LoginPage() {
                 const { error } = await supabase.auth.signUp({
                     email,
                     password,
+                    options: {
+                        data: {
+                            full_name: fullName,
+                            is_company: isCompany,
+                            address,
+                            city,
+                            cap,
+                            cf,
+                            piva: isCompany ? piva : null,
+                            sdi: isCompany ? sdi : null,
+                            user_type: isCompany ? 'company' : 'private'
+                        }
+                    }
                 })
                 if (error) throw error
-                alert('Controlla la tua email per confermare la registrazione!')
+                // Invia notifica email se è un'azienda (Simple Invoice Automation)
+                if (isCompany) {
+                    try {
+                        const messageDetails = `
+                            NUOVA AZIENDA REGISTRATA:
+                            Ragione Sociale: ${fullName}
+                            Email: ${email}
+                            P.IVA: ${piva}
+                            SDI/PEC: ${sdi}
+                            Codice Fiscale: ${cf}
+                            Indirizzo: ${address}, ${cap} ${city}
+                            
+                            (Dati salvati in Supabase Metadata per fatturazione)
+                        `
+
+                        await emailjs.send(
+                            'service_fwvybtr',      // Service ID (from contatti/page.tsx)
+                            'template_b8p58ci',     // Template ID (reusing contact form)
+                            {
+                                from_name: "REGISTRAZIONE AZIENDA: " + fullName,
+                                from_email: email,
+                                subject: "NUOVA REGISTRAZIONE AZIENDA - FATTURARE",
+                                message: messageDetails,
+                            },
+                            'NcJg5-hiu3gVJiJZ-'     // Public Key
+                        )
+                    } catch (emailErr) {
+                        console.error('Errore invio notifica admin:', emailErr)
+                        // Non blocchiamo la UX se l'email fallisce, ma lo logghiamo
+                    }
+                }
+
+                // Redirect to login view with success message
+                setMode('login')
+                setRegistrationSuccess(true)
+                setError(null)
+                // Scroll to top to ensure message is seen
+                window.scrollTo({ top: 0, behavior: 'smooth' })
+
             } else {
                 const { error } = await supabase.auth.signInWithPassword({
                     email,
@@ -82,9 +144,133 @@ export default function LoginPage() {
                     <p className="text-gray-500 mt-2">
                         {mode === 'login' ? 'Inserisci le tue credenziali' : 'Inizia la tua formazione professionale'}
                     </p>
+
+                    {registrationSuccess && mode === 'login' && (
+                        <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-xl flex flex-col items-center animate-in fade-in zoom-in">
+                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center text-green-600 mb-2">
+                                <Mail className="w-5 h-5" />
+                            </div>
+                            <h3 className="font-bold text-green-800">Registrazione Effettuata!</h3>
+                            <p className="text-sm text-green-700 text-center mt-1">
+                                Ti abbiamo inviato una email di conferma. <br />
+                                <strong>Clicca sul link nella mail</strong> per attivare il tuo account e accedere.
+                            </p>
+                        </div>
+                    )}
                 </div>
 
                 <form onSubmit={handleAuth} className="space-y-4">
+
+                    {/* Switch Privato / Azienda (solo in signup) */}
+                    {mode === 'signup' && (
+                        <div className="flex p-1 bg-gray-100 rounded-lg mb-4">
+                            <button
+                                type="button"
+                                onClick={() => setIsCompany(false)}
+                                className={`flex-1 py-1 text-sm font-medium rounded-md transition-colors ${!isCompany ? 'bg-white shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                Privato
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setIsCompany(true)}
+                                className={`flex-1 py-1 text-sm font-medium rounded-md transition-colors ${isCompany ? 'bg-white shadow-sm text-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                            >
+                                Azienda / P.IVA
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Campi extra solo in signup */}
+                    {mode === 'signup' && (
+                        <div className="space-y-3 p-4 bg-gray-50 rounded-xl border border-gray-100 mb-4 animate-in fade-in slide-in-from-top-2">
+                            <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">
+                                    {isCompany ? 'Ragione Sociale' : 'Nome e Cognome'}
+                                </label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={fullName}
+                                    onChange={(e) => setFullName(e.target.value)}
+                                    className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                    placeholder={isCompany ? "Es. Termotecnica SRL" : "Es. Mario Rossi"}
+                                />
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div className="col-span-2">
+                                    <label className="block text-xs font-medium text-gray-500 mb-1">Indirizzo</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={address}
+                                        onChange={(e) => setAddress(e.target.value)}
+                                        className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                        placeholder="Via Roma 10"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-500 mb-1">Città</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={city}
+                                        onChange={(e) => setCity(e.target.value)}
+                                        className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-medium text-gray-500 mb-1">CAP</label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={cap}
+                                        onChange={(e) => setCap(e.target.value)}
+                                        className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                    />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-medium text-gray-500 mb-1">Codice Fiscale</label>
+                                <input
+                                    type="text"
+                                    required
+                                    value={cf}
+                                    onChange={(e) => setCf(e.target.value)}
+                                    className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white uppercase"
+                                />
+                            </div>
+
+                            {isCompany && (
+                                <>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-500 mb-1">Partita IVA</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={piva}
+                                            onChange={(e) => setPiva(e.target.value)}
+                                            className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-medium text-gray-500 mb-1">Codice SDI o PEC</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={sdi}
+                                            onChange={(e) => setSdi(e.target.value)}
+                                            className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                            placeholder="XXXXXXX o email@pec.it"
+                                        />
+                                    </div>
+                                </>
+                            )}
+                        </div>
+                    )}
+
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                         <div className="relative">

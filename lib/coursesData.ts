@@ -9,7 +9,7 @@ export interface Course {
     youtubeId: string
     freeDuration: string
     premiumDuration: string
-    level: "Base" | "Intermedio" | "Avanzato"
+    level: "Base" | "Intermedio" | "Avanzato" | "Laboratorio"
     price: string
     learnings: string[]
     premiumContent: string[]
