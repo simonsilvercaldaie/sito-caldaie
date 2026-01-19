@@ -20,19 +20,33 @@ export function EducationalPanel({ videoId }: EducationalPanelProps) {
     const [progress, setProgress] = useState<Record<string, UserProgress>>({});
     const [activeTab, setActiveTab] = useState<string>('scheda');
 
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
     const fetchData = useCallback(async () => {
         try {
             const res = await fetch(`/api/educational/${videoId}`);
+            if (res.status === 401) {
+                setErrorMsg('unauthorized');
+                return;
+            }
             if (!res.ok) throw new Error('Failed to fetch educational data');
+
             const data = await res.json();
             setResources(data.resources || []);
             // Map progress by resource_id is already done by API but let's ensure type safety
             setProgress(data.progress || {});
 
+            if (data.resources?.length === 0) {
+                setErrorMsg('empty');
+            } else {
+                setErrorMsg(null);
+            }
+
             // Select first available tab if activeTab not present
             // (logic omitted for brevity, keeping 'scheda' default)
         } catch (err) {
             console.error(err);
+            setErrorMsg('error');
         } finally {
             setLoading(false);
         }
@@ -87,17 +101,26 @@ export function EducationalPanel({ videoId }: EducationalPanelProps) {
 
     return (
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-            {resources.length === 0 ? (
+            {errorMsg === 'unauthorized' ? (
                 <div className="p-8 text-center bg-slate-50">
-                    <AlertTriangle className="w-8 h-8 text-yellow-500 mx-auto mb-2" />
-                    <h3 className="text-lg font-semibold text-slate-700">Materiali in preparazione</h3>
-                    <p className="text-slate-500 text-sm">Schede, Checklist e Quiz saranno disponibili a breve per questo video.</p>
-                    <div className="hidden">{`[LOG] VideoId: ${videoId} - No resources found`}</div>
+                    <Lock className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                    <h3 className="text-lg font-semibold text-slate-700">Accesso Richiesto</h3>
+                    <p className="text-slate-500 text-sm mb-4">Accedi per visualizzare i materiali didattici, quiz e progressi.</p>
                 </div>
+            ) : errorMsg === 'empty' ? (
+                <div className="p-8 text-center bg-slate-50">
+                    <AlertTriangle className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                    <h3 className="text-lg font-semibold text-slate-700">Nessun Materiale</h3>
+                    <p className="text-slate-500 text-sm">Non ci sono ancora materiali didattici per questo video.</p>
+                    <div className="hidden">{`[LOG] VideoId: ${videoId} - Empty`}</div>
+                </div>
+            ) : resources.length === 0 && !loading ? (
+                // Fallback catch-all
+                <div className="p-8 text-center bg-slate-50">Caricamento materiali...</div>
             ) : (
                 <>
                     {/* Tabs Header */}
-                    <div className="flex border-b border-slate-200 bg-slate-50">
+                    <div className="flex border-b border-slate-200 bg-slate-50 overflow-x-auto">
                         {tabs.map((tab) => {
                             const res = getResourceByType(tab.id);
                             if (!res) return null; // Don't show tab if resource doesn't exist

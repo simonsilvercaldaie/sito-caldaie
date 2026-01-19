@@ -27,6 +27,15 @@ export default function CorsoPage() {
     const course = getCourseBySlug(slug)
     const allCourses = getAllCourses()
 
+    // Robust Video ID Extraction
+    // 1. Try to find first number in slug (e.g. "01-caldaia" -> "01", "video-1" -> "01")
+    // 2. Fallback to course.id prefix if available
+    // 3. Last resort "01"
+    const slugNumberMatch = slug.match(/(\d+)/);
+    const rawVideoId = slugNumberMatch ? slugNumberMatch[1] : (course?.id.split('-')[0] || "01");
+    // Normalize to 2 digits (1 -> 01)
+    const videoId = rawVideoId.padStart(2, '0');
+
     const [user, setUser] = useState<any>(null)
     const [loading, setLoading] = useState(true)
     const [hasPurchased, setHasPurchased] = useState(false)
@@ -373,7 +382,7 @@ export default function CorsoPage() {
                                     <BookOpen className="w-6 h-6 text-primary" />
                                     <h2 className="text-2xl font-bold text-primary">Materiali Didattici</h2>
                                 </div>
-                                <EducationalPanel videoId={course.id.split('-')[0]} />
+                                <EducationalPanel videoId={videoId} />
                             </div>
 
                             {/* Description */}
