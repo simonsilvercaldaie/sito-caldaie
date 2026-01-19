@@ -24,11 +24,23 @@ export function CasoStudioRenderer({ asset, isLocked, onSolve }: CasoStudioRende
         );
     }
 
+    const steps = asset.steps || asset.investigation || [];
+    const description = asset.scenario.description || asset.scenario.context;
+
     return (
         <div className="space-y-6">
             <div className="bg-blue-50 p-6 rounded-lg border border-blue-100">
                 <h3 className="font-bold text-blue-900 mb-2">Scenario</h3>
-                <p className="text-blue-800">{asset.scenario.description}</p>
+                <p className="text-blue-800">{description}</p>
+
+                {asset.scenario.initial_obs && (
+                    <div className="mt-4 space-y-1">
+                        <h4 className="text-sm font-bold text-blue-900/70 uppercase">Osservazioni Iniziali:</h4>
+                        <ul className="list-disc list-inside text-blue-800/80 text-sm">
+                            {asset.scenario.initial_obs.map((obs, i) => <li key={i}>{obs}</li>)}
+                        </ul>
+                    </div>
+                )}
 
                 {asset.scenario.initial_data && (
                     <div className="mt-4 grid grid-cols-2 gap-4">
@@ -39,18 +51,25 @@ export function CasoStudioRenderer({ asset, isLocked, onSolve }: CasoStudioRende
                         ))}
                     </div>
                 )}
+
+                {asset.challenge && (
+                    <div className="mt-6 pt-4 border-t border-blue-200">
+                        <h4 className="font-bold text-blue-900 mb-1">Sfida:</h4>
+                        <p className="text-blue-800 font-medium">{asset.challenge}</p>
+                    </div>
+                )}
             </div>
 
             <h3 className="font-bold text-lg mt-8 mb-4">Analisi Guidata</h3>
             <div className="space-y-8 relative pl-8 before:absolute before:left-3 before:top-2 before:bottom-0 before:w-0.5 before:bg-slate-200">
-                {asset.steps.map((step, idx) => (
+                {steps.map((step, idx) => (
                     <div key={idx} className="relative">
                         <div className="absolute -left-[2.85rem] bg-white border-2 border-slate-200 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm text-slate-500">
                             {step.step}
                         </div>
                         <div className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                             <h4 className="font-bold text-slate-800 mb-1">{step.action}</h4>
-                            <p className="text-slate-600">{step.reaction}</p>
+                            <p className="text-slate-600">{step.reaction || step.result}</p>
                         </div>
                     </div>
                 ))}
@@ -58,7 +77,7 @@ export function CasoStudioRenderer({ asset, isLocked, onSolve }: CasoStudioRende
 
             <div className="mt-10 p-6 bg-green-50 rounded-lg border border-green-200">
                 <h3 className="font-bold text-green-800 mb-2">Soluzione Finale</h3>
-                <p className="text-green-700">{asset.solution}</p>
+                <p className="text-green-700">{asset.solution || asset.resolution}</p>
             </div>
 
             <div className="flex justify-center mt-8">

@@ -44,13 +44,26 @@ export interface BaseAsset {
 // 1. Scheda Diagnosi
 export interface SchedaAsset extends BaseAsset {
     content: {
-        sections: Array<{
+        // New structure matching DB
+        pro_tips?: string[];
+        objective?: string;
+        technical_data?: Array<{
+            component: string;
+            value: string;
+            note?: string;
+        }>;
+        diagnosis_steps?: Array<{
+            step: number;
+            action: string;
+            question?: string;
+        }>;
+        // Keep old structure for backward compatibility if needed, or remove
+        sections?: Array<{
             title: string;
-            icon?: string; // React-icons name or similar
+            icon?: string;
             items: string[];
         }>;
         tables?: Array<{
-            title?: string;
             headers: string[];
             rows: string[][];
         }>;
@@ -79,16 +92,16 @@ export interface QuizOption {
 
 export interface QuizQuestion {
     id: string;
-    type: string; // "concetto_chiave" | "sintomo" | ...
+    type: string;
     text: string;
     options: QuizOption[];
-    correct: string; // Option ID
+    correct: string;
     explanation: string;
 }
 
 export interface QuizAsset extends BaseAsset {
     content: {
-        passing_score: number; // e.g., 4
+        passing_score: number;
         questions: QuizQuestion[];
     };
 }
@@ -97,18 +110,25 @@ export interface QuizAsset extends BaseAsset {
 export interface CasoStudioStep {
     step: number;
     action: string;
-    reaction: string;
+    reaction?: string;
+    result?: string; // DB uses 'result' in investigation
     clue?: string;
 }
 
 export interface CasoStudioAsset extends BaseAsset {
     content: {
         scenario: {
-            description: string;
-            initial_data: Record<string, string>; // "D40": "30C"
+            context?: string; // DB uses 'context'
+            initial_obs?: string[]; // DB uses 'initial_obs'
+            description?: string;
+            initial_data?: Record<string, string>;
         };
-        steps: CasoStudioStep[];
-        solution: string;
+        challenge?: string;
+        resolution?: string;
+        // DB uses 'investigation' instead of 'steps'
+        investigation?: CasoStudioStep[];
+        steps?: CasoStudioStep[];
+        solution?: string;
     };
 }
 
