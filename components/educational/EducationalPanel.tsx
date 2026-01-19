@@ -160,26 +160,26 @@ export function EducationalPanel({ videoId }: EducationalPanelProps) {
                             <>
                                 {activeTab === 'scheda' && (
                                     <SchedaRenderer
-                                        asset={activeResource.content}
+                                        asset={activeResource.content?.content || {}}
                                     />
                                 )}
                                 {activeTab === 'checklist' && (
                                     <ChecklistRenderer
-                                        asset={activeResource.content}
+                                        asset={activeResource.content?.content || {}}
                                         savedProgress={activeProgress}
                                         onSave={(data) => handleProgressUpdate(activeResource.id, 'unlocked', data)}
                                     />
                                 )}
                                 {activeTab === 'quiz' && (
                                     <QuizPlayer
-                                        asset={activeResource.content}
+                                        asset={activeResource.content?.content || {}}
                                         savedProgress={activeProgress}
                                         onComplete={(score, passed) => handleProgressUpdate(activeResource.id, 'completed', { passed }, score)}
                                     />
                                 )}
                                 {activeTab === 'caso_studio' && (
                                     <CasoStudioRenderer
-                                        asset={activeResource.content}
+                                        asset={activeResource.content?.content || {}}
                                         isLocked={!activeProgress || activeProgress.status === 'locked'}
                                         onSolve={() => handleProgressUpdate(activeResource.id, 'completed', { solved: true })}
                                     />
