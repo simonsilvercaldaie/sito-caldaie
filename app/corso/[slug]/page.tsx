@@ -28,13 +28,16 @@ export default function CorsoPage() {
     const allCourses = getAllCourses()
 
     // Robust Video ID Extraction
-    // 1. Try to find first number in slug (e.g. "01-caldaia" -> "01", "video-1" -> "01")
-    // 2. Fallback to course.id prefix if available
-    // 3. Last resort "01"
-    const slugNumberMatch = slug.match(/(\d+)/);
-    const rawVideoId = slugNumberMatch ? slugNumberMatch[1] : (course?.id.split('-')[0] || "01");
-    // Normalize to 2 digits (1 -> 01)
-    const videoId = rawVideoId.padStart(2, '0');
+    // Regex: Start or non-digit, capture 1-2 digits, non-digit or end
+    const m = slug.match(/(?:^|\D)(\d{1,2})(?:\D|$)/);
+    // Safe access to course.id
+    const courseIdPrefix = course?.id ? course.id.split('-')[0] : null;
+
+    // Choose the matched number from slug (m[1]) or fallback to course prefix, or null
+    const rawVideoId = m ? m[1] : courseIdPrefix;
+
+    // Normalize if present
+    const videoId = rawVideoId ? rawVideoId.padStart(2, '0') : null;
 
     const [user, setUser] = useState<any>(null)
     const [loading, setLoading] = useState(true)
@@ -377,13 +380,15 @@ export default function CorsoPage() {
                             </div>
 
                             {/* Educational Panel (Schede, Quiz, ecc.) */}
-                            <div className="pt-8">
-                                <div className="flex items-center gap-2 mb-4">
-                                    <BookOpen className="w-6 h-6 text-primary" />
-                                    <h2 className="text-2xl font-bold text-primary">Materiali Didattici</h2>
+                            {videoId && (
+                                <div className="pt-8">
+                                    <div className="flex items-center gap-2 mb-4">
+                                        <BookOpen className="w-6 h-6 text-primary" />
+                                        <h2 className="text-2xl font-bold text-primary">Materiali Didattici</h2>
+                                    </div>
+                                    <EducationalPanel videoId={videoId} />
                                 </div>
-                                <EducationalPanel videoId={videoId} />
-                            </div>
+                            )}
 
                             {/* Description */}
                             <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">

@@ -11,10 +11,19 @@ import { QuizPlayer } from './QuizPlayer';
 import { CasoStudioRenderer } from './CasoStudioRenderer';
 
 interface EducationalPanelProps {
-    videoId: string;
+    videoId: string | null;
 }
 
 export function EducationalPanel({ videoId }: EducationalPanelProps) {
+    if (!videoId) {
+        return (
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8 text-center bg-slate-50">
+                <AlertTriangle className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                <h3 className="text-lg font-semibold text-slate-700">Materiali non disponibili</h3>
+                <p className="text-slate-500 text-sm">Identificativo video mancante.</p>
+            </div>
+        );
+    }
     const [loading, setLoading] = useState(true);
     const [resources, setResources] = useState<any[]>([]);
     const [progress, setProgress] = useState<Record<string, UserProgress>>({});
