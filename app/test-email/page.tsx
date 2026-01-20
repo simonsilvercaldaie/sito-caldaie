@@ -100,8 +100,8 @@ Benvenuto!
 Il tuo account è stato creato con successo.
 Ora puoi accedere alla piattaforma e iniziare a esplorare i corsi.
 
-Vai alla Dashboard:
-https://simonsilvercaldaie.it/dashboard
+Vai al Sito:
+https://simonsilvercaldaie.it/
 
 Buon lavoro,
 Simon Silver
