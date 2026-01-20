@@ -193,8 +193,8 @@ export default function DashboardPage() {
             <main className="max-w-4xl mx-auto px-4 space-y-8">
 
                 <div className="flex items-center justify-between">
-                    <h1 className="text-3xl font-bold text-gray-800">Il Mio Account</h1>
-                    <Link href="/" className="px-4 py-2 bg-white border border-gray-200 text-gray-600 rounded-xl hover:bg-gray-50 hover:text-primary transition-colors text-sm font-medium shadow-sm">
+                    <h1 className="text-3xl font-bold text-gray-900">Il Mio Account</h1>
+                    <Link href="/" className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 hover:text-primary transition-colors text-sm font-medium shadow-sm">
                         → Home page
                     </Link>
                 </div>
@@ -207,7 +207,7 @@ export default function DashboardPage() {
                         </div>
                         <div>
                             <h2 className="text-xl font-bold text-primary">Dati Fatturazione</h2>
-                            <p className="text-sm text-gray-500">I dati per le fatture dei tuoi acquisti</p>
+                            <p className="text-sm text-gray-600">I dati per le fatture dei tuoi acquisti</p>
                         </div>
                     </div>
 
@@ -220,55 +220,55 @@ export default function DashboardPage() {
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                <label className="block text-sm font-medium text-gray-800 mb-1">
                                     {isCompany ? 'Ragione Sociale' : 'Nome e Cognome'}
                                 </label>
                                 <input
                                     type="text"
                                     value={fullName}
                                     onChange={(e) => setFullName(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
                                 />
                             </div>
 
                             <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Indirizzo</label>
+                                <label className="block text-sm font-medium text-gray-800 mb-1">Indirizzo</label>
                                 <input
                                     type="text"
                                     value={address}
                                     onChange={(e) => setAddress(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
                                     placeholder="Via Roma 10"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Città</label>
+                                <label className="block text-sm font-medium text-gray-800 mb-1">Città</label>
                                 <input
                                     type="text"
                                     value={city}
                                     onChange={(e) => setCity(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">CAP</label>
+                                <label className="block text-sm font-medium text-gray-800 mb-1">CAP</label>
                                 <input
                                     type="text"
                                     value={cap}
                                     onChange={(e) => setCap(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Codice Fiscale</label>
+                                <label className="block text-sm font-medium text-gray-800 mb-1">Codice Fiscale</label>
                                 <input
                                     type="text"
                                     value={cf}
                                     onChange={(e) => setCf(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none uppercase"
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none uppercase text-black"
                                 />
                             </div>
 
@@ -277,18 +277,18 @@ export default function DashboardPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Partita IVA</label>
+                                <label className="block text-sm font-medium text-gray-800 mb-1">Partita IVA</label>
                                 <input
                                     type="text"
                                     value={piva}
                                     onChange={(e) => setPiva(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
                                     placeholder="Solo se richiedi fattura"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Codice SDI / PEC</label>
+                                <label className="block text-sm font-medium text-gray-800 mb-1">Codice SDI / PEC</label>
                                 <input
                                     type="text"
                                     value={sdi || pec}
@@ -296,7 +296,7 @@ export default function DashboardPage() {
                                         // Semplificazione: salviamo nello stesso campo sdi o entrambi se l'utente li scrive
                                         setSdi(e.target.value)
                                     }}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none"
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
                                     placeholder="Codice Univoco o PEC"
                                 />
                             </div>
@@ -323,19 +323,19 @@ export default function DashboardPage() {
                         </div>
                         <div>
                             <h2 className="text-xl font-bold text-primary">Sicurezza</h2>
-                            <p className="text-sm text-gray-500">Modifica la passowrd del tuo account</p>
+                            <p className="text-sm text-gray-600">Modifica la passowrd del tuo account</p>
                         </div>
                     </div>
 
                     <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-md">
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Nuova Password</label>
+                            <label className="block text-sm font-medium text-gray-800 mb-1">Nuova Password</label>
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     value={newPassword}
                                     onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none pr-12"
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none pr-12 text-black"
                                     placeholder="Nuova password sicura"
                                     minLength={6}
                                 />
@@ -354,13 +354,13 @@ export default function DashboardPage() {
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Conferma Password</label>
+                            <label className="block text-sm font-medium text-gray-800 mb-1">Conferma Password</label>
                             <div className="relative">
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none pr-12"
+                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none pr-12 text-black"
                                     placeholder="Ripeti la password"
                                     minLength={6}
                                 />
