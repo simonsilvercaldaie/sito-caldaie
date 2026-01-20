@@ -52,7 +52,7 @@ export default function ContactsPage() {
             // Invia email tramite EmailJS
             await emailjs.send(
                 'service_i4y7ewt',      // Gmail Service ID
-                'template_esq7ac8',     // Template ID (Unified styled template)
+                'template_sotc25n',     // Template ID (Unified styled template)
                 {
                     from_name: formData.name,
                     from_email: formData.email,
