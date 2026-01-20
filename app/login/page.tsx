@@ -104,7 +104,7 @@ export default function LoginPage() {
                     password,
                 })
                 if (error) throw error
-                router.push('/dashboard')
+                router.push('/')
             }
         } catch (err: any) {
             setError(err.message)
