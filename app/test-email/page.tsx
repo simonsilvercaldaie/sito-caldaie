@@ -24,10 +24,13 @@ export default function TestEmailPage() {
                 message: `
 TEST EMAIL ACQUISTO
 Ciao! Grazie per il tuo acquisto.
-Hai sbloccato con successo il livello: TEST
-Corsi sbloccati: 10
+
+Hai sbloccato con successo:
+Pacchetto TEST (9 Video)
+
 Puoi accedere subito ai tuoi corsi dalla Dashboard:
 https://simonsilvercaldaie.it/dashboard
+
 Buono studio!
 Simon Silver
                 `.trim()

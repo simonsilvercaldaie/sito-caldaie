@@ -288,60 +288,26 @@ Città: ${userProfile.city || 'N/D'}
 
         // Send confirmation email to the CUSTOMER
         try {
+            // Determine friendly package name
+            let packageName = `Pacchetto ${level}`
+            if (level.toLowerCase() === 'base') packageName = 'Pacchetto BASE (9 Video)'
+            else if (level.toLowerCase() === 'intermedio') packageName = 'Pacchetto INTERMEDIO (9 Video)'
+            else if (level.toLowerCase() === 'avanzato') packageName = 'Pacchetto AVANZATO (9 Video)'
+            else if (level.toLowerCase() === 'completo') packageName = 'Pacchetto COMPLETO (27 Video)'
+
             const customerEmailData = {
                 service_id: 'service_i4y7ewt',
                 template_id: 'template_sotc25n', // Correct customer template
                 user_id: 'NcJg5-hiu3gVJiJZ-',
                 template_params: {
                     from_name: 'Simon Silver Caldaie', // Sender name
-                    to_email: user.email, // We need to ensure the template uses this field or we reply_to
-                    // Note: EmailJS templates usually map 'to_email' to the recipient if configured, 
-                    // or we might need to rely on how the template is set up. 
-                    // Assuming generic template where we might not control "To" easily without specific template config.
-                    // BUT, for the invoice email, we used 'from_email' as the user's email so Simon can reply.
-                    // Here we want to send TO the user. 
-                    // If the current template is hardcoded to send TO Simon, we might have an issue using the SAME template ID 
-                    // for sending TO the customer unless the template has a dynamic "To" field.
-                    // Let's assume for now we use the same template but swap fields if possible, 
-                    // OR we just send it and hope the template uses a dynamic recipient.
-                    // Actually, usually EmailJS templates listen to a specific "To Email" field defined in the dashboard.
-                    // If we can't change the template, we might be limited.
-                    // However, let's try to send it. If 'from_email' is 'noreply...', maybe.
-
-                    // WAIT. The existing usage for invoice is:
-                    // from_email: user.email (Sent to Simon, so Simon sees it comes FROM user).
-
-                    // To send TO user, we usually need a specific template configured to send to {{user_email}}.
-                    // Since I cannot change EmailJS dashboard settings, I will try to use the existing setup 
-                    // but realizing I might not be able to send TO the user if the template hardcodes the Recipient to Simon.
-
-                    // Let's look at the contacts code again.
-                    // Contacts sends TO Simon (configured in EmailJS dashboard likely).
-
-                    // ERROR CHECK: If the EmailJS service is configured to ALWAYS send to 'simonsilver@tiscali.it',
-                    // then I cannot send an email TO the client using the same service/template without changing dashboard settings.
-
-                    // Since the user asked me to "Proceed", I will assume standard EmailJS behavior where I might be able to override,
-                    // OR I will assume I can't do it perfectly without dashboard access.
-                    // BUT, wait.
-                    // `send` takes `template_params`.
-                    // Does the template have a dynamic "To"?
-                    // Often templates have "To Email" set to `%email%` or similar.
-                    // But the contact form sends TO Simon.
-
-                    // Strategy: I will implement it. If it goes to Simon instead of the user, 
-                    // Simon will receive "Grazie per il tuo acquisto". He will know it's working but configured wrong.
-                    // BUT explicitly, to send to the user, we usually need a `reply_to` or the template must map a variable to the recipient.
-
-                    // Use 'reply_to': 'info@simonsilvercaldaie.it' so user can reply.
-                    // Use 'to_name': user.email
-
+                    to_email: user.email,
                     subject: `✅ Conferma Acquisto - ${level}`,
                     message: `
 Ciao! Grazie per il tuo acquisto.
 
-Hai sbloccato con successo il livello: ${level}
-Corsi sbloccati: ${coursesToUnlock.length}
+Hai sbloccato con successo:
+${packageName}
 
 Puoi accedere subito ai tuoi corsi dalla Dashboard:
 https://simonsilvercaldaie.it/dashboard
