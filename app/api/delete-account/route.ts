@@ -93,7 +93,7 @@ export async function DELETE(request: Request) {
                 template_params: {
                     from_name: 'Simon Silver Caldaie',
                     to_email: user.email,
-                    subject: '❌ Cancellazione Account - Simon Silver Caldaie',
+                    subject: 'Cancellazione Account - Simon Silver Caldaie',
                     message: `
 Ciao.
 
@@ -107,11 +107,20 @@ Simon Silver
                 }
             }
 
-            await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            console.log(`[delete-account] Attempting to send goodbye email to ${user.email}...`)
+            const emailRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(goodbyeEmailData)
             })
+
+            if (emailRes.ok) {
+                console.log(`[delete-account] Goodbye email sent successfully to ${user.email}`)
+            } else {
+                const errText = await emailRes.text()
+                console.error(`[delete-account] Failed to send email. Status: ${emailRes.status}. Response: ${errText}`)
+            }
+
         } catch (emailError) {
             console.error('[delete-account] Error sending goodbye email:', emailError)
         }
