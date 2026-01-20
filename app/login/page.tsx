@@ -193,7 +193,7 @@ export default function LoginPage() {
                                     required
                                     value={fullName}
                                     onChange={(e) => setFullName(e.target.value)}
-                                    className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                    className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white text-black"
                                     placeholder={isCompany ? "Es. Termotecnica SRL" : "Es. Mario Rossi"}
                                 />
                             </div>
@@ -206,7 +206,7 @@ export default function LoginPage() {
                                         required
                                         value={address}
                                         onChange={(e) => setAddress(e.target.value)}
-                                        className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                        className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white text-black"
                                         placeholder="Via Roma 10"
                                     />
                                 </div>
@@ -217,7 +217,7 @@ export default function LoginPage() {
                                         required
                                         value={city}
                                         onChange={(e) => setCity(e.target.value)}
-                                        className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                        className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white text-black"
                                         placeholder="Es. Milano"
                                     />
                                 </div>
@@ -228,7 +228,7 @@ export default function LoginPage() {
                                         required
                                         value={cap}
                                         onChange={(e) => setCap(e.target.value)}
-                                        className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                        className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white text-black"
                                         placeholder="Es. 20100"
                                     />
                                 </div>
@@ -241,7 +241,7 @@ export default function LoginPage() {
                                     required
                                     value={cf}
                                     onChange={(e) => setCf(e.target.value)}
-                                    className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white uppercase"
+                                    className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white uppercase text-black"
                                     placeholder="Es. RSSMRA80A01H501U"
                                 />
                             </div>
@@ -255,7 +255,7 @@ export default function LoginPage() {
                                             required
                                             value={piva}
                                             onChange={(e) => setPiva(e.target.value)}
-                                            className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                            className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white text-black"
                                             placeholder="Es. 12345678901"
                                         />
                                     </div>
@@ -266,7 +266,7 @@ export default function LoginPage() {
                                             required
                                             value={sdi}
                                             onChange={(e) => setSdi(e.target.value)}
-                                            className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                            className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white text-black"
                                             placeholder="XXXXXXX o email@pec.it"
                                         />
                                     </div>
