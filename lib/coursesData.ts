@@ -41,7 +41,7 @@ export const courses: Course[] = [
             "Esempi pratici di 'rifiuto' all'avvio"
         ],
         featured: true,
-        coverImage: "/images/courses/01-caldaia-decisioni.png"
+        coverImage: "/images/courses/01-caldaia-decisioni.webp"
     },
     {
         id: "02-check-iniziale",
@@ -55,7 +55,7 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["Osservazione preliminare", "Rumori e odori", "Pressioni e temperature a vista", "Errori da non commettere appena arrivati"],
         premiumContent: ["Checklist dei 3 minuti da stampare", "Come interrogare il cliente mentre osservi", "Segnali visivi spesso ignorati"],
-        coverImage: "/images/courses/02-check-iniziale.png"
+        coverImage: "/images/courses/02-check-iniziale.webp"
     },
     {
         id: "03-schema-funzionale",
@@ -69,7 +69,7 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["Schema idraulico vs elettrico", "Seguire il flusso logico", "Individuare il punto di rottura", "Mappa mentale del funzionamento"],
         premiumContent: ["Analisi schemi reali (Vaillant, Ariston, ecc.)", "Simulazione guasto su carta", "Dal sintomo al blocco nello schema"],
-        coverImage: "/images/courses/03-schema-funzionale.png"
+        coverImage: "/images/courses/03-schema-funzionale.webp"
     },
     {
         id: "04-acs-riscaldamento",
@@ -83,7 +83,7 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["Interazione tra i due circuiti", "Il ruolo della valvola deviatrice", "Scambio termico indesiderato", "Diagnosi differenziale"],
         premiumContent: ["Test pratici per isolare il circuito", "Problemi di trafilamento", "Caso studio: radiatori caldi in estate"],
-        coverImage: "/images/courses/04-acs-riscaldamento.png"
+        coverImage: "/images/courses/04-acs-riscaldamento.webp"
     },
     {
         id: "05-sicurezze",
@@ -97,7 +97,7 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["Sicurezza sovratemperatura", "Mancanza acqua", "Mancanza tiraggio", "Distinguere guasto sonda da intervento sicurezza"],
         premiumContent: ["Testare le sicurezze senza rischi", "Bypassare per test (con cautela)", "Gerarchia degli interventi"],
-        coverImage: "/images/courses/05-sicurezze.png"
+        coverImage: "/images/courses/05-sicurezze.webp"
     },
     {
         id: "06-falsi-colpevoli",
@@ -111,7 +111,7 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["La scheda elettronica (l'accusata n.1)", "La valvola gas", "Lo scambiatore", "Come scagionare i componenti innocenti"],
         premiumContent: ["Statistica reale dei guasti", "Casi in cui sembrava lui ma non era", "Risparmiare ricambi inutili"],
-        coverImage: "/images/courses/06-falsi-colpevoli.png"
+        coverImage: "/images/courses/06-falsi-colpevoli.webp"
     },
     {
         id: "07-manutenzione-vera",
@@ -125,7 +125,7 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["Pulizia vs Controllo", "Punti critici da verificare sempre", "Prevenzione attiva", "Valore aggiunto per il cliente"],
         premiumContent: ["Checklist manutenzione 'Premium'", "Pulizia scambiatori condensazione", "Controllo vaso espansione obbligatorio"],
-        coverImage: "/images/courses/07-manutenzione-vera.png"
+        coverImage: "/images/courses/07-manutenzione-vera.webp"
     },
     {
         id: "08-segnali-deboli",
@@ -139,7 +139,7 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["Ascolto della pompa", "Rumori di ebollizione", "Tempi di accensione ritardati", "Piccole oscillazioni di pressione"],
         premiumContent: ["Diagnostica acustica", "Interpretare i log (se presenti)", "Prevedere la rottura per fidelizzare il cliente"],
-        coverImage: "/images/courses/08-segnali-deboli.png"
+        coverImage: "/images/courses/08-segnali-deboli.webp"
     },
     {
         id: "09-quando-non-intervenire",
@@ -153,7 +153,7 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["Valutazione costi/benefici", "Sicurezza impianto non a norma", "Caldaie a fine vita", "Etica professionale"],
         premiumContent: ["Come dire di no al cliente", "Responsabilità legale", "Proporre la sostituzione in modo etico"],
-        coverImage: "/images/courses/09-quando-non-intervenire.png"
+        coverImage: "/images/courses/09-quando-non-intervenire.webp"
     },
 
     // --- LIVELLO INTERMEDIO (9 Video) ---
@@ -169,7 +169,7 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Ciclo di accensione interrotto", "Fiamma che non tiene", "Salita temperatura troppo rapida", "Caduta di pressione immediata"],
         premiumContent: ["Analisi curve di temperatura", "Problemi di ionizzazione a caldo", "Diagnosi predittiva durante l'accensione"],
-        coverImage: "/images/courses/10-blocchi-prevedibili.png"
+        coverImage: "/images/courses/10-blocchi-prevedibili.webp"
     },
     {
         id: "11-problema-impianto",
@@ -183,7 +183,7 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Mancanza di circolazione", "Aria nell'impianto", "Sporcizia e fanghi esterni", "Dimensionamento tubi errato"],
         premiumContent: ["Test a 'caldaia chiusa'", "Verifica prevalenza pompa", "Bilanciamento impianto base"],
-        coverImage: "/images/courses/11-problema-impianto.png"
+        coverImage: "/images/courses/11-problema-impianto.webp"
     },
     {
         id: "12-scambiatori-colpevoli",
@@ -197,7 +197,7 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Scambio termico inefficiente", "Sintomi calcare lato acqua", "Intasamento lato fumi", "Sostituire o lavare?"],
         premiumContent: ["Lavaggio chimico sicuro", "Calcolo delta T per diagnosi", "Casi reali di scambiatori 'finti guasti'"],
-        coverImage: "/images/courses/12-scambiatori-colpevoli.png"
+        coverImage: "/images/courses/12-scambiatori-colpevoli.webp"
     },
     {
         id: "13-valvola-tre-vie",
@@ -211,7 +211,7 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Trafilamento interno", "Blocco meccanico", "Motore vs Corpo valvola", "Diagnosi certa al 100%"],
         premiumContent: ["Revisione cartuccia", "Test motore elettrico", "Bypassare temporaneamente per diagnosi"],
-        coverImage: "/images/courses/13-valvola-tre-vie.png"
+        coverImage: "/images/courses/13-valvola-tre-vie.webp"
     },
     {
         id: "14-sensori-ntc",
@@ -225,7 +225,7 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Deriva termica NTC", "Isteresi pressostati", " falsi contatti", "Leggere col multimetro vs leggere dalla scheda"],
         premiumContent: ["Tabella valori Ohm/Temp universale", "Costruire un simulatore di sensori", "Casi di sensori 'bugiardi'"],
-        coverImage: "/images/courses/14-sensori-ntc.png"
+        coverImage: "/images/courses/14-sensori-ntc.webp"
     },
     {
         id: "15-scheda-elettronica",
@@ -239,7 +239,7 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Codici generici vs specifici", "La scheda come 'vittima' di altri guasti", "Reset software vs Guasto hardware", "Quando sostituirla davvero"],
         premiumContent: ["Verifica alimentazioni a bordo", "Relè incollati", "Tracce bruciate o saldature fredde"],
-        coverImage: "/images/courses/15-scheda-elettronica.png"
+        coverImage: "/images/courses/15-scheda-elettronica.webp"
     },
     {
         id: "16-calcare-magnetite",
@@ -253,7 +253,7 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Differenza Calcare vs Magnetite", "Danni alle pompe modulanti", "Surriscaldamenti localizzati", "Prevenzione efficace"],
         premiumContent: ["Analisi acqua impianto", "Installazione filtri defangatori", "Lavaggio risanante: quando e come"],
-        coverImage: "/images/courses/16-calcare-magnetite.png"
+        coverImage: "/images/courses/16-calcare-magnetite.webp"
     },
     {
         id: "17-errori-installazione",
@@ -267,7 +267,7 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Scarichi fumi non a norma", "Mancanza prese d'aria", "Diametri gas insufficienti", "Assenza vasi espansione sanitari"],
         premiumContent: ["Gestire l'errore altrui col cliente", "Normative UNI essenziali", "Correggere senza rifare tutto"],
-        coverImage: "/images/courses/17-errori-installazione.png"
+        coverImage: "/images/courses/17-errori-installazione.webp"
     },
     {
         id: "18-riparare-senza-cambiare",
@@ -281,7 +281,7 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Sbloccare pompe e valvole", "Pulire contatti ed elettrodi", "Ricaricare vasi", "Tarare anziché sostituire"],
         premiumContent: ["Kit di sopravvivenza (paglietta, spray, ecc.)", "Interventi 'Mondo Reale'", "Quando la pulizia vale più del ricambio"],
-        coverImage: "/images/courses/18-riparare-senza-cambiare.png"
+        coverImage: "/images/courses/18-riparare-senza-cambiare.webp"
     },
 
     // --- LIVELLO AVANZATO (9 Video) ---
@@ -297,7 +297,7 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Analisi fumi avanzata", "Eccesso d'aria nascosto", "CO2 instabile", "Punti di rugiada"],
         premiumContent: ["Tarare valvole gas elettroniche", "Lettura critica scontrino analizzatore", "Combustione condensazione vs premiscelata"],
-        coverImage: "/images/courses/19-combustione-falsa.png"
+        coverImage: "/images/courses/19-combustione-falsa.webp"
     },
     {
         id: "20-guasti-intermittenti",
@@ -311,7 +311,7 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Strategia di monitoraggio", "Replicare le condizioni del guasto", "Fattori ambientali (vento, tensione)", "Pazienza metodica"],
         premiumContent: ["Strumenti di logging", "Intervistare il cliente come un detective", "Il metodo 'Trappola'"],
-        coverImage: "/images/courses/20-guasti-intermittenti.png"
+        coverImage: "/images/courses/20-guasti-intermittenti.webp"
     },
     {
         id: "21-cinque-domande",
@@ -325,7 +325,7 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["L'anamnesi tecnica", "Cosa è cambiato da ieri?", "Lo fa sempre o solo quando...?", "Chi l'ha toccata per ultimo?"],
         premiumContent: ["Script di intervista completo", "Decodificare le risposte dei clienti", "Trovare la bugia innocente"],
-        coverImage: "/images/courses/21-cinque-domande.png"
+        coverImage: "/images/courses/21-cinque-domande.webp"
     },
     {
         id: "22-parametri-corretti-guasto",
@@ -339,7 +339,7 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Conflitti software", "Problemi di messa a terra/neutro", "Interferenze elettromagnetiche", "Bug del firmware"],
         premiumContent: ["Uso dell'oscilloscopio (base)", "Verifica terra e polarità avanzata", "Reset di fabbrica e riconfigurazione"],
-        coverImage: "/images/courses/22-parametri-corretti-guasto.png"
+        coverImage: "/images/courses/22-parametri-corretti-guasto.webp"
     },
     {
         id: "23-perdite-invisibili",
@@ -353,7 +353,7 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Perdite nello scambiatore primario (evaporano)", "Valvole sicurezza che gocciolano solo a caldo", "Vaso scarico ma non rotto", "Perdite sottotraccia"],
         premiumContent: ["Tecniche di ricerca perdite", "Isolare caldaia vs impianto", "Gestione del vaso espansione problematica"],
-        coverImage: "/images/courses/23-perdite-invisibili.png"
+        coverImage: "/images/courses/23-perdite-invisibili.webp"
     },
     {
         id: "24-problema-insieme",
@@ -367,7 +367,7 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Compatibilità caldaia/impianto", "Pendolamenti dovuti ai termostati", "Portate minime non rispettate", "Problemi idraulici complessi"],
         premiumContent: ["Analisi sistemica", "Risolvere senza cambiare caldaia", "Modifiche impiantistiche correttive"],
-        coverImage: "/images/courses/24-problema-insieme.png"
+        coverImage: "/images/courses/24-problema-insieme.webp"
     },
     {
         id: "25-decisione-finale",
@@ -381,7 +381,7 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Valutazione del rischio", "Preventivazione onesta", "Responsabilità civile e penale", "Dormire sonni tranquilli"],
         premiumContent: ["Procedure di messa fuori servizio", "Documentazione da lasciare", "Gestire il cliente arrabbiato"],
-        coverImage: "/images/courses/25-decisione-finale.png"
+        coverImage: "/images/courses/25-decisione-finale.webp"
     },
     {
         id: "26-gestire-cliente",
@@ -395,7 +395,7 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Comunicazione assertiva", "Spiegare il guasto in parole semplici", "Giustificare il prezzo", "Farsi rispettare come professionista"],
         premiumContent: ["Frasi da dire e da non dire", "Gestire l'obiezione 'è troppo caro'", "Costruire fiducia immediata"],
-        coverImage: "/images/courses/26-gestire-cliente.png"
+        coverImage: "/images/courses/26-gestire-cliente.webp"
     },
     {
         id: "27-pensare-primario",
