@@ -96,8 +96,18 @@ export default function RootLayout({
   return (
     <html lang="it">
       <head>
-        {/* Plausible Analytics - Privacy-friendly */}
-        <script defer data-domain="simonsilvercaldaie.it" src="https://plausible.io/js/script.js"></script>
+        {/* Google Analytics 4 - TODO: Replace G-XXXXXXXXXX with your Measurement ID from analytics.google.com */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-XXXXXXXXXX');
+            `,
+          }}
+        />
 
         {/* JSON-LD Structured Data for Organization */}
         <script

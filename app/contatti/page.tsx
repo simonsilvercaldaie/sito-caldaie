@@ -217,8 +217,8 @@ export default function ContactsPage() {
                                         </div>
                                         <div>
                                             <p className="text-sm text-gray-300 mb-1">Email Diretta</p>
-                                            <a href="mailto:simonsilver@tiscali.it" className="font-bold hover:text-accent transition-colors">
-                                                simonsilver@tiscali.it
+                                            <a href="mailto:simonsilvercaldaie@gmail.com" className="font-bold hover:text-accent transition-colors">
+                                                simonsilvercaldaie@gmail.com
                                             </a>
                                         </div>
                                     </div>

@@ -45,8 +45,8 @@ export default function NotFound() {
 
                 <p className="mt-12 text-slate-500 text-sm">
                     Se pensi ci sia un errore, contattaci a{' '}
-                    <a href="mailto:simonsilver@tiscali.it" className="text-accent hover:underline">
-                        simonsilver@tiscali.it
+                    <a href="mailto:simonsilvercaldaie@gmail.com" className="text-accent hover:underline">
+                        simonsilvercaldaie@gmail.com
                     </a>
                 </p>
             </div>

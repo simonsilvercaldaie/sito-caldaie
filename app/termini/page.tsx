@@ -61,8 +61,8 @@ export default function TerminiPage() {
                             <h2 className="text-xl font-bold text-primary">5. Contatti</h2>
                             <p>
                                 Per qualsiasi domanda puoi contattarci all'indirizzo email:{' '}
-                                <a href="mailto:simonsilver@tiscali.it" className="text-accent hover:underline">
-                                    simonsilver@tiscali.it
+                                <a href="mailto:simonsilvercaldaie@gmail.com" className="text-accent hover:underline">
+                                    simonsilvercaldaie@gmail.com
                                 </a>
                             </p>
                         </section>

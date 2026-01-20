@@ -18,8 +18,8 @@ export default function PrivacyPage() {
                             <p>
                                 Il Titolare del trattamento dei dati è <strong>Simon Silver Caldaie</strong>,
                                 P.IVA 03235620121, contattabile all'indirizzo email: {' '}
-                                <a href="mailto:simonsilver@tiscali.it" className="text-accent hover:underline">
-                                    simonsilver@tiscali.it
+                                <a href="mailto:simonsilvercaldaie@gmail.com" className="text-accent hover:underline">
+                                    simonsilvercaldaie@gmail.com
                                 </a>
                             </p>
                         </section>
@@ -84,8 +84,8 @@ export default function PrivacyPage() {
                             </ul>
                             <p>
                                 Per esercitare questi diritti, contattaci a: {' '}
-                                <a href="mailto:simonsilver@tiscali.it" className="text-accent hover:underline">
-                                    simonsilver@tiscali.it
+                                <a href="mailto:simonsilvercaldaie@gmail.com" className="text-accent hover:underline">
+                                    simonsilvercaldaie@gmail.com
                                 </a>
                             </p>
                         </section>

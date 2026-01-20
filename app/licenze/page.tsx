@@ -142,7 +142,7 @@ export default function LicenzePage() {
                                 </li>
                             </ul>
                             <a
-                                href="mailto:simonsilver@tiscali.it?subject=Richiesta%20Licenza%20Formatore"
+                                href="mailto:simonsilvercaldaie@gmail.com?subject=Richiesta%20Licenza%20Formatore"
                                 className="w-full py-3 bg-accent text-white font-bold rounded-xl hover:bg-accent/90 transition-colors flex items-center justify-center gap-2"
                             >
                                 <Mail className="w-4 h-4" />
@@ -214,7 +214,7 @@ export default function LicenzePage() {
                             Contattaci per ricevere un preventivo personalizzato per le licenze Team, Azienda o Formatore.
                         </p>
                         <a
-                            href="mailto:simonsilver@tiscali.it?subject=Richiesta%20Licenza%20Aziendale"
+                            href="mailto:simonsilvercaldaie@gmail.com?subject=Richiesta%20Licenza%20Aziendale"
                             className="inline-flex items-center gap-2 bg-white text-primary font-bold px-6 py-3 rounded-xl hover:bg-gray-100 transition-colors"
                         >
                             <Mail className="w-5 h-5" />
