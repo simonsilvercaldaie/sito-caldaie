@@ -409,7 +409,7 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Visione d'insieme", "Mindset diagnostico superiore", "L'esperienza codificata", "Diventare un riferimento"],
         premiumContent: ["Il manifesto del tecnico evoluto", "Next steps per la carriera", "Saluti finali e augurio"],
-        coverImage: "/images/courses/27-pensare-primario.jpg"
+        coverImage: "/images/courses/27-pensare-primario.webp"
     }
 ]
 
