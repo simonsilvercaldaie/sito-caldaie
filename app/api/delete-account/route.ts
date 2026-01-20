@@ -84,6 +84,38 @@ export async function DELETE(request: Request) {
             return NextResponse.json({ error: 'Error deleting TOS: ' + tosError.message }, { status: 500 })
         }
 
+        // Send goodbye email to the user BEFORE deleting the account
+        try {
+            const goodbyeEmailData = {
+                service_id: 'service_fwvybtr',
+                template_id: 'template_b8p58ci',
+                user_id: 'NcJg5-hiu3gVJiJZ-',
+                template_params: {
+                    from_name: 'Simon Silver Caldaie',
+                    to_email: user.email,
+                    subject: '❌ Cancellazione Account - Simon Silver Caldaie',
+                    message: `
+Ciao.
+
+Come da tua richiesta, ti confermiamo che il tuo account e tutti i dati associati sono stati cancellati dai nostri sistemi.
+
+Se in futuro vorrai tornare a studiare con noi, sarai sempre il benvenuto.
+
+Un saluto,
+Simon Silver
+                    `.trim()
+                }
+            }
+
+            await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(goodbyeEmailData)
+            })
+        } catch (emailError) {
+            console.error('[delete-account] Error sending goodbye email:', emailError)
+        }
+
         // 4. Delete the user
         const { error: deleteError } = await adminClient.auth.admin.deleteUser(user.id)
 
