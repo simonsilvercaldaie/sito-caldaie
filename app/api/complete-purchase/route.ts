@@ -246,7 +246,7 @@ export async function POST(request: NextRequest) {
             if (userProfile?.piva) {
                 // Send email notification for invoice via EmailJS API
                 const emailData = {
-                    service_id: 'service_fwvybtr',
+                    service_id: 'service_i4y7ewt',
                     template_id: 'template_b8p58ci',
                     user_id: 'NcJg5-hiu3gVJiJZ-',
                     template_params: {
@@ -289,7 +289,7 @@ Città: ${userProfile.city || 'N/D'}
         // Send confirmation email to the CUSTOMER
         try {
             const customerEmailData = {
-                service_id: 'service_fwvybtr',
+                service_id: 'service_i4y7ewt',
                 template_id: 'template_sotc25n', // Correct customer template
                 user_id: 'NcJg5-hiu3gVJiJZ-',
                 template_params: {

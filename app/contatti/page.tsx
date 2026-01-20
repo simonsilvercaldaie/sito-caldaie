@@ -51,8 +51,8 @@ export default function ContactsPage() {
         try {
             // Invia email tramite EmailJS
             await emailjs.send(
-                'service_fwvybtr',      // Service ID
-                'template_b8p58ci',     // Template ID
+                'service_i4y7ewt',      // Gmail Service ID
+                'template_b8p58ci',     // Template ID (Existing contact template)
                 {
                     from_name: formData.name,
                     from_email: formData.email,

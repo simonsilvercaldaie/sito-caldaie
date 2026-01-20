@@ -87,7 +87,7 @@ export async function DELETE(request: Request) {
         // Send goodbye email to the user BEFORE deleting the account
         try {
             const goodbyeEmailData = {
-                service_id: 'service_fwvybtr',
+                service_id: 'service_i4y7ewt',
                 template_id: 'template_sotc25n', // Correct customer template
                 user_id: 'NcJg5-hiu3gVJiJZ-',
                 template_params: {
