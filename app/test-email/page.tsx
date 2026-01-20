@@ -32,8 +32,8 @@ Ciao! Grazie per il tuo acquisto.
 Hai sbloccato con successo:
 Pacchetto BASE (9 Video)
 
-Puoi accedere subito ai tuoi corsi dalla Dashboard:
-https://simonsilvercaldaie.it/dashboard
+Puoi accedere subito ai tuoi corsi qui:
+https://simonsilvercaldaie.it/catalogo/base
 
 Buono studio!
 Simon Silver
@@ -50,8 +50,8 @@ Ciao! Grazie per il tuo acquisto.
 Hai sbloccato con successo:
 Pacchetto INTERMEDIO (9 Video)
 
-Puoi accedere subito ai tuoi corsi dalla Dashboard:
-https://simonsilvercaldaie.it/dashboard
+Puoi accedere subito ai tuoi corsi qui:
+https://simonsilvercaldaie.it/catalogo/intermedio
 
 Buono studio!
 Simon Silver
@@ -68,8 +68,8 @@ Ciao! Grazie per il tuo acquisto.
 Hai sbloccato con successo:
 Pacchetto AVANZATO (9 Video)
 
-Puoi accedere subito ai tuoi corsi dalla Dashboard:
-https://simonsilvercaldaie.it/dashboard
+Puoi accedere subito ai tuoi corsi qui:
+https://simonsilvercaldaie.it/catalogo/avanzato
 
 Buono studio!
 Simon Silver
