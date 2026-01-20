@@ -88,7 +88,7 @@ export async function DELETE(request: Request) {
         try {
             const goodbyeEmailData = {
                 service_id: 'service_i4y7ewt',
-                template_id: 'template_sotc25n', // Correct customer template
+                template_id: 'template_esq7ac8', // Correct customer template
                 user_id: 'NcJg5-hiu3gVJiJZ-',
                 template_params: {
                     from_name: 'Simon Silver Caldaie',

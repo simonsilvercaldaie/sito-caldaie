@@ -47,7 +47,7 @@ Simon Silver
             const data = {
                 service_id: 'service_i4y7ewt',
                 // Usa il NUOVO template ID che mi hai dato
-                template_id: 'template_sotc25n',
+                template_id: 'template_esq7ac8',
                 user_id: 'NcJg5-hiu3gVJiJZ-',
                 template_params: templateParams
             }

@@ -247,7 +247,7 @@ export async function POST(request: NextRequest) {
                 // Send email notification for invoice via EmailJS API
                 const emailData = {
                     service_id: 'service_i4y7ewt',
-                    template_id: 'template_b8p58ci',
+                    template_id: 'template_esq7ac8',
                     user_id: 'NcJg5-hiu3gVJiJZ-',
                     template_params: {
                         from_name: 'Sistema Acquisti',
@@ -290,7 +290,7 @@ Città: ${userProfile.city || 'N/D'}
         try {
             const customerEmailData = {
                 service_id: 'service_i4y7ewt',
-                template_id: 'template_sotc25n', // Correct customer template
+                template_id: 'template_esq7ac8', // Correct customer template
                 user_id: 'NcJg5-hiu3gVJiJZ-',
                 template_params: {
                     from_name: 'Simon Silver Caldaie', // Sender name

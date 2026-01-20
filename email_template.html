@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simon Silver Caldaie</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #000000;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #ffffff;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #111111;
+            border: 1px solid #333333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #000000;
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 2px solid #D4AF37; /* Gold border */
+        }
+        .logo {
+            max-width: 180px;
+            height: auto;
+        }
+        .content {
+            padding: 40px 30px;
+            font-size: 16px;
+            line-height: 1.6;
+            color: #e0e0e0;
+        }
+        .message-box {
+            background-color: #1a1a1a;
+            border-left: 4px solid #D4AF37;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+            white-space: pre-wrap; /* Keeps formatting */
+        }
+        .footer {
+            background-color: #0a0a0a;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666666;
+            border-top: 1px solid #222222;
+        }
+        .social-link {
+            color: #D4AF37;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+<body>
+    <div style="padding: 20px;">
+        <div class="container">
+            <!-- HEADER CON LOGO -->
+            <div class="header">
+                <img src="https://simonsilvercaldaie.it/logo.png" alt="Simon Silver Caldaie" class="logo">
+            </div>
+
+            <!-- CONTENUTO -->
+            <div class="content">
+                <h2 style="color: #D4AF37; margin-top: 0;">{{subject}}</h2>
+                
+                <p>Ciao,</p>
+                
+                <!-- Questo box contiene il messaggio dinamico -->
+                <div class="message-box">
+                    {{message}}
+                </div>
+                
+                <p style="margin-top: 30px;">
+                    Buono studio,<br>
+                    <strong style="color: #ffffff;">Simon Silver</strong>
+                </p>
+            </div>
+
+            <!-- FOOTER -->
+            <div class="footer">
+                <p>&copy; 2025 Simon Silver Caldaie - Tutti i diritti riservati.</p>
+                <p>
+                    <a href="https://simonsilvercaldaie.it" class="social-link">Vai al sito</a> | 
+                    <a href="https://simonsilvercaldaie.it/dashboard" class="social-link">Dashboard</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
