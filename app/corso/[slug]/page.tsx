@@ -17,8 +17,8 @@ import {
     ArrowLeft,
     Star,
     Package,
-
 } from "lucide-react"
+import { CourseJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd"
 
 
 export default function CorsoPage() {
@@ -264,6 +264,15 @@ export default function CorsoPage() {
     return (
         <div className="min-h-screen flex flex-col font-sans bg-gray-50">
             <Navbar />
+
+            {/* SEO Structured Data */}
+            <CourseJsonLd course={course} />
+            <BreadcrumbJsonLd items={[
+                { name: "Home", url: "/" },
+                { name: "Catalogo", url: "/catalogo" },
+                { name: `Corsi ${course.level}`, url: `/catalogo/${course.level.toLowerCase()}` },
+                { name: course.title, url: `/corso/${course.id}` }
+            ]} />
 
             <main className="flex-grow">
                 {/* Hero Section */}

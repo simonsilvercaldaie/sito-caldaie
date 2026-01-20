@@ -4,6 +4,7 @@ import { getAllCourses, Course } from "@/lib/coursesData"
 import Link from "next/link"
 import Navbar from "@/components/Navbar"
 import { PlayCircle, MonitorPlay, ShieldCheck, ArrowLeft } from "lucide-react"
+import { CatalogJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd"
 
 export default function LivelloPage() {
     const params = useParams()
@@ -60,6 +61,14 @@ export default function LivelloPage() {
     return (
         <div className="min-h-screen flex flex-col font-sans bg-gray-50">
             <Navbar />
+
+            {/* SEO Structured Data */}
+            <CatalogJsonLd courses={courses} level={levelInfo.dbLevel} />
+            <BreadcrumbJsonLd items={[
+                { name: "Home", url: "/" },
+                { name: "Catalogo", url: "/catalogo" },
+                { name: `Corsi ${levelInfo.dbLevel}`, url: `/catalogo/${levelSlug}` }
+            ]} />
 
             <main className="flex-grow py-12 px-4 md:px-8">
                 <div className="max-w-7xl mx-auto">
