@@ -293,7 +293,8 @@ Città: ${userProfile.city || 'N/D'}
             if (level.toLowerCase() === 'base') packageName = 'Pacchetto BASE (9 Video)'
             else if (level.toLowerCase() === 'intermedio') packageName = 'Pacchetto INTERMEDIO (9 Video)'
             else if (level.toLowerCase() === 'avanzato') packageName = 'Pacchetto AVANZATO (9 Video)'
-            else if (level.toLowerCase() === 'completo') packageName = 'Pacchetto COMPLETO (27 Video)'
+            // Fallback for unexpected levels
+            else packageName = `Pacchetto ${level}`
 
             const customerEmailData = {
                 service_id: 'service_i4y7ewt',
