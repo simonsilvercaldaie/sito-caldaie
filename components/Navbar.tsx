@@ -56,10 +56,10 @@ export default function Navbar() {
                         </div>
                         <Link
                             href="/dashboard"
-                            className="hidden sm:flex items-center gap-2 px-4 py-2 bg-gray-100 text-primary font-bold rounded-lg hover:bg-gray-200 transition-colors"
+                            className="flex items-center gap-2 px-3 py-2 bg-gray-100 text-primary font-bold rounded-lg hover:bg-gray-200 transition-colors"
                         >
                             <LayoutDashboard className="w-4 h-4" />
-                            Dashboard
+                            <span>Dashboard</span>
                         </Link>
                         <button
                             onClick={handleLogout}
