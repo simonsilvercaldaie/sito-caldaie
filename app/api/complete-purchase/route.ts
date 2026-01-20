@@ -235,6 +235,58 @@ export async function POST(request: NextRequest) {
 
         console.log(`[complete-purchase] Ordine ${orderId} completato: ${coursesToUnlock.length} corsi per user ${user.id}`)
 
+        // Check if user has P.IVA and send invoice notification email
+        try {
+            const { data: userProfile } = await getSupabaseAdmin()
+                .from('user_profiles')
+                .select('company_name, piva, address, city, cap, cf')
+                .eq('id', user.id)
+                .maybeSingle()
+
+            if (userProfile?.piva) {
+                // Send email notification for invoice via EmailJS API
+                const emailData = {
+                    service_id: 'service_fwvybtr',
+                    template_id: 'template_b8p58ci',
+                    user_id: 'NcJg5-hiu3gVJiJZ-',
+                    template_params: {
+                        from_name: 'Sistema Acquisti',
+                        from_email: user.email,
+                        subject: `🧾 FATTURA RICHIESTA - Ordine ${orderId}`,
+                        message: `
+NUOVO ACQUISTO CON P.IVA - SERVE FATTURA
+
+📦 ORDINE: ${orderId}
+📚 LIVELLO: ${level}
+💰 IMPORTO: €${expectedAmount.toFixed(2)}
+
+👤 DATI CLIENTE:
+Email: ${user.email}
+Ragione Sociale: ${userProfile.company_name || 'N/D'}
+P.IVA: ${userProfile.piva}
+Codice Fiscale: ${userProfile.cf || 'N/D'}
+Indirizzo: ${userProfile.address || 'N/D'}
+CAP: ${userProfile.cap || 'N/D'}
+Città: ${userProfile.city || 'N/D'}
+
+⏰ Data: ${new Date().toLocaleString('it-IT')}
+                        `.trim()
+                    }
+                }
+
+                await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(emailData)
+                })
+
+                console.log(`[complete-purchase] Email fattura inviata per ordine ${orderId}`)
+            }
+        } catch (emailError) {
+            // Don't fail the purchase if email fails
+            console.error('[complete-purchase] Errore invio email fattura:', emailError)
+        }
+
         return NextResponse.json({
             ok: true,
             alreadyProcessed: false,
