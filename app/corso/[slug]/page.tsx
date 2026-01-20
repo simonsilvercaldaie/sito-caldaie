@@ -17,9 +17,9 @@ import {
     ArrowLeft,
     Star,
     Package,
-    BookOpen
+
 } from "lucide-react"
-import { EducationalPanel } from "@/components/educational/EducationalPanel"
+
 
 export default function CorsoPage() {
     const params = useParams()
@@ -379,16 +379,7 @@ export default function CorsoPage() {
                                 </div>
                             </div>
 
-                            {/* Educational Panel (Schede, Quiz, ecc.) */}
-                            {videoId && (
-                                <div className="pt-8">
-                                    <div className="flex items-center gap-2 mb-4">
-                                        <BookOpen className="w-6 h-6 text-primary" />
-                                        <h2 className="text-2xl font-bold text-primary">Materiali Didattici</h2>
-                                    </div>
-                                    <EducationalPanel videoId={videoId} />
-                                </div>
-                            )}
+
 
                             {/* Description */}
                             <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
@@ -523,14 +514,6 @@ export default function CorsoPage() {
                                         <li className="flex items-center gap-2">
                                             <CheckCircle2 className="w-3 h-3 text-green-500" />
                                             Accesso a tutti i 9 corsi {course.level}
-                                        </li>
-                                        <li className="flex items-center gap-2">
-                                            <CheckCircle2 className="w-3 h-3 text-green-500" />
-                                            Materiali e checklist scaricabili
-                                        </li>
-                                        <li className="flex items-center gap-2">
-                                            <CheckCircle2 className="w-3 h-3 text-green-500" />
-                                            Aggiornamenti futuri inclusi
                                         </li>
                                     </ul>
                                 </div>
