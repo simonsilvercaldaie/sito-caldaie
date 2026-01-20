@@ -218,6 +218,7 @@ export default function LoginPage() {
                                         value={city}
                                         onChange={(e) => setCity(e.target.value)}
                                         className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                        placeholder="Es. Milano"
                                     />
                                 </div>
                                 <div>
@@ -228,6 +229,7 @@ export default function LoginPage() {
                                         value={cap}
                                         onChange={(e) => setCap(e.target.value)}
                                         className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                        placeholder="Es. 20100"
                                     />
                                 </div>
                             </div>
@@ -240,6 +242,7 @@ export default function LoginPage() {
                                     value={cf}
                                     onChange={(e) => setCf(e.target.value)}
                                     className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white uppercase"
+                                    placeholder="Es. RSSMRA80A01H501U"
                                 />
                             </div>
 
@@ -253,6 +256,7 @@ export default function LoginPage() {
                                             value={piva}
                                             onChange={(e) => setPiva(e.target.value)}
                                             className="w-full px-3 py-2 text-sm border rounded-lg outline-none focus:border-primary bg-white"
+                                            placeholder="Es. 12345678901"
                                         />
                                     </div>
                                     <div>

@@ -96,6 +96,9 @@ export default function RootLayout({
   return (
     <html lang="it">
       <head>
+        {/* Plausible Analytics - Privacy-friendly */}
+        <script defer data-domain="simonsilvercaldaie.it" src="https://plausible.io/js/script.js"></script>
+
         {/* JSON-LD Structured Data for Organization */}
         <script
           type="application/ld+json"
