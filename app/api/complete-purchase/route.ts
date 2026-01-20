@@ -290,7 +290,7 @@ Città: ${userProfile.city || 'N/D'}
         try {
             const customerEmailData = {
                 service_id: 'service_fwvybtr',
-                template_id: 'template_esq7ac8', // New customer template
+                template_id: 'template_sotc25n', // Correct customer template
                 user_id: 'NcJg5-hiu3gVJiJZ-',
                 template_params: {
                     from_name: 'Simon Silver Caldaie', // Sender name
