@@ -150,15 +150,15 @@ export async function POST(request: NextRequest) {
         // import { checkRateLimit } from '@/lib/rateLimit' <--- Spostato sopra
         const ip = request.headers.get('x-forwarded-for') || 'unknown'
 
-        // Limit 1: User-based (5 requests / minute)
-        const userLimit = await checkRateLimit(`purchase_user_${user.id}`, 5, 60)
+        // Limit 1: User-based (5 requests / minute) - FAIL CLOSED
+        const userLimit = await checkRateLimit(`purchase_user_${user.id}`, 5, 60, false)
         if (!userLimit.success) {
             console.warn(`[RateLimit] User ${user.id} exceeded limit`)
             return NextResponse.json({ ok: false, error: 'rate_limit_exceeded' }, { status: 429 })
         }
 
-        // Limit 2: IP-based (10 requests / minute)
-        const ipLimit = await checkRateLimit(`purchase_ip_${ip}`, 10, 60)
+        // Limit 2: IP-based (10 requests / minute) - FAIL CLOSED
+        const ipLimit = await checkRateLimit(`purchase_ip_${ip}`, 10, 60, false)
         if (!ipLimit.success) {
             console.warn(`[RateLimit] IP ${ip} exceeded limit`)
             return NextResponse.json({ ok: false, error: 'rate_limit_exceeded' }, { status: 429 })

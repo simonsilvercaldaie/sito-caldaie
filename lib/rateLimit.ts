@@ -8,76 +8,53 @@ const getAdminClient = () => createClient(
 
 /**
  * Check if a request has exceeded the rate limit.
- * Uses Supabase as a distributed store.
+ * Uses Supabase RPC atomic increment.
  * 
- * @param identifier Unique key (e.g. "purchase_ip_127.0.0.1" or "purchase_user_123")
+ * @param identifier Unique key (e.g. "purchase_ip_127.0.0.1")
  * @param limit Max requests allowed
  * @param windowSeconds Window duration in seconds
+ * @param failOpen If true (default), allow request on DB error. If false, block.
  * @returns { success: boolean, count: number }
  */
 export async function checkRateLimit(
     identifier: string,
     limit: number,
-    windowSeconds: number
+    windowSeconds: number,
+    failOpen: boolean = true
 ): Promise<{ success: boolean; count: number }> {
     const supabase = getAdminClient()
-    const now = new Date()
-    const expiresAt = new Date(now.getTime() + windowSeconds * 1000)
 
     try {
-        // 1. Try to increment existing counter
+        // Atomic increment via RPC
         const { data, error } = await supabase.rpc('increment_rate_limit', {
             row_key: identifier,
             window_seconds: windowSeconds
         })
 
         if (error) {
-            // Fallback strategy if RPC is not defined yet (first deploy)
-            // Or simple upsert approach
+            console.error('Rate Limit RPC Error:', error)
 
-            // Fetch existing
-            const { data: existing } = await supabase
-                .from('rate_limits')
-                .select('*')
-                .eq('key', identifier)
-                .single()
-
-            if (existing) {
-                if (new Date(existing.expires_at) < now) {
-                    // Expired, reset
-                    await supabase
-                        .from('rate_limits')
-                        .update({ count: 1, expires_at: expiresAt.toISOString() })
-                        .eq('key', identifier)
-                    return { success: true, count: 1 }
-                } else {
-                    // Valid, increment
-                    const newCount = existing.count + 1
-                    await supabase
-                        .from('rate_limits')
-                        .update({ count: newCount })
-                        .eq('key', identifier)
-
-                    return { success: newCount <= limit, count: newCount }
-                }
-            } else {
-                // Create new
-                await supabase
-                    .from('rate_limits')
-                    .insert({ key: identifier, count: 1, expires_at: expiresAt.toISOString() })
-                return { success: true, count: 1 }
+            if (!failOpen) {
+                // Fail CLOSED: Block request on error
+                return { success: false, count: limit + 1 }
             }
+            // Fail OPEN: Allow request
+            return { success: true, count: 0 }
         }
 
-        // If RPC worked (better atomicity) - we will implement RPC below
-        // validation logic here
-        return { success: true, count: 1 }
+        const result = data as { success: boolean, count: number }
+        return {
+            success: result.success && result.count <= limit,
+            count: result.count
+        }
 
     } catch (e) {
-        console.error('Rate limit error:', e)
-        // Fail open to avoid blocking legitimate users on db error, 
-        // OR Fail closed for high security. 
-        // Choosing Fail Open for availability unless critical.
+        console.error('Rate limit exception:', e)
+        if (!failOpen) {
+            // Fail CLOSED
+            return { success: false, count: limit + 1 }
+        }
+        // Fail OPEN
         return { success: true, count: 0 }
     }
 }

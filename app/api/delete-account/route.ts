@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
+import { checkRateLimit } from '@/lib/rateLimit'
 
 export async function DELETE(request: Request) {
     try {
@@ -10,9 +11,19 @@ export async function DELETE(request: Request) {
 
         // Since we are in an API route, we can't easily use the client-side cookie handling 
         // without @supabase/ssr or similar helpers, but we can verify the JWT if sent.
-        // HOWEVER, for simplicity and security in this specific setup:
+        // However, for simplicity and security in this specific setup:
         // We will trust the Supabase Auth handling if we were using the middleware, 
-        // but here we should instantiate a client to check the session.
+
+        // RATE LIMITING (Package 2) - Fail Closed
+        const ip = request.headers.get('x-forwarded-for') || 'unknown'
+
+        // Limit: IP-based check before heavy auth/DB lifting (3 requests / minute)
+        // Note: For delete account, we want to be strict.
+        const ipLimit = await checkRateLimit(`delete_ip_${ip}`, 3, 60, false)
+        if (!ipLimit.success) {
+            console.warn(`[RateLimit] IP ${ip} exceeded limit (delete)`)
+            return NextResponse.json({ error: 'rate_limit_exceeded' }, { status: 429 })
+        }
 
         // Let's assume the client sends the access_token or we rely on the cookie if using createServerComponentClient logic.
         // Simplified approach: Expect the standard Supabase cookie.
