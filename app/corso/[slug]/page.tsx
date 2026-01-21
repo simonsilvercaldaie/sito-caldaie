@@ -503,39 +503,43 @@ export default function CorsoPage() {
                                     <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                         <h3 className="text-xl font-bold text-gray-800 text-center mb-4">Scegli la tua Licenza</h3>
 
-                                        <button
-                                            onClick={() => setViewMode('individual')}
-                                            className="w-full bg-white border-2 border-gray-100 hover:border-primary/50 hover:bg-blue-50/30 p-6 rounded-2xl transition-all group text-left shadow-sm hover:shadow-md"
-                                        >
-                                            <div className="p-3 bg-blue-100 text-primary rounded-xl group-hover:scale-110 transition-transform">
-                                                <User className="w-8 h-8" />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-lg text-gray-900 group-hover:text-primary transition-colors">Licenza Singola</h4>
-                                                <p className="text-sm text-gray-500 mt-1">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            {/* SINGOLA */}
+                                            <button
+                                                onClick={() => setViewMode('individual')}
+                                                className="relative group flex flex-col items-center text-center bg-blue-50/50 border-2 border-blue-100 hover:border-blue-400 p-8 rounded-3xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full"
+                                            >
+                                                <div className="p-4 bg-blue-100 text-blue-600 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                                                    <User className="w-10 h-10" />
+                                                </div>
+                                                <h4 className="font-bold text-2xl text-blue-900 mb-3 group-hover:text-blue-700 transition-colors">Licenza Singola</h4>
+                                                <p className="text-base text-gray-600 leading-relaxed">
                                                     Include solo i corsi del livello attuale ({course.level}).<br />
-                                                    <span className="opacity-75">Per privati e liberi professionisti.</span>
+                                                    <span className="opacity-80 text-sm">Per 1 utente.</span>
                                                 </p>
-                                            </div>
-                                        </button>
+                                                <div className="mt-6 py-2 px-6 bg-white text-blue-600 font-bold rounded-full text-sm shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all">
+                                                    Seleziona
+                                                </div>
+                                            </button>
 
-                                        <button
-                                            onClick={() => setViewMode('team')}
-                                            className="w-full bg-white border-2 border-gray-100 hover:border-indigo-500/50 hover:bg-indigo-50/30 p-6 rounded-2xl transition-all group text-left shadow-sm hover:shadow-md"
-                                        >
-                                            <div className="flex items-start gap-4">
-                                                <div className="p-3 bg-indigo-100 text-indigo-600 rounded-xl group-hover:scale-110 transition-transform">
-                                                    <Users className="w-8 h-8" />
+                                            {/* TEAM */}
+                                            <button
+                                                onClick={() => setViewMode('team')}
+                                                className="relative group flex flex-col items-center text-center bg-indigo-50/50 border-2 border-indigo-100 hover:border-indigo-400 p-8 rounded-3xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full"
+                                            >
+                                                <div className="p-4 bg-indigo-100 text-indigo-600 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-300 shadow-sm">
+                                                    <Users className="w-10 h-10" />
                                                 </div>
-                                                <div>
-                                                    <h4 className="font-bold text-lg text-gray-900 group-hover:text-indigo-700 transition-colors">Licenza Team</h4>
-                                                    <p className="text-sm text-gray-500 mt-1">
-                                                        Include l’accesso completo a tutti e 3 i livelli: Base, Intermedio e Avanzato.<br />
-                                                        <span className="opacity-75">Per aziende, centri assistenza e gruppi.</span>
-                                                    </p>
+                                                <h4 className="font-bold text-2xl text-indigo-900 mb-3 group-hover:text-indigo-700 transition-colors">Licenza Team</h4>
+                                                <p className="text-base text-gray-600 leading-relaxed">
+                                                    Include l’accesso completo a tutti e 3 i livelli.<br />
+                                                    <span className="opacity-80 text-sm">Base, Intermedio e Avanzato.</span>
+                                                </p>
+                                                <div className="mt-6 py-2 px-6 bg-white text-indigo-600 font-bold rounded-full text-sm shadow-sm group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                                    Seleziona
                                                 </div>
-                                            </div>
-                                        </button>
+                                            </button>
+                                        </div>
                                     </div>
                                 )}
 
