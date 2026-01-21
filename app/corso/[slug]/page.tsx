@@ -513,12 +513,13 @@ export default function CorsoPage() {
                                                     <div className="p-4 lg:p-5 bg-blue-100 text-blue-600 rounded-2xl mb-4 lg:mb-5 group-hover:scale-110 transition-transform duration-300 shadow-sm">
                                                         <User className="w-10 h-10 lg:w-12 lg:h-12" />
                                                     </div>
-                                                    <h4 className="font-bold text-2xl lg:text-3xl text-blue-900 mb-3 lg:mb-4 group-hover:text-blue-700 transition-colors">Licenza Singola</h4>
-                                                    <p className="text-base lg:text-lg text-gray-600 leading-relaxed">
-                                                        <span className="lg:whitespace-nowrap">Include solo i corsi del livello attuale ({course.level}).</span>
-                                                        <br className="lg:hidden" />
-                                                        <span className="hidden lg:inline"> — </span>
-                                                        <span className="opacity-80 text-sm lg:text-base">Per 1 utente.</span>
+                                                    <h4 className="font-bold text-2xl lg:text-3xl text-blue-900 mb-1 group-hover:text-blue-700 transition-colors">Licenza Singola</h4>
+                                                    <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-3">Solo questo livello</span>
+                                                    <p className="text-base lg:text-lg text-gray-700 leading-relaxed font-medium mb-2">
+                                                        Comprende <strong>SOLO</strong> il livello: <strong className="text-blue-700">{course.level}</strong>
+                                                    </p>
+                                                    <p className="text-sm text-gray-500">
+                                                        1 utente · Accesso a vita
                                                     </p>
                                                 </div>
                                                 <div className="mt-6 lg:mt-8 py-2 lg:py-3 px-6 lg:px-10 bg-white text-blue-600 font-bold rounded-full text-sm lg:text-base shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all">
@@ -535,12 +536,13 @@ export default function CorsoPage() {
                                                     <div className="p-4 lg:p-5 bg-indigo-100 text-indigo-600 rounded-2xl mb-4 lg:mb-5 group-hover:scale-110 transition-transform duration-300 shadow-sm">
                                                         <Users className="w-10 h-10 lg:w-12 lg:h-12" />
                                                     </div>
-                                                    <h4 className="font-bold text-2xl lg:text-3xl text-indigo-900 mb-3 lg:mb-4 group-hover:text-indigo-700 transition-colors">Licenza Team</h4>
-                                                    <p className="text-base lg:text-lg text-gray-600 leading-relaxed">
-                                                        <span className="lg:whitespace-nowrap">Include l'accesso completo a tutti e 3 i livelli.</span>
-                                                        <br className="lg:hidden" />
-                                                        <span className="hidden lg:inline"> — </span>
-                                                        <span className="opacity-80 text-sm lg:text-base">Base, Intermedio e Avanzato.</span>
+                                                    <h4 className="font-bold text-2xl lg:text-3xl text-indigo-900 mb-1 group-hover:text-indigo-700 transition-colors">Licenza Team</h4>
+                                                    <span className="text-sm font-semibold text-indigo-600 uppercase tracking-wide mb-3">Tutti i livelli</span>
+                                                    <p className="text-base lg:text-lg text-gray-700 leading-relaxed font-medium mb-2">
+                                                        Comprende <strong>Base + Intermedio + Avanzato</strong>
+                                                    </p>
+                                                    <p className="text-sm text-gray-500">
+                                                        Più utenti · Accesso a vita
                                                     </p>
                                                 </div>
                                                 <div className="mt-6 lg:mt-8 py-2 lg:py-3 px-6 lg:px-10 bg-white text-indigo-600 font-bold rounded-full text-sm lg:text-base shadow-sm group-hover:bg-indigo-600 group-hover:text-white transition-all">
