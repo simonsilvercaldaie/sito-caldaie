@@ -501,34 +501,69 @@ export default function CorsoPage() {
                                 {/* BLOCCO PRINCIPALE — LICENZA SINGOLA (DEFAULT) */}
                                 {!hasPurchased && viewMode === null && (
                                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                        {/* Singola Card - Dominant */}
-                                        <div className="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-3xl p-6 lg:p-8 text-center shadow-lg">
-                                            <div className="p-4 bg-blue-100 text-blue-600 rounded-2xl mb-4 inline-block">
-                                                <User className="w-10 h-10" />
-                                            </div>
-                                            <h3 className="font-bold text-2xl lg:text-3xl text-blue-900 mb-1">Licenza Singola</h3>
-                                            <span className="inline-block text-sm font-semibold text-blue-600 uppercase tracking-wide mb-4 bg-blue-100 px-3 py-1 rounded-full">Solo questo livello</span>
+                                        {/* Singola Card - Dominant with Dynamic Colors */}
+                                        {(() => {
+                                            // Dynamic color theming based on level
+                                            const levelColors = {
+                                                'Base': {
+                                                    gradient: 'from-blue-50 to-white',
+                                                    border: 'border-blue-200',
+                                                    iconBg: 'bg-blue-100',
+                                                    iconText: 'text-blue-600',
+                                                    title: 'text-blue-900',
+                                                    levelHighlight: 'text-blue-700',
+                                                    button: 'bg-blue-600 hover:bg-blue-700',
+                                                },
+                                                'Intermedio': {
+                                                    gradient: 'from-green-50 to-white',
+                                                    border: 'border-green-200',
+                                                    iconBg: 'bg-green-100',
+                                                    iconText: 'text-green-600',
+                                                    title: 'text-green-900',
+                                                    levelHighlight: 'text-green-700',
+                                                    button: 'bg-green-600 hover:bg-green-700',
+                                                },
+                                                'Avanzato': {
+                                                    gradient: 'from-red-50 to-white',
+                                                    border: 'border-red-200',
+                                                    iconBg: 'bg-red-100',
+                                                    iconText: 'text-red-600',
+                                                    title: 'text-red-900',
+                                                    levelHighlight: 'text-red-700',
+                                                    button: 'bg-red-600 hover:bg-red-700',
+                                                },
+                                            };
+                                            const colors = levelColors[course.level as keyof typeof levelColors] || levelColors['Base'];
 
-                                            {/* Prezzo in evidenza */}
-                                            <div className="text-4xl lg:text-5xl font-extrabold text-primary mb-2">
-                                                € {pricingInfo?.amountToPay}.00
-                                            </div>
+                                            return (
+                                                <div className={`bg-gradient-to-br ${colors.gradient} border-2 ${colors.border} rounded-3xl p-6 lg:p-8 text-center shadow-lg`}>
+                                                    <div className={`p-4 ${colors.iconBg} ${colors.iconText} rounded-2xl mb-4 inline-block`}>
+                                                        <User className="w-10 h-10" />
+                                                    </div>
+                                                    <h3 className={`font-bold text-2xl lg:text-3xl ${colors.title} mb-4`}>Licenza Singola</h3>
 
-                                            <p className="text-base lg:text-lg text-gray-700 font-medium mb-1">
-                                                Comprende <strong>SOLO</strong> il livello: <strong className="text-blue-700">{course.level}</strong>
-                                            </p>
-                                            <p className="text-sm text-gray-500 mb-6">
-                                                1 utente · Accesso a vita · 9 video corsi
-                                            </p>
+                                                    {/* Prezzo in evidenza */}
+                                                    <div className="text-4xl lg:text-5xl font-extrabold text-primary mb-2">
+                                                        € {pricingInfo?.amountToPay}.00
+                                                    </div>
 
-                                            {/* CTA Primaria */}
-                                            <button
-                                                onClick={() => setViewMode('individual')}
-                                                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5"
-                                            >
-                                                Acquista questo livello
-                                            </button>
-                                        </div>
+                                                    <p className="text-base lg:text-lg text-gray-700 font-medium mb-1">
+                                                        Comprende l'intero livello <strong className={colors.levelHighlight}>{course.level}</strong>
+                                                    </p>
+                                                    <p className="text-sm text-gray-500 mb-6">
+                                                        1 utente · Accesso a vita · 9 video corsi
+                                                    </p>
+
+                                                    {/* CTA Primaria */}
+                                                    <button
+                                                        onClick={() => setViewMode('individual')}
+                                                        className={`w-full py-4 ${colors.button} text-white font-bold text-lg rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5`}
+                                                    >
+                                                        Acquista questo livello
+                                                    </button>
+                                                </div>
+                                            );
+                                        })()}
 
                                         {/* Team Teaser - Secondary */}
                                         <div
