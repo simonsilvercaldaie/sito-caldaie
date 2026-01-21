@@ -19,6 +19,7 @@ import {
     Package,
     Building,
     Users,
+    User,
 } from "lucide-react"
 import { CourseJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd"
 
@@ -550,144 +551,152 @@ export default function CorsoPage() {
                                         </Link>
                                     </div>
                                 ) : (
-                                    <div className="space-y-4">
-                                        {/* Checkbox accettazione ToS */}
-                                        {user && (
-                                            <label className={`flex items-start gap-3 text-sm text-gray-600 cursor-pointer p-3 bg-gray-50 rounded-xl border border-gray-200 hover:border-accent/30 transition-colors ${tosLoading ? 'opacity-50 pointer-events-none' : ''}`}>
-                                                <input
-                                                    type="checkbox"
-                                                    checked={tosAccepted}
-                                                    onChange={(e) => handleTosCheckbox(e.target.checked)}
-                                                    disabled={tosLoading}
-                                                    className="mt-0.5 w-4 h-4 accent-accent flex-shrink-0"
-                                                />
-                                                <span className="leading-relaxed">
-                                                    {tosLoading ? 'Registrazione in corso...' : (
-                                                        <>
-                                                            Ho letto e accetto i{' '}
-                                                            <Link href="/termini" target="_blank" className="text-accent underline font-semibold">
-                                                                Termini e Condizioni
-                                                            </Link>
-                                                            {' '}e confermo che questo accesso è per {viewMode === 'team' ? 'il mio team' : 'mio uso personale'} (vedi{' '}
-                                                            <Link href="/licenze" target="_blank" className="text-accent underline font-semibold">
-                                                                Tipi di Licenza
-                                                            </Link>).
-                                                        </>
-                                                    )}
-                                                </span>
-                                            </label>
-                                        )}
+                                    viewMode !== null && (
+                                        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                                            {/* Checkbox accettazione ToS */}
+                                            {user && (
+                                                <label className={`flex items-start gap-3 text-sm text-gray-600 cursor-pointer p-3 bg-gray-50 rounded-xl border border-gray-200 hover:border-accent/30 transition-colors ${tosLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={tosAccepted}
+                                                        onChange={(e) => handleTosCheckbox(e.target.checked)}
+                                                        disabled={tosLoading}
+                                                        className="mt-0.5 w-4 h-4 accent-accent flex-shrink-0"
+                                                    />
+                                                    <span className="leading-relaxed">
+                                                        {tosLoading ? 'Registrazione in corso...' : (
+                                                            <>
+                                                                Ho letto e accetto i{' '}
+                                                                <Link href="/termini" target="_blank" className="text-accent underline font-semibold">
+                                                                    Termini e Condizioni
+                                                                </Link>
+                                                                {' '}e confermo che questo accesso è per {viewMode === 'team' ? 'il mio team' : 'mio uso personale'} (vedi{' '}
+                                                                <Link href="/licenze" target="_blank" className="text-accent underline font-semibold">
+                                                                    Tipi di Licenza
+                                                                </Link>).
+                                                            </>
+                                                        )}
+                                                    </span>
+                                                </label>
+                                            )}
 
-                                        {/* VIEW MODE: INDIVIDUAL */}
-                                        {viewMode === 'individual' && (
-                                            tosAccepted ? (
-                                                <PayPalBtn
-                                                    amount={String(pricingInfo?.amountToPay || 0)}
-                                                    courseTitle={`Pacchetto ${course.level}`}
-                                                    onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'individual' })}
-                                                />
-                                            ) : (
-                                                <button disabled className="w-full py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed">
-                                                    Accetta i Termini per procedere
-                                                </button>
-                                            )
-                                        )}
+                                            {/* VIEW MODE: INDIVIDUAL */}
+                                            {viewMode === 'individual' && (
+                                                tosAccepted ? (
+                                                    <PayPalBtn
+                                                        amount={String(pricingInfo?.amountToPay || 0)}
+                                                        courseTitle={`Pacchetto ${course.level}`}
+                                                        onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'individual' })}
+                                                    />
+                                                ) : (
+                                                    !user ? (
+                                                        <p className="text-xs text-gray-400 text-center mt-2">
+                                                            <Link href="/login" className="underline hover:text-accent">Accedi</Link> se hai già acquistato.
+                                                        </p>
+                                                    ) : (
+                                                        <button disabled className="w-full py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed">
+                                                            Accetta i Termini per procedere
+                                                        </button>
+                                                    )
+                                                )
+                                            )}
 
-                                        {/* VIEW MODE: TEAM Cards */}
-                                        {viewMode === 'team' && (
-                                            <div className="space-y-4">
-                                                {/* TEAM 5 */}
-                                                <div className="border border-indigo-100 rounded-xl p-4 hover:border-indigo-300 transition-colors bg-indigo-50/30">
-                                                    <div className="flex justify-between items-start mb-2">
-                                                        <div>
-                                                            <h4 className="font-bold text-indigo-900">Team 5</h4>
-                                                            <div className="text-xs text-indigo-600 flex items-center gap-1">
-                                                                <Users className="w-3 h-3" /> Fino a 5 Utenti
+                                            {/* VIEW MODE: TEAM Cards */}
+                                            {viewMode === 'team' && (
+                                                <div className="space-y-4">
+                                                    {/* TEAM 5 */}
+                                                    <div className="border border-indigo-100 rounded-xl p-4 hover:border-indigo-300 transition-colors bg-indigo-50/30">
+                                                        <div className="flex justify-between items-start mb-2">
+                                                            <div>
+                                                                <h4 className="font-bold text-indigo-900">Team 5</h4>
+                                                                <div className="text-xs text-indigo-600 flex items-center gap-1">
+                                                                    <Users className="w-3 h-3" /> Fino a 5 Utenti
+                                                                </div>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <div className="font-bold text-xl text-primary">€ 1.500</div>
+                                                                <div className="text-xs text-gray-500 uppercase">LIFETIME</div>
                                                             </div>
                                                         </div>
-                                                        <div className="text-right">
-                                                            <div className="font-bold text-xl text-primary">€ 1.500</div>
-                                                            <div className="text-[10px] text-gray-500 uppercase">LIFETIME</div>
+                                                        <div className="text-xs text-gray-500 mb-3 border-t border-indigo-100 pt-2 mt-2">
+                                                            Licenza a vita. Accesso completo per tutto il team. Nessun canone di rinnovo.
                                                         </div>
+                                                        {tosAccepted ? (
+                                                            <PayPalBtn
+                                                                amount="1500"
+                                                                courseTitle="Licenza Team 5 (Lifetime)"
+                                                                onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'team', product_code: 'team_5', amount_cents: 150000 })}
+                                                            />
+                                                        ) : (
+                                                            <button disabled className="w-full py-2 bg-gray-200 text-gray-400 font-bold rounded text-xs">Accetta Termini</button>
+                                                        )}
                                                     </div>
-                                                    <div className="text-xs text-gray-500 mb-3 border-t border-indigo-100 pt-2 mt-2">
-                                                        Licenza a vita. Accesso completo per tutto il team. Nessun canone di rinnovo.
-                                                    </div>
-                                                    {tosAccepted ? (
-                                                        <PayPalBtn
-                                                            amount="1500"
-                                                            courseTitle="Licenza Team 5 (Lifetime)"
-                                                            onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'team', product_code: 'team_5', amount_cents: 150000 })}
-                                                        />
-                                                    ) : (
-                                                        <button disabled className="w-full py-2 bg-gray-200 text-gray-400 font-bold rounded text-xs">Accetta Termini</button>
-                                                    )}
-                                                </div>
 
-                                                {/* TEAM 10 */}
-                                                <div className="border border-indigo-100 rounded-xl p-4 hover:border-indigo-300 transition-colors bg-indigo-50/30">
-                                                    <div className="flex justify-between items-start mb-2">
-                                                        <div>
-                                                            <h4 className="font-bold text-indigo-900">Team 10</h4>
-                                                            <div className="text-xs text-indigo-600 flex items-center gap-1">
-                                                                <Users className="w-3 h-3" /> Fino a 10 Utenti
+                                                    {/* TEAM 10 */}
+                                                    <div className="border border-indigo-100 rounded-xl p-4 hover:border-indigo-300 transition-colors bg-indigo-50/30">
+                                                        <div className="flex justify-between items-start mb-2">
+                                                            <div>
+                                                                <h4 className="font-bold text-indigo-900">Team 10</h4>
+                                                                <div className="text-xs text-indigo-600 flex items-center gap-1">
+                                                                    <Users className="w-3 h-3" /> Fino a 10 Utenti
+                                                                </div>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <div className="font-bold text-xl text-primary">€ 2.000</div>
+                                                                <div className="text-[10px] text-gray-500 uppercase">LIFETIME</div>
                                                             </div>
                                                         </div>
-                                                        <div className="text-right">
-                                                            <div className="font-bold text-xl text-primary">€ 2.000</div>
-                                                            <div className="text-[10px] text-gray-500 uppercase">LIFETIME</div>
+                                                        <div className="text-xs text-gray-500 mb-3 border-t border-indigo-100 pt-2 mt-2">
+                                                            Licenza a vita. Accesso completo per tutto il team. Nessun canone di rinnovo.
                                                         </div>
+                                                        {tosAccepted ? (
+                                                            <PayPalBtn
+                                                                amount="2000"
+                                                                courseTitle="Licenza Team 10 (Lifetime)"
+                                                                onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'team', product_code: 'team_10', amount_cents: 200000 })}
+                                                            />
+                                                        ) : (
+                                                            <button disabled className="w-full py-2 bg-gray-200 text-gray-400 font-bold rounded text-xs">Accetta Termini</button>
+                                                        )}
                                                     </div>
-                                                    <div className="text-xs text-gray-500 mb-3 border-t border-indigo-100 pt-2 mt-2">
-                                                        Licenza a vita. Accesso completo per tutto il team. Nessun canone di rinnovo.
-                                                    </div>
-                                                    {tosAccepted ? (
-                                                        <PayPalBtn
-                                                            amount="2000"
-                                                            courseTitle="Licenza Team 10 (Lifetime)"
-                                                            onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'team', product_code: 'team_10', amount_cents: 200000 })}
-                                                        />
-                                                    ) : (
-                                                        <button disabled className="w-full py-2 bg-gray-200 text-gray-400 font-bold rounded text-xs">Accetta Termini</button>
-                                                    )}
-                                                </div>
 
-                                                {/* TEAM 25 */}
-                                                <div className="border border-indigo-100 rounded-xl p-4 hover:border-indigo-300 transition-colors bg-indigo-50/30">
-                                                    <div className="flex justify-between items-start mb-2">
-                                                        <div>
-                                                            <h4 className="font-bold text-indigo-900">Team 25</h4>
-                                                            <div className="text-xs text-indigo-600 flex items-center gap-1">
-                                                                <Users className="w-3 h-3" /> Fino a 25 Utenti
+                                                    {/* TEAM 25 */}
+                                                    <div className="border border-indigo-100 rounded-xl p-4 hover:border-indigo-300 transition-colors bg-indigo-50/30">
+                                                        <div className="flex justify-between items-start mb-2">
+                                                            <div>
+                                                                <h4 className="font-bold text-indigo-900">Team 25</h4>
+                                                                <div className="text-xs text-indigo-600 flex items-center gap-1">
+                                                                    <Users className="w-3 h-3" /> Fino a 25 Utenti
+                                                                </div>
+                                                            </div>
+                                                            <div className="text-right">
+                                                                <div className="font-bold text-xl text-primary">€ 3.000</div>
+                                                                <div className="text-[10px] text-gray-500 uppercase">LIFETIME</div>
                                                             </div>
                                                         </div>
-                                                        <div className="text-right">
-                                                            <div className="font-bold text-xl text-primary">€ 3.000</div>
-                                                            <div className="text-[10px] text-gray-500 uppercase">LIFETIME</div>
+                                                        <div className="text-xs text-gray-500 mb-3 border-t border-indigo-100 pt-2 mt-2">
+                                                            Licenza a vita. Accesso completo per tutto il team. Nessun canone di rinnovo.
                                                         </div>
+                                                        {tosAccepted ? (
+                                                            <PayPalBtn
+                                                                amount="3000"
+                                                                courseTitle="Licenza Team 25 (Lifetime)"
+                                                                onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'team', product_code: 'team_25', amount_cents: 300000 })}
+                                                            />
+                                                        ) : (
+                                                            <button disabled className="w-full py-2 bg-gray-200 text-gray-400 font-bold rounded text-xs">Accetta Termini</button>
+                                                        )}
                                                     </div>
-                                                    <div className="text-xs text-gray-500 mb-3 border-t border-indigo-100 pt-2 mt-2">
-                                                        Licenza a vita. Accesso completo per tutto il team. Nessun canone di rinnovo.
-                                                    </div>
-                                                    {tosAccepted ? (
-                                                        <PayPalBtn
-                                                            amount="3000"
-                                                            courseTitle="Licenza Team 25 (Lifetime)"
-                                                            onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'team', product_code: 'team_25', amount_cents: 300000 })}
-                                                        />
-                                                    ) : (
-                                                        <button disabled className="w-full py-2 bg-gray-200 text-gray-400 font-bold rounded text-xs">Accetta Termini</button>
-                                                    )}
                                                 </div>
-                                            </div>
-                                        )}
+                                            )}
 
-                                        {!user && (
-                                            <p className="text-xs text-gray-400 text-center mt-2">
-                                                <Link href="/login" className="underline hover:text-accent">Accedi</Link> se hai già acquistato.
-                                            </p>
-                                        )}
-                                    </div>
+                                            {!user && (
+                                                <p className="text-xs text-gray-400 text-center mt-2">
+                                                    <Link href="/login" className="underline hover:text-accent">Accedi</Link> se hai già acquistato.
+                                                </p>
+                                            )}
+                                        </div>
+                                    )
                                 )}
 
                                 <hr className="my-6" />
