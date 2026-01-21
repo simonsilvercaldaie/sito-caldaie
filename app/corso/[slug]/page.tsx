@@ -498,6 +498,31 @@ export default function CorsoPage() {
                         <div className="lg:col-span-1">
                             <div id="purchase-card" className="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
 
+                                {/* BLOCCO ACCESSO ATTIVO — UTENTE HA GIÀ ACQUISTATO */}
+                                {hasPurchased && (
+                                    <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                        <div className={`${teamAccess ? 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200' : 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200'} border-2 rounded-2xl p-6 text-center`}>
+                                            <div className={`p-4 ${teamAccess ? 'bg-indigo-100 text-indigo-600' : 'bg-green-100 text-green-600'} rounded-2xl mb-4 inline-block`}>
+                                                <CheckCircle2 className="w-10 h-10" />
+                                            </div>
+                                            <h3 className={`font-bold text-xl ${teamAccess ? 'text-indigo-900' : 'text-green-900'} mb-2`}>
+                                                {teamAccess ? 'Accesso Team Attivo' : 'Accesso Attivo'}
+                                            </h3>
+                                            <p className="text-gray-600 mb-4">
+                                                {teamAccess
+                                                    ? 'Hai accesso completo a tutti i livelli.'
+                                                    : 'Hai già accesso a questo livello.'}
+                                            </p>
+                                            <a
+                                                href="#premium-section"
+                                                className={`inline-block py-3 px-6 ${teamAccess ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-green-600 hover:bg-green-700'} text-white font-bold rounded-xl transition-all duration-300 hover:shadow-lg`}
+                                            >
+                                                Vai al contenuto premium
+                                            </a>
+                                        </div>
+                                    </div>
+                                )}
+
                                 {/* BLOCCO PRINCIPALE — LICENZA SINGOLA (DEFAULT) */}
                                 {!hasPurchased && viewMode === null && (
                                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
