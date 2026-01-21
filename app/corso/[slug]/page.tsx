@@ -541,8 +541,8 @@ export default function CorsoPage() {
                                                         <Users className="w-6 h-6" />
                                                     </div>
                                                     <div className="text-left">
-                                                        <h4 className="font-bold text-indigo-900">Hai un team o un'azienda?</h4>
-                                                        <p className="text-sm text-gray-600">Accesso completo a <strong>tutti e 3 i livelli</strong> per più utenti</p>
+                                                        <h4 className="font-bold text-indigo-900">Sei un team di tecnici?</h4>
+                                                        <p className="text-sm text-gray-600">Accesso completo a <strong>tutti e 3 i livelli</strong> per più utenti.</p>
                                                     </div>
                                                 </div>
                                                 <div className="text-indigo-500 group-hover:translate-x-1 transition-transform">
