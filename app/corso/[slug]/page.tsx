@@ -507,14 +507,15 @@ export default function CorsoPage() {
                                             onClick={() => setViewMode('individual')}
                                             className="w-full bg-white border-2 border-gray-100 hover:border-primary/50 hover:bg-blue-50/30 p-6 rounded-2xl transition-all group text-left shadow-sm hover:shadow-md"
                                         >
-                                            <div className="flex items-start gap-4">
-                                                <div className="p-3 bg-blue-100 text-primary rounded-xl group-hover:scale-110 transition-transform">
-                                                    <User className="w-8 h-8" />
-                                                </div>
-                                                <div>
-                                                    <h4 className="font-bold text-lg text-gray-900 group-hover:text-primary transition-colors">Licenza Singola</h4>
-                                                    <p className="text-sm text-gray-500 mt-1">Per privati e liberi professionisti. Accesso completo per 1 utente.</p>
-                                                </div>
+                                            <div className="p-3 bg-blue-100 text-primary rounded-xl group-hover:scale-110 transition-transform">
+                                                <User className="w-8 h-8" />
+                                            </div>
+                                            <div>
+                                                <h4 className="font-bold text-lg text-gray-900 group-hover:text-primary transition-colors">Licenza Singola</h4>
+                                                <p className="text-sm text-gray-500 mt-1">
+                                                    Include solo i corsi del livello attuale ({course.level}).<br />
+                                                    <span className="opacity-75">Per privati e liberi professionisti.</span>
+                                                </p>
                                             </div>
                                         </button>
 
@@ -528,7 +529,10 @@ export default function CorsoPage() {
                                                 </div>
                                                 <div>
                                                     <h4 className="font-bold text-lg text-gray-900 group-hover:text-indigo-700 transition-colors">Licenza Team</h4>
-                                                    <p className="text-sm text-gray-500 mt-1">Per aziende, centri assistenza e gruppi. Gestisci membri e inviti.</p>
+                                                    <p className="text-sm text-gray-500 mt-1">
+                                                        Include l’accesso completo a tutti e 3 i livelli: Base, Intermedio e Avanzato.<br />
+                                                        <span className="opacity-75">Per aziende, centri assistenza e gruppi.</span>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </button>
@@ -733,7 +737,6 @@ export default function CorsoPage() {
                                                 <ul className="space-y-2 text-xs">
                                                     <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />Tutti i 9 corsi {course.level}</li>
                                                     <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />Accesso a vita senza scadenza</li>
-                                                    <li className="flex items-center gap-2"><CheckCircle2 className="w-3 h-3 text-green-500" />Certificato finale</li>
                                                 </ul>
                                             </div>
                                         )}
