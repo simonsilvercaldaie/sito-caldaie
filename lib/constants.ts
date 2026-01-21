@@ -10,9 +10,13 @@ export const TOS_VERSION = '2026-01-18-v1'
 // CONFIGURAZIONE PAGAMENTI
 // ============================================
 
-// Interruttore pagamenti: true = attivi, false = disabilitati
-// Controllato da ENV per deploy senza modifiche codice
-export const PAYMENTS_ENABLED = process.env.NEXT_PUBLIC_PAYMENTS_ENABLED === 'true'
+// Interruttore pagamenti SERVER-SIDE (Kill Switch)
+// Deve essere usato dalle API per bloccare le transazioni
+export const SERVER_PAYMENTS_ENABLED = process.env.PAYMENTS_ENABLED === 'true'
+
+// Interruttore pagamenti CLIENT-SIDE (UI Toggle)
+// Usato per nascondere pulsanti, ma la sicurezza reale è sul server
+export const UI_PAYMENTS_ENABLED = process.env.NEXT_PUBLIC_PAYMENTS_ENABLED === 'true'
 
 // Ambiente PayPal: 'sandbox' o 'live'
 export const PAYPAL_ENV = (process.env.NEXT_PUBLIC_PAYPAL_ENV || 'sandbox') as 'sandbox' | 'live'

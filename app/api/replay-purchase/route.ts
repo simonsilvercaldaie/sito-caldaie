@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { TOS_VERSION, PAYMENTS_ENABLED, PAYPAL_API_URL, PAYPAL_ENV } from '@/lib/constants'
+import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL, PAYPAL_ENV } from '@/lib/constants'
 import { getExpectedPrice } from '@/lib/serverPricing'
 import { getAllCourses } from '@/lib/coursesData'
 import { checkRateLimit } from '@/lib/rateLimit'

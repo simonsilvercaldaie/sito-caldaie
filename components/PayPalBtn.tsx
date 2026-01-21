@@ -1,6 +1,6 @@
 'use client'
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
-import { PAYMENTS_ENABLED, PAYPAL_CLIENT_ID, PAYPAL_ENV } from "@/lib/constants";
+import { UI_PAYMENTS_ENABLED, PAYPAL_CLIENT_ID, PAYPAL_ENV } from "@/lib/constants";
 
 interface PayPalBtnProps {
     amount: string;
@@ -11,7 +11,7 @@ interface PayPalBtnProps {
 export function PayPalBtn({ amount, courseTitle, onSuccess }: PayPalBtnProps) {
 
     // Pagamenti disabilitati: mostra messaggio
-    if (!PAYMENTS_ENABLED) {
+    if (!UI_PAYMENTS_ENABLED) {
         return (
             <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 text-center">
                 <p className="font-bold text-orange-800 mb-1">Pagamenti temporaneamente non disponibili</p>

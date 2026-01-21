@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { TOS_VERSION, PAYMENTS_ENABLED, PAYPAL_API_URL, PAYPAL_ENV } from '@/lib/constants'
+import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL, PAYPAL_ENV } from '@/lib/constants'
 import { getExpectedPrice } from '@/lib/serverPricing'
 import { getAllCourses } from '@/lib/coursesData'
 import { checkRateLimit } from '@/lib/rateLimit'
@@ -99,7 +99,7 @@ async function verifyPayPalOrder(orderId: string, expectedAmount: number): Promi
  */
 export async function POST(request: NextRequest) {
     try {
-        if (!PAYMENTS_ENABLED) {
+        if (!SERVER_PAYMENTS_ENABLED) {
             return NextResponse.json(
                 { ok: false, error: 'payments_disabled' },
                 { status: 503 }
