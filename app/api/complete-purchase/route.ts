@@ -1,10 +1,10 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL, PAYPAL_ENV } from '@/lib/constants'
-import { getExpectedPrice } from '@/lib/serverPricing'
-import { getAllCourses } from '@/lib/coursesData'
+import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL } from '@/lib/constants'
+import { getExpectedPriceCents } from '@/lib/serverPricing'
 import { checkRateLimit } from '@/lib/rateLimit'
 
+// Admin Client
 function getSupabaseAdmin() {
     return createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,356 +15,171 @@ function getSupabaseAdmin() {
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID!
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET!
 
-const PAYPAL_ORDER_ID_REGEX = /^[A-Z0-9-]{10,32}$/i
-
 async function getPayPalAccessToken(): Promise<string> {
     const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64')
-
-    const res = await fetch(`${PAYPAL_API_URL}/v1/oauth2/token`, {
+    const response = await fetch(`${PAYPAL_API_URL}/v1/oauth2/token`, {
         method: 'POST',
         headers: {
             'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/x-www-form-urlencoded'
+            'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: 'grant_type=client_credentials'
+        body: 'grant_type=client_credentials',
     })
-
-    if (!res.ok) {
-        console.error('[complete-purchase] Errore auth PayPal')
-        throw new Error('Errore autenticazione PayPal')
-    }
-
-    const data = await res.json()
+    const data = await response.json()
     return data.access_token
 }
 
-async function verifyPayPalOrder(orderId: string, expectedAmount: number): Promise<{
+async function verifyPayPalOrder(orderId: string, expectedAmountCents: number): Promise<{
     valid: boolean
+    captureId?: string
     error?: string
-    code?: string
 }> {
     try {
         const accessToken = await getPayPalAccessToken()
-
         const res = await fetch(`${PAYPAL_API_URL}/v2/checkout/orders/${orderId}`, {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' }
         })
 
-        if (!res.ok) {
-            console.error(`[complete-purchase] Ordine ${orderId} non trovato`)
-            return { valid: false, error: 'Ordine non trovato', code: 'ORDER_NOT_FOUND' }
-        }
-
+        if (!res.ok) return { valid: false, error: 'Ordine non trovato' }
         const order = await res.json()
 
-        if (order.status !== 'COMPLETED') {
-            console.error(`[complete-purchase] Ordine ${orderId} stato: ${order.status}`)
-            return { valid: false, error: 'Ordine non completato', code: 'ORDER_NOT_COMPLETED' }
-        }
+        if (order.status !== 'COMPLETED') return { valid: false, error: 'Ordine non completato' }
 
         const capture = order.purchase_units?.[0]?.payments?.captures?.[0]
-        if (!capture) {
-            return { valid: false, error: 'Pagamento non catturato', code: 'NO_CAPTURE' }
-        }
+        if (!capture) return { valid: false, error: 'Capture non trovato' }
 
-        const paidAmount = parseFloat(capture.amount.value)
+        const paidVal = parseFloat(capture.amount.value)
         const currency = capture.amount.currency_code
 
-        if (currency !== 'EUR') {
-            console.error(`[complete-purchase] Valuta errata: ${currency}`)
-            return { valid: false, error: 'Valuta non valida', code: 'INVALID_CURRENCY' }
+        // Tolleranza 1 cent
+        if (Math.abs(paidVal - (expectedAmountCents / 100)) > 0.01) {
+            return { valid: false, error: 'Importo errato' }
         }
+        if (currency !== 'EUR') return { valid: false, error: 'Valuta errata' }
 
-        if (Math.abs(paidAmount - expectedAmount) > 0.01) {
-            console.error(`[complete-purchase] Importo: ${paidAmount}, atteso: ${expectedAmount}`)
-            return { valid: false, error: 'Importo non corrispondente', code: 'AMOUNT_MISMATCH' }
-        }
-
-        return { valid: true }
-
-    } catch (error) {
-        console.error('[complete-purchase] Errore verifica PayPal:', error)
-        return { valid: false, error: 'Errore verifica pagamento', code: 'VERIFICATION_ERROR' }
+        return { valid: true, captureId: capture.id }
+    } catch (e) {
+        console.error('PayPal Verify Error', e)
+        return { valid: false, error: 'Eccezione Verifica' }
     }
 }
 
-/**
- * POST /api/complete-purchase
- * 
- * Completa l'acquisto dopo pagamento PayPal.
- * Autenticazione via Bearer token.
- */
 export async function POST(request: NextRequest) {
     try {
         if (!SERVER_PAYMENTS_ENABLED) {
-            return NextResponse.json(
-                { ok: false, error: 'payments_disabled' },
-                { status: 503 }
-            )
+            return NextResponse.json({ ok: false, error: 'payments_disabled' }, { status: 503 })
         }
 
-        // Auth via Bearer token
+        // 1. Auth Headers
         const authHeader = request.headers.get('authorization') || ''
-
-        if (!authHeader || !authHeader.toLowerCase().startsWith('bearer ')) {
-            console.error('[complete-purchase] Token mancante')
-            return NextResponse.json(
-                { ok: false, error: 'missing_token' },
-                { status: 401 }
-            )
-        }
-
         const token = authHeader.replace(/^Bearer\s+/i, '').trim()
-        const { data: { user }, error: authError } = await getSupabaseAdmin().auth.getUser(token)
+        if (!token) return NextResponse.json({ ok: false, error: 'missing_token' }, { status: 401 })
 
-        if (authError || !user) {
-            console.error('[complete-purchase] Token invalido:', authError?.message)
-            return NextResponse.json(
-                { ok: false, error: 'invalid_token' },
-                { status: 401 }
-            )
-        }
+        // 2. Parse Body BEFORE Auth verification to fail fast on bad input? 
+        // No, Auth first for security.
+        const supabaseAdmin = getSupabaseAdmin()
+        const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
+        if (authError || !user || !user.email) return NextResponse.json({ ok: false, error: 'invalid_token' }, { status: 401 })
 
-        // Parsing body
+        // 3. Parse Body
         const body = await request.json()
-        const { orderId, level } = body
+        const { orderId, product_code, amount_cents } = body
 
-        if (!orderId || typeof orderId !== 'string' || !orderId.trim()) {
-            return NextResponse.json(
-                { ok: false, error: 'missing_order_id' },
-                { status: 400 }
-            )
+        if (!orderId || !product_code || !amount_cents) {
+            return NextResponse.json({ ok: false, error: 'missing_fields' }, { status: 400 })
         }
 
-        if (!PAYPAL_ORDER_ID_REGEX.test(orderId)) {
-            return NextResponse.json(
-                { ok: false, error: 'invalid_order_id_format' },
-                { status: 400 }
-            )
-        }
-
-        // RATE LIMITING (Package 2)
-        // import { checkRateLimit } from '@/lib/rateLimit' <--- Spostato sopra
-        const ip = request.headers.get('x-forwarded-for') || 'unknown'
-
-        // Limit 1: User-based (5 requests / minute) - FAIL CLOSED
-        const userLimit = await checkRateLimit(`purchase_user_${user.id}`, 5, 60, false)
-        if (!userLimit.success) {
-            console.warn(`[RateLimit] User ${user.id} exceeded limit`)
-            return NextResponse.json({ ok: false, error: 'rate_limit_exceeded' }, { status: 429 })
-        }
-
-        // Limit 2: IP-based (10 requests / minute) - FAIL CLOSED
-        const ipLimit = await checkRateLimit(`purchase_ip_${ip}`, 10, 60, false)
-        if (!ipLimit.success) {
-            console.warn(`[RateLimit] IP ${ip} exceeded limit`)
-            return NextResponse.json({ ok: false, error: 'rate_limit_exceeded' }, { status: 429 })
-        }
-
-        if (!level || !['Base', 'Intermedio', 'Avanzato'].includes(level)) {
-            return NextResponse.json(
-                { ok: false, error: 'invalid_level' },
-                { status: 400 }
-            )
-        }
-
-        const expectedAmount = getExpectedPrice(level)
-        if (expectedAmount === null) {
-            return NextResponse.json(
-                { ok: false, error: 'price_not_found' },
-                { status: 500 }
-            )
-        }
-
-        // Idempotenza
-        const { data: existingPurchase } = await getSupabaseAdmin()
-            .from('purchases')
-            .select('id')
-            .eq('paypal_order_id', orderId)
-            .maybeSingle()
-
-        if (existingPurchase) {
-            console.log(`[complete-purchase] Ordine ${orderId} già processato`)
-            return NextResponse.json({ ok: true, alreadyProcessed: true })
-        }
-
-        // Verifica ToS
-        const { data: tosAcceptance } = await getSupabaseAdmin()
-            .from('tos_acceptances')
-            .select('id')
-            .eq('user_id', user.id)
-            .eq('tos_version', TOS_VERSION)
-            .maybeSingle()
-
-        if (!tosAcceptance) {
-            return NextResponse.json(
-                { ok: false, error: 'tos_not_accepted' },
-                { status: 403 }
-            )
-        }
-
-        // Verifica PayPal
-        const verification = await verifyPayPalOrder(orderId, expectedAmount)
-
-        if (!verification.valid) {
-            return NextResponse.json(
-                { ok: false, error: verification.error, code: verification.code },
-                { status: 402 }
-            )
-        }
-
-        // Ottieni corsi
-        const allCourses = getAllCourses()
-        const coursesToUnlock = allCourses.filter(c => c.level === level)
-
-        if (coursesToUnlock.length === 0) {
-            return NextResponse.json(
-                { ok: false, error: 'no_courses_found' },
-                { status: 500 }
-            )
-        }
-
-        // Salva acquisti
-        const purchaseRecords = coursesToUnlock.map(course => ({
-            user_id: user.id,
-            course_id: course.title,
-            amount: expectedAmount / coursesToUnlock.length,
-            paypal_order_id: orderId
-        }))
-
-        const { error: purchaseError } = await getSupabaseAdmin()
-            .from('purchases')
-            .insert(purchaseRecords)
-
-        if (purchaseError) {
-            if (purchaseError.code === '23505') {
-                console.log(`[complete-purchase] Ordine ${orderId} già presente (constraint)`)
-                return NextResponse.json({ ok: true, alreadyProcessed: true })
-            }
-
-            console.error('[complete-purchase] Errore insert:', purchaseError)
-            return NextResponse.json(
-                { ok: false, error: 'purchase_error' },
-                { status: 500 }
-            )
-        }
-
-        console.log(`[complete-purchase] Ordine ${orderId} completato: ${coursesToUnlock.length} corsi per user ${user.id}`)
-
-        // Check if user has P.IVA and send invoice notification email
+        // 4. Price Validation (SERVER TRUTH)
+        let truthPrice = 0
         try {
-            const { data: userProfile } = await getSupabaseAdmin()
-                .from('user_profiles')
-                .select('company_name, piva, address, city, cap, cf')
-                .eq('id', user.id)
-                .maybeSingle()
-
-            if (userProfile?.piva) {
-                // Send email notification for invoice via EmailJS API
-                const emailData = {
-                    service_id: 'service_i4y7ewt',
-                    template_id: 'template_sotc25n',
-                    user_id: 'NcJg5-hiu3gVJiJZ-',
-                    template_params: {
-                        from_name: 'Sistema Acquisti',
-                        from_email: user.email,
-                        subject: `🧾 FATTURA RICHIESTA - Ordine ${orderId}`,
-                        message: `
-NUOVO ACQUISTO CON P.IVA - SERVE FATTURA
-
-📦 ORDINE: ${orderId}
-📚 LIVELLO: ${level}
-💰 IMPORTO: €${expectedAmount.toFixed(2)}
-
-👤 DATI CLIENTE:
-Email: ${user.email}
-Ragione Sociale: ${userProfile.company_name || 'N/D'}
-P.IVA: ${userProfile.piva}
-Codice Fiscale: ${userProfile.cf || 'N/D'}
-Indirizzo: ${userProfile.address || 'N/D'}
-CAP: ${userProfile.cap || 'N/D'}
-Città: ${userProfile.city || 'N/D'}
-
-⏰ Data: ${new Date().toLocaleString('it-IT')}
-                        `.trim()
-                    }
-                }
-
-                await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(emailData)
-                })
-
-                console.log(`[complete-purchase] Email fattura inviata per ordine ${orderId}`)
-            }
-        } catch (emailError) {
-            console.error('[complete-purchase] Errore invio email fattura:', emailError)
+            truthPrice = getExpectedPriceCents(product_code)
+        } catch (e) {
+            return NextResponse.json({ ok: false, error: 'invalid_product_code' }, { status: 400 })
         }
 
-        // Send confirmation email to the CUSTOMER
-        try {
-            // Determine friendly package name
-            let packageName = `Pacchetto ${level}`
-            if (level.toLowerCase() === 'base') packageName = 'Pacchetto BASE (9 Video)'
-            else if (level.toLowerCase() === 'intermedio') packageName = 'Pacchetto INTERMEDIO (9 Video)'
-            else if (level.toLowerCase() === 'avanzato') packageName = 'Pacchetto AVANZATO (9 Video)'
-            // Fallback for unexpected levels
-            else packageName = `Pacchetto ${level}`
+        // Security Check: Client vs Server amount
+        if (amount_cents !== truthPrice) {
+            return NextResponse.json({ ok: false, error: 'price_mismatch' }, { status: 400 })
+        }
 
-            const customerEmailData = {
-                service_id: 'service_i4y7ewt',
-                template_id: 'template_sotc25n', // Correct customer template
-                user_id: 'NcJg5-hiu3gVJiJZ-',
-                template_params: {
-                    from_name: 'Simon Silver Caldaie', // Sender name
-                    to_email: user.email,
-                    subject: `✅ Conferma Acquisto - ${level}`,
-                    message: `
-Ciao! Grazie per il tuo acquisto.
+        // 5. Rate Limit
+        const limitRes = await checkRateLimit(`purch_${user.id}`, 5, 60, false)
+        if (!limitRes.success) return NextResponse.json({ ok: false, error: 'rate_limit' }, { status: 429 })
 
-Hai sbloccato con successo:
-${packageName}
+        // 6. TOS
+        const { data: tos } = await supabaseAdmin.from('tos_acceptances').select('id').eq('user_id', user.id).eq('tos_version', TOS_VERSION).maybeSingle()
+        if (!tos) return NextResponse.json({ ok: false, error: 'tos_required' }, { status: 403 })
 
-Puoi accedere subito ai tuoi corsi dalla Dashboard:
-https://simonsilvercaldaie.it/dashboard
+        // 7. Verify PayPal
+        const ver = await verifyPayPalOrder(orderId, truthPrice)
+        if (!ver.valid || !ver.captureId) return NextResponse.json({ ok: false, error: ver.error }, { status: 402 })
+        const captureId = ver.captureId
 
-Buono studio!
-Simon Silver
-                    `.trim()
-                }
-            }
+        // 8. Idempotency on Capture ID
+        // Note: Using 'maybeSingle' to handle 0 or 1.
+        const { data: existing } = await supabaseAdmin.from('purchases').select('id').eq('paypal_capture_id', captureId).maybeSingle()
+        if (existing) return NextResponse.json({ ok: true, alreadyProcessed: true })
 
-            // Note: If the template is fixed to send to Simon, this email will go to Simon.
-            // There is no way to fix this via code only if EmailJS is locked to one recipient.
-            // I will implement it and warn the user.
+        // 9. Execute Purchase (LIFETIME LOGIC)
+        const isTeam = product_code.startsWith('team_')
 
-            await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(customerEmailData)
+        if (isTeam) {
+            // --- RAMO TEAM ---
+            const seats = parseInt(product_code.split('_')[1])
+
+            // Create License
+            // Ignore legacy fields. Provide defaults only if DB requires them.
+            // company_name might be required in legacy schema? 
+            // Providing generic name just in case constraint exists. User said "ignore", but SQL might complain if NOT NULL.
+            const { data: lic, error: licErr } = await supabaseAdmin.from('team_licenses').insert({
+                owner_user_id: user.id,
+                seats: seats,
+                company_name: user.email // Fallback in case of constraint
+            }).select().single()
+
+            if (licErr || !lic) throw licErr
+
+            // Add Owner
+            const { error: memErr } = await supabaseAdmin.from('team_members').insert({
+                team_license_id: lic.id,
+                user_id: user.id
             })
+            if (memErr) throw memErr
 
-        } catch (confError) {
-            console.error('[complete-purchase] Errore invio conferma:', confError)
+            // Record Purchase
+            // ignore course_id (set null as per last instruction)
+            const { error: purErr } = await supabaseAdmin.from('purchases').insert({
+                user_id: user.id,
+                plan_type: 'team',
+                product_code: product_code,
+                amount_cents: truthPrice,
+                paypal_capture_id: captureId,
+                team_license_id: lic.id,
+                course_id: null
+            })
+            if (purErr) throw purErr
+
+        } else {
+            // --- RAMO INDIVIDUAL ---
+            // plan_type = 'individual'
+            // course_id = product_code upper (Legacy compat) or null? user said ignore for Team. 
+            // For individual, let's keep it populated for legacy queries.
+            const { error: purErr } = await supabaseAdmin.from('purchases').insert({
+                user_id: user.id,
+                plan_type: 'individual',
+                product_code: product_code,
+                amount_cents: truthPrice,
+                paypal_capture_id: captureId,
+                team_license_id: null,
+                course_id: product_code.toUpperCase()
+            })
+            if (purErr) throw purErr
         }
 
-        return NextResponse.json({
-            ok: true,
-            alreadyProcessed: false,
-            level: level,
-            coursesUnlocked: coursesToUnlock.length,
-            environment: PAYPAL_ENV
-        })
+        return NextResponse.json({ ok: true })
 
-    } catch (error) {
-        console.error('[complete-purchase] Errore interno:', error)
-        return NextResponse.json(
-            { ok: false, error: 'internal_error' },
-            { status: 500 }
-        )
+    } catch (e) {
+        console.error('Internal Error', e)
+        return NextResponse.json({ ok: false, error: 'internal_server_error' }, { status: 500 })
     }
 }

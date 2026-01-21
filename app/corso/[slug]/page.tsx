@@ -17,6 +17,8 @@ import {
     ArrowLeft,
     Star,
     Package,
+    Building,
+    Users,
 } from "lucide-react"
 import { CourseJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd"
 
@@ -47,6 +49,10 @@ export default function CorsoPage() {
     const [tosAccepted, setTosAccepted] = useState(false)
     const [tosLoading, setTosLoading] = useState(false)
 
+    // Team UI State
+    const [viewMode, setViewMode] = useState<'individual' | 'team'>('individual')
+    const [teamAccess, setTeamAccess] = useState(false)
+
     useEffect(() => {
         const checkUser = async () => {
             const { data: { session } } = await supabase.auth.getSession()
@@ -60,18 +66,51 @@ export default function CorsoPage() {
             }
 
             if (currentUser) {
-                // Carica tutti gli acquisti dell'utente
+                // 1. Carica acquisti Individuali
                 const { data: purchases } = await supabase
                     .from('purchases')
                     .select('course_id')
                     .eq('user_id', currentUser.id)
 
+                let hasAccess = false
+                let userCourseIds: string[] = []
+
                 if (purchases) {
-                    const courseIds = purchases.map(p => p.course_id)
-                    setPurchasedCourses(courseIds)
-                    // Verifica se ha acquistato questo corso
-                    setHasPurchased(course ? courseIds.includes(course.title) : false)
+                    userCourseIds = purchases.map(p => p.course_id)
                 }
+
+                // 2. Check Team Membership (Accesso Totale)
+                const { data: teamMember } = await supabase
+                    .from('team_members')
+                    .select(`
+                        team_license_id,
+                        team_licenses (
+                            status,
+                            valid_until
+                        )
+                    `)
+                    .eq('user_id', currentUser.id)
+                    .is('removed_at', null) // Solo membri attivi
+                    .maybeSingle()
+
+                if (teamMember && teamMember.team_licenses) {
+                    const lic = teamMember.team_licenses as any
+                    const now = new Date()
+                    const validUntil = new Date(lic.valid_until)
+
+                    if (lic.status === 'active' && validUntil > now) {
+                        setTeamAccess(true)
+                        hasAccess = true // Team ha accesso a tutto
+                    }
+                }
+
+                // Verifica se ha accesso a QUESTO corso
+                if (!hasAccess && course) {
+                    hasAccess = userCourseIds.includes(course.title)
+                }
+
+                setPurchasedCourses(userCourseIds)
+                setHasPurchased(hasAccess)
             }
 
             setLoading(false)
@@ -133,10 +172,9 @@ export default function CorsoPage() {
         }
     }
 
-    const handlePurchaseSuccess = async (orderId: string) => {
+    const handlePurchaseSuccess = async (orderId: string, params: { product_code?: string, amount_cents?: number, plan_type?: string }) => {
         if (!user || !course || !pricingInfo) return
 
-        // Ottieni token per Authorization header
         const { data: { session } } = await supabase.auth.getSession()
         const accessToken = session?.access_token
 
@@ -145,10 +183,37 @@ export default function CorsoPage() {
             return
         }
 
-        // Funzione per tentare il salvataggio (con retry)
+        // Determine Payload
+        let product_code = params.product_code
+        let amount_cents = params.amount_cents
+
+        // Fallback for Individual if not explicit
+        if (!product_code && params.plan_type === 'individual') {
+            const map: Record<string, string> = {
+                "Base": "base",
+                "Intermedio": "intermediate",
+                "Avanzato": "advanced",
+                "Laboratorio": "advanced" // Fallback? Or unsupported.
+            }
+            product_code = map[course.level]
+            amount_cents = pricingInfo.amountToPay * 100
+        }
+
+        if (!product_code || !amount_cents) {
+            alert("Errore configurazione prodotto: impossibile determinare il codice.")
+            return
+        }
+
         const attemptSave = async (attempt: number = 1): Promise<boolean> => {
             try {
                 console.log(`[handlePurchaseSuccess] Tentativo ${attempt} per orderId: ${orderId}`)
+
+                const body = {
+                    orderId: orderId,
+                    product_code: product_code,
+                    amount_cents: amount_cents,
+                    plan_type: params.plan_type // Optional now for backend but kept for debug, backend relies on product_code mostly
+                }
 
                 const res = await fetch('/api/complete-purchase', {
                     method: 'POST',
@@ -156,48 +221,36 @@ export default function CorsoPage() {
                         'Content-Type': 'application/json',
                         'Authorization': `Bearer ${accessToken}`
                     },
-                    body: JSON.stringify({
-                        orderId: orderId,
-                        level: course.level
-                    })
+                    body: JSON.stringify(body)
                 })
 
                 const data = await res.json()
 
                 if (res.ok) {
-                    // Successo (anche se già processato)
                     console.log(`[handlePurchaseSuccess] Successo:`, data)
                     return true
                 }
 
-                // Errori specifici che non richiedono retry
                 if (data.error === 'tos_not_accepted') {
                     alert('Accetta i Termini per procedere.')
                     setTosAccepted(false)
                     return false
                 }
-
                 if (data.error === 'payments_disabled') {
                     alert('Pagamenti temporaneamente non disponibili.')
                     return false
                 }
-
-                // Errori PayPal (ordine non valido, importo errato, ecc.)
                 if (res.status === 402) {
-                    console.error('[handlePurchaseSuccess] Errore verifica PayPal:', data)
                     alert(`Errore verifica pagamento: ${data.error}`)
                     return false
                 }
 
-                // Errori server temporanei: retry
                 if (res.status >= 500 && attempt < 3) {
-                    console.log(`[handlePurchaseSuccess] Errore server, retry in 2s...`)
                     await new Promise(r => setTimeout(r, 2000))
                     return attemptSave(attempt + 1)
                 }
 
-                // Errore non recuperabile
-                console.error('[handlePurchaseSuccess] Errore non recuperabile:', data)
+                console.error('[handlePurchaseSuccess] Errore:', data)
                 return false
 
             } catch (err) {
@@ -210,20 +263,29 @@ export default function CorsoPage() {
             }
         }
 
-        // Tenta il salvataggio
         const success = await attemptSave()
 
-        // Redirect sempre a pagina stato ordine (funziona anche se ricarica)
         if (success) {
-            // Successo immediato: redirect con parametro per mostrare messaggio
             window.location.href = `/ordine/${orderId}`
         } else {
-            // Fallimento: redirect comunque, la pagina ordine riproverà
             localStorage.setItem('pendingOrderId', orderId)
             localStorage.setItem('pendingOrderLevel', course.level)
             window.location.href = `/ordine/${orderId}`
         }
     }
+
+    // ... (rendering code unchanged until cards) ...
+    /* INSERTO NEI PUNTI GIUSTI SOTTO */
+    // Nota per l'AI: Il Replace sostituira' tutto il blocco handlePurchaseSuccess fino alle card.
+    // Devo mantenere il resto del file coerente.
+    // Siccome il replace e' grande, assicuro di coprire i punti.
+
+    // Per brevita', includo solo le modifiche alle card nelle righe sotto, 
+    // ma siccome `replace_file_content` deve matchare chunk contigui, devo stare attento.
+    // FARÒ DUE CHIAMATE SEPARATE PER SICUREZZA SE NECESSARIO.
+    // MA PROVO A FARE UN REAPLACE MIRATO SU `handlePurchaseSuccess` PRIMA.
+    // E POI LE CARD.
+
 
     // Corso non trovato
     if (!course) {
@@ -435,25 +497,50 @@ export default function CorsoPage() {
                         <div className="lg:col-span-1">
                             <div id="purchase-card" className="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
 
+                                {/* Toggle Individual / Team */}
+                                {!hasPurchased && (
+                                    <div className="flex bg-gray-100 p-1 rounded-lg mb-6">
+                                        <button
+                                            onClick={() => setViewMode('individual')}
+                                            className={`flex-1 py-2 text-sm font-bold rounded-md transition-all ${viewMode === 'individual' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                        >
+                                            Privato
+                                        </button>
+                                        <button
+                                            onClick={() => setViewMode('team')}
+                                            className={`flex-1 py-2 text-sm font-bold rounded-md transition-all flex items-center justify-center gap-1 ${viewMode === 'team' ? 'bg-white text-primary shadow-sm' : 'text-gray-500 hover:text-gray-700'}`}
+                                        >
+                                            <Building className="w-3 h-3" /> Azienda
+                                        </button>
+                                    </div>
+                                )}
+
                                 {/* Pricing Display */}
                                 <div className="text-center mb-6">
                                     <div className="inline-block p-3 bg-accent/10 text-accent rounded-full mb-3">
-                                        <Package className="w-8 h-8 mx-auto" />
+                                        {viewMode === 'team' ? <Building className="w-8 h-8 mx-auto" /> : <Package className="w-8 h-8 mx-auto" />}
                                     </div>
                                     <h3 className="font-bold text-gray-500 uppercase tracking-wider text-sm mb-1">
-                                        PACCHETTO {course.level.toUpperCase()}
+                                        {viewMode === 'team' ? 'LICENZA TEAM' : `PACCHETTO ${course.level.toUpperCase()}`}
                                     </h3>
-                                    <div className="text-4xl font-extrabold text-primary mb-2">
-                                        € {pricingInfo?.amountToPay}.00
-                                    </div>
-                                    <p className="text-gray-500 text-sm">Include tutti i 9 corsi del livello</p>
+
+                                    {viewMode === 'individual' ? (
+                                        <>
+                                            <div className="text-4xl font-extrabold text-primary mb-2">
+                                                € {pricingInfo?.amountToPay}.00
+                                            </div>
+                                            <p className="text-gray-500 text-sm">Include tutti i 9 corsi del livello</p>
+                                        </>
+                                    ) : (
+                                        <p className="text-gray-500 text-sm">Scegli la dimensione del tuo team</p>
+                                    )}
                                 </div>
 
                                 {hasPurchased ? (
                                     <div className="space-y-4">
                                         <div className="bg-green-50 text-green-800 p-4 rounded-xl text-center">
                                             <CheckCircle2 className="w-8 h-8 mx-auto mb-2" />
-                                            <p className="font-bold">Pacchetto Attivo!</p>
+                                            <p className="font-bold">{teamAccess ? 'Accesso Team Attivo!' : 'Pacchetto Attivo!'}</p>
                                         </div>
                                         <Link
                                             href="/dashboard"
@@ -481,7 +568,7 @@ export default function CorsoPage() {
                                                             <Link href="/termini" target="_blank" className="text-accent underline font-semibold">
                                                                 Termini e Condizioni
                                                             </Link>
-                                                            {' '}e confermo che questo accesso è per mio uso personale (vedi{' '}
+                                                            {' '}e confermo che questo accesso è per {viewMode === 'team' ? 'il mio team' : 'mio uso personale'} (vedi{' '}
                                                             <Link href="/licenze" target="_blank" className="text-accent underline font-semibold">
                                                                 Tipi di Licenza
                                                             </Link>).
@@ -491,17 +578,108 @@ export default function CorsoPage() {
                                             </label>
                                         )}
 
-                                        {/* Pulsante acquisto - gestito da PayPalBtn con PAYMENTS_ENABLED */}
-                                        {tosAccepted ? (
-                                            <PayPalBtn
-                                                amount={String(pricingInfo?.amountToPay || 0)}
-                                                courseTitle={`Pacchetto ${course.level}`}
-                                                onSuccess={handlePurchaseSuccess}
-                                            />
-                                        ) : (
-                                            <button disabled className="w-full py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed">
-                                                Accetta i Termini per procedere
-                                            </button>
+                                        {/* VIEW MODE: INDIVIDUAL */}
+                                        {viewMode === 'individual' && (
+                                            tosAccepted ? (
+                                                <PayPalBtn
+                                                    amount={String(pricingInfo?.amountToPay || 0)}
+                                                    courseTitle={`Pacchetto ${course.level}`}
+                                                    onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'individual' })}
+                                                />
+                                            ) : (
+                                                <button disabled className="w-full py-3 bg-gray-300 text-gray-500 font-bold rounded-xl cursor-not-allowed">
+                                                    Accetta i Termini per procedere
+                                                </button>
+                                            )
+                                        )}
+
+                                        {/* VIEW MODE: TEAM Cards */}
+                                        {viewMode === 'team' && (
+                                            <div className="space-y-4">
+                                                {/* TEAM 5 */}
+                                                <div className="border border-indigo-100 rounded-xl p-4 hover:border-indigo-300 transition-colors bg-indigo-50/30">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div>
+                                                            <h4 className="font-bold text-indigo-900">Team 5</h4>
+                                                            <div className="text-xs text-indigo-600 flex items-center gap-1">
+                                                                <Users className="w-3 h-3" /> Fino a 5 Utenti
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <div className="font-bold text-xl text-primary">€ 1.500</div>
+                                                            <div className="text-[10px] text-gray-500 uppercase">LIFETIME</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 mb-3 border-t border-indigo-100 pt-2 mt-2">
+                                                        Licenza a vita. Accesso completo per tutto il team. Nessun canone di rinnovo.
+                                                    </div>
+                                                    {tosAccepted ? (
+                                                        <PayPalBtn
+                                                            amount="1500"
+                                                            courseTitle="Licenza Team 5 (Lifetime)"
+                                                            onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'team', product_code: 'team_5', amount_cents: 150000 })}
+                                                        />
+                                                    ) : (
+                                                        <button disabled className="w-full py-2 bg-gray-200 text-gray-400 font-bold rounded text-xs">Accetta Termini</button>
+                                                    )}
+                                                </div>
+
+                                                {/* TEAM 10 */}
+                                                <div className="border border-indigo-100 rounded-xl p-4 hover:border-indigo-300 transition-colors bg-indigo-50/30">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div>
+                                                            <h4 className="font-bold text-indigo-900">Team 10</h4>
+                                                            <div className="text-xs text-indigo-600 flex items-center gap-1">
+                                                                <Users className="w-3 h-3" /> Fino a 10 Utenti
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <div className="font-bold text-xl text-primary">€ 2.000</div>
+                                                            <div className="text-[10px] text-gray-500 uppercase">LIFETIME</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 mb-3 border-t border-indigo-100 pt-2 mt-2">
+                                                        Licenza a vita. Accesso completo per tutto il team. Nessun canone di rinnovo.
+                                                    </div>
+                                                    {tosAccepted ? (
+                                                        <PayPalBtn
+                                                            amount="2000"
+                                                            courseTitle="Licenza Team 10 (Lifetime)"
+                                                            onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'team', product_code: 'team_10', amount_cents: 200000 })}
+                                                        />
+                                                    ) : (
+                                                        <button disabled className="w-full py-2 bg-gray-200 text-gray-400 font-bold rounded text-xs">Accetta Termini</button>
+                                                    )}
+                                                </div>
+
+                                                {/* TEAM 25 */}
+                                                <div className="border border-indigo-100 rounded-xl p-4 hover:border-indigo-300 transition-colors bg-indigo-50/30">
+                                                    <div className="flex justify-between items-start mb-2">
+                                                        <div>
+                                                            <h4 className="font-bold text-indigo-900">Team 25</h4>
+                                                            <div className="text-xs text-indigo-600 flex items-center gap-1">
+                                                                <Users className="w-3 h-3" /> Fino a 25 Utenti
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-right">
+                                                            <div className="font-bold text-xl text-primary">€ 3.000</div>
+                                                            <div className="text-[10px] text-gray-500 uppercase">LIFETIME</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-xs text-gray-500 mb-3 border-t border-indigo-100 pt-2 mt-2">
+                                                        Licenza a vita. Accesso completo per tutto il team. Nessun canone di rinnovo.
+                                                    </div>
+                                                    {tosAccepted ? (
+                                                        <PayPalBtn
+                                                            amount="3000"
+                                                            courseTitle="Licenza Team 25 (Lifetime)"
+                                                            onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'team', product_code: 'team_25', amount_cents: 300000 })}
+                                                        />
+                                                    ) : (
+                                                        <button disabled className="w-full py-2 bg-gray-200 text-gray-400 font-bold rounded text-xs">Accetta Termini</button>
+                                                    )}
+                                                </div>
+                                            </div>
                                         )}
 
                                         {!user && (
@@ -515,17 +693,19 @@ export default function CorsoPage() {
                                 <hr className="my-6" />
 
                                 {/* Info prezzi - nascosto su mobile */}
-                                <div className="hidden lg:block text-sm text-gray-500 mb-6">
-                                    <p className="mb-2">
-                                        <strong>Cosa include il pack:</strong>
-                                    </p>
-                                    <ul className="space-y-2 text-xs">
-                                        <li className="flex items-center gap-2">
-                                            <CheckCircle2 className="w-3 h-3 text-green-500" />
-                                            Accesso a tutti i 9 corsi {course.level}
-                                        </li>
-                                    </ul>
-                                </div>
+                                {viewMode === 'individual' && (
+                                    <div className="hidden lg:block text-sm text-gray-500 mb-6">
+                                        <p className="mb-2">
+                                            <strong>Cosa include il pack:</strong>
+                                        </p>
+                                        <ul className="space-y-2 text-xs">
+                                            <li className="flex items-center gap-2">
+                                                <CheckCircle2 className="w-3 h-3 text-green-500" />
+                                                Accesso a tutti i 9 corsi {course.level}
+                                            </li>
+                                        </ul>
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { LogOut, User, Lock, Save, Loader2, Eye, EyeOff } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
+import TeamDashboard from '@/components/TeamDashboard'
 
 export default function DashboardPage() {
     const [user, setUser] = useState<any>(null)
@@ -198,6 +199,8 @@ export default function DashboardPage() {
                         → Home page
                     </Link>
                 </div>
+
+                <TeamDashboard />
 
                 {/* Sezione Profilo */}
                 <section className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">

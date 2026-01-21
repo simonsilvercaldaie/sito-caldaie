@@ -1,16 +1,25 @@
-// Mappa prezzi server-side ONLY
-// NON ESPORTARE AL CLIENT - usato solo in /api/complete-purchase
 
-export const SERVER_PRICES: Record<string, number> = {
-    'Base': 200,
-    'Intermedio': 300,
-    'Avanzato': 400,
-}
+// Price constants used server-side (in cents)
+// VERITÀ UNICA PREZZI (Centesimi)
+export const PRODUCT_PRICES_CENTS = {
+    // Individual
+    'base': 20000,       // 200 EUR
+    'intermediate': 30000, // 300 EUR
+    'advanced': 40000,   // 400 EUR
+    'complete': 90000,   // 900 EUR
 
-/**
- * Calcola il prezzo atteso per un livello.
- * Da usare SOLO lato server per validare i pagamenti.
- */
-export function getExpectedPrice(level: string): number | null {
-    return SERVER_PRICES[level] ?? null
+    // Team (Complete)
+    'team_5': 150000,    // 1500 EUR
+    'team_10': 200000,   // 2000 EUR
+    'team_25': 300000    // 3000 EUR
+} as const
+
+export type ProductCode = keyof typeof PRODUCT_PRICES_CENTS
+
+export function getExpectedPriceCents(productCode: string): number {
+    // Validazione stretta
+    if (Object.prototype.hasOwnProperty.call(PRODUCT_PRICES_CENTS, productCode)) {
+        return PRODUCT_PRICES_CENTS[productCode as ProductCode]
+    }
+    throw new Error(`Invalid product_code: ${productCode}`)
 }
