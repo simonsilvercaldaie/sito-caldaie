@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL, PAYPAL_ENV } from '@/lib/constants'
-import { getExpectedPrice } from '@/lib/serverPricing'
+import { getExpectedPriceCents } from '@/lib/serverPricing'
 import { getAllCourses } from '@/lib/coursesData'
 import { checkRateLimit } from '@/lib/rateLimit'
 
@@ -77,9 +77,9 @@ async function verifyPayPalOrder(orderId: string): Promise<{
 
         // Determina il livello dall'importo
         let level: string
-        if (Math.abs(paidAmount - 200) < 0.01) level = 'Base'
-        else if (Math.abs(paidAmount - 300) < 0.01) level = 'Intermedio'
-        else if (Math.abs(paidAmount - 400) < 0.01) level = 'Avanzato'
+        if (Math.abs(paidAmount - (getExpectedPriceCents('base') / 100)) < 0.01) level = 'Base'
+        else if (Math.abs(paidAmount - (getExpectedPriceCents('intermediate') / 100)) < 0.01) level = 'Intermedio'
+        else if (Math.abs(paidAmount - (getExpectedPriceCents('advanced') / 100)) < 0.01) level = 'Avanzato'
         else {
             return { valid: false, error: `Importo non riconosciuto: €${paidAmount}`, code: 'AMOUNT_UNKNOWN' }
         }
