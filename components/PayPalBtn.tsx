@@ -10,6 +10,10 @@ interface PayPalBtnProps {
 
 export function PayPalBtn({ amount, courseTitle, onSuccess }: PayPalBtnProps) {
 
+    // DEBUG: Verifica stato variabile
+    console.log('[PayPalBtn] UI_PAYMENTS_ENABLED:', UI_PAYMENTS_ENABLED);
+    console.log('[PayPalBtn] Raw ENV:', process.env.NEXT_PUBLIC_PAYMENTS_ENABLED);
+
     // Pagamenti disabilitati: mostra messaggio
     if (!UI_PAYMENTS_ENABLED) {
         return (
