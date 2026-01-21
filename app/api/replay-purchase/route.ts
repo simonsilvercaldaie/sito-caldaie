@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { TOS_VERSION, PAYMENTS_ENABLED, PAYPAL_API_URL, PAYPAL_ENV } from '@/lib/constants'
 import { getExpectedPrice } from '@/lib/serverPricing'
 import { getAllCourses } from '@/lib/coursesData'
+import { checkRateLimit } from '@/lib/rateLimit'
 
 function getSupabaseAdmin() {
     return createClient(
@@ -140,6 +141,23 @@ export async function POST(request: NextRequest) {
                 message: 'Ordine già attivato',
                 coursesUnlocked: existingPurchase.length
             })
+        }
+
+        // RATE LIMITING (Package 2)
+        const ip = request.headers.get('x-forwarded-for') || 'unknown'
+
+        // Limit 1: User-based (3 requests / minute)
+        const userLimit = await checkRateLimit(`replay_user_${user.id}`, 3, 60)
+        if (!userLimit.success) {
+            console.warn(`[RateLimit] User ${user.id} exceeded limit (replay)`)
+            return NextResponse.json({ ok: false, error: 'rate_limit_exceeded' }, { status: 429 })
+        }
+
+        // Limit 2: IP-based (6 requests / minute)
+        const ipLimit = await checkRateLimit(`replay_ip_${ip}`, 6, 60)
+        if (!ipLimit.success) {
+            console.warn(`[RateLimit] IP ${ip} exceeded limit (replay)`)
+            return NextResponse.json({ ok: false, error: 'rate_limit_exceeded' }, { status: 429 })
         }
 
         // Verifica ordine PayPal
