@@ -498,57 +498,57 @@ export default function CorsoPage() {
                         <div className="lg:col-span-1">
                             <div id="purchase-card" className="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
 
-                                {/* SELEZIONE INIZIALE TIPO LICENZA */}
+                                {/* BLOCCO PRINCIPALE — LICENZA SINGOLA (DEFAULT) */}
                                 {!hasPurchased && viewMode === null && (
-                                    <div className="space-y-4 lg:space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                        <h3 className="text-xl lg:text-2xl font-bold text-gray-800 text-center mb-4 lg:mb-6">Scegli la tua Licenza</h3>
+                                    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                        {/* Singola Card - Dominant */}
+                                        <div className="bg-gradient-to-br from-blue-50 to-white border-2 border-blue-200 rounded-3xl p-6 lg:p-8 text-center shadow-lg">
+                                            <div className="p-4 bg-blue-100 text-blue-600 rounded-2xl mb-4 inline-block">
+                                                <User className="w-10 h-10" />
+                                            </div>
+                                            <h3 className="font-bold text-2xl lg:text-3xl text-blue-900 mb-1">Licenza Singola</h3>
+                                            <span className="inline-block text-sm font-semibold text-blue-600 uppercase tracking-wide mb-4 bg-blue-100 px-3 py-1 rounded-full">Solo questo livello</span>
 
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
-                                            {/* SINGOLA */}
+                                            {/* Prezzo in evidenza */}
+                                            <div className="text-4xl lg:text-5xl font-extrabold text-primary mb-2">
+                                                € {pricingInfo?.amountToPay}.00
+                                            </div>
+
+                                            <p className="text-base lg:text-lg text-gray-700 font-medium mb-1">
+                                                Comprende <strong>SOLO</strong> il livello: <strong className="text-blue-700">{course.level}</strong>
+                                            </p>
+                                            <p className="text-sm text-gray-500 mb-6">
+                                                1 utente · Accesso a vita · 9 video corsi
+                                            </p>
+
+                                            {/* CTA Primaria */}
                                             <button
                                                 onClick={() => setViewMode('individual')}
-                                                className="relative group flex flex-col items-center text-center bg-blue-50/50 border-2 border-blue-100 hover:border-blue-400 p-8 lg:p-10 rounded-3xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full justify-between"
+                                                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-lg rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5"
                                             >
-                                                <div className="flex flex-col items-center">
-                                                    <div className="p-4 lg:p-5 bg-blue-100 text-blue-600 rounded-2xl mb-4 lg:mb-5 group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                                                        <User className="w-10 h-10 lg:w-12 lg:h-12" />
-                                                    </div>
-                                                    <h4 className="font-bold text-2xl lg:text-3xl text-blue-900 mb-1 group-hover:text-blue-700 transition-colors">Licenza Singola</h4>
-                                                    <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-3">Solo questo livello</span>
-                                                    <p className="text-base lg:text-lg text-gray-700 leading-relaxed font-medium mb-2">
-                                                        Comprende <strong>SOLO</strong> il livello: <strong className="text-blue-700">{course.level}</strong>
-                                                    </p>
-                                                    <p className="text-sm text-gray-500">
-                                                        1 utente · Accesso a vita
-                                                    </p>
-                                                </div>
-                                                <div className="mt-6 lg:mt-8 py-2 lg:py-3 px-6 lg:px-10 bg-white text-blue-600 font-bold rounded-full text-sm lg:text-base shadow-sm group-hover:bg-blue-600 group-hover:text-white transition-all">
-                                                    Seleziona
-                                                </div>
+                                                Acquista questo livello
                                             </button>
+                                        </div>
 
-                                            {/* TEAM */}
-                                            <button
-                                                onClick={() => setViewMode('team')}
-                                                className="relative group flex flex-col items-center text-center bg-indigo-50/50 border-2 border-indigo-100 hover:border-indigo-400 p-8 lg:p-10 rounded-3xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full justify-between"
-                                            >
-                                                <div className="flex flex-col items-center">
-                                                    <div className="p-4 lg:p-5 bg-indigo-100 text-indigo-600 rounded-2xl mb-4 lg:mb-5 group-hover:scale-110 transition-transform duration-300 shadow-sm">
-                                                        <Users className="w-10 h-10 lg:w-12 lg:h-12" />
+                                        {/* Team Teaser - Secondary */}
+                                        <div
+                                            onClick={() => setViewMode('team')}
+                                            className="bg-indigo-50/50 border border-indigo-200 rounded-2xl p-4 lg:p-5 cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all duration-300 group"
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-indigo-100 text-indigo-600 rounded-xl">
+                                                        <Users className="w-6 h-6" />
                                                     </div>
-                                                    <h4 className="font-bold text-2xl lg:text-3xl text-indigo-900 mb-1 group-hover:text-indigo-700 transition-colors">Licenza Team</h4>
-                                                    <span className="text-sm font-semibold text-indigo-600 uppercase tracking-wide mb-3">Tutti i livelli</span>
-                                                    <p className="text-base lg:text-lg text-gray-700 leading-relaxed font-medium mb-2">
-                                                        Comprende <strong>Base + Intermedio + Avanzato</strong>
-                                                    </p>
-                                                    <p className="text-sm text-gray-500">
-                                                        Più utenti · Accesso a vita
-                                                    </p>
+                                                    <div className="text-left">
+                                                        <h4 className="font-bold text-indigo-900">Hai un team o un'azienda?</h4>
+                                                        <p className="text-sm text-gray-600">Accesso completo a <strong>tutti e 3 i livelli</strong> per più utenti</p>
+                                                    </div>
                                                 </div>
-                                                <div className="mt-6 lg:mt-8 py-2 lg:py-3 px-6 lg:px-10 bg-white text-indigo-600 font-bold rounded-full text-sm lg:text-base shadow-sm group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                                                    Seleziona
+                                                <div className="text-indigo-500 group-hover:translate-x-1 transition-transform">
+                                                    →
                                                 </div>
-                                            </button>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
