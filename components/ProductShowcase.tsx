@@ -106,47 +106,7 @@ export default function ProductShowcase() {
                 {/* SEZIONE TEAM REMOVED */}
 
 
-                {/* FAQ SECTION */}
-                <div className="max-w-3xl mx-auto mb-20">
-                    <h2 className="text-3xl font-bold text-primary text-center mb-10">Domande Frequenti</h2>
-                    <div className="space-y-6">
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                            <h3 className="font-bold text-lg text-slate-800 mb-2">Come accedo ai corsi?</h3>
-                            <p className="text-slate-600">
-                                Esclusivamente tramite il tuo account Google. Non serve ricordare nuove password.
-                                È il metodo più sicuro e veloce.
-                            </p>
-                        </div>
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                            <h3 className="font-bold text-lg text-slate-800 mb-2">Posso guardare i video dal telefono?</h3>
-                            <p className="text-slate-600">
-                                Sì. Puoi collegare fino a <strong>2 dispositivi</strong> (es. PC e Telefono).
-                                Puoi resettare i dispositivi associati una volta ogni 30 giorni dalla tua dashboard.
-                            </p>
-                        </div>
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                            <h3 className="font-bold text-lg text-slate-800 mb-2">Posso condividere l'account con un collega?</h3>
-                            <p className="text-slate-600">
-                                <strong>No.</strong> La licenza è strettamente personale. Il sistema permette una sola sessione attiva:
-                                se accedi da un altro dispositivo, il precedente viene disconnesso. Per i team, esistono le licenze dedicate.
-                            </p>
-                        </div>
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                            <h3 className="font-bold text-lg text-slate-800 mb-2">Come funzionano le licenze Team?</h3>
-                            <p className="text-slate-600">
-                                Acquistando un pacchetto Team (5, 10 o 25), ricevi un link per invitare i tuoi tecnici.
-                                Ognuno entrerà con il proprio account Google personale, occupando uno "slot" della licenza aziendale.
-                            </p>
-                        </div>
-                        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                            <h3 className="font-bold text-lg text-slate-800 mb-2">Ricevo la fattura?</h3>
-                            <p className="text-slate-600">
-                                Certamente. In fase di primo accesso ti verranno chiesti i dati di fatturazione (P.IVA e SDI).
-                                La fattura viene emessa elettronicamente entro i termini di legge.
-                            </p>
-                        </div>
-                    </div>
-                </div>
+
 
 
             </div>
