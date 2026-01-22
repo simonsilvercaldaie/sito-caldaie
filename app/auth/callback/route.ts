@@ -87,7 +87,15 @@ export async function GET(request: NextRequest) {
             )
             // Copy all cookies that Supabase set (session tokens)
             supabaseResponse.cookies.getAll().forEach(cookie => {
-                redirectToProfile.cookies.set(cookie.name, cookie.value, cookie)
+                redirectToProfile.cookies.set(cookie.name, cookie.value, {
+                    path: cookie.path,
+                    domain: cookie.domain,
+                    secure: cookie.secure,
+                    httpOnly: cookie.httpOnly,
+                    sameSite: cookie.sameSite as 'lax' | 'strict' | 'none' | undefined,
+                    maxAge: cookie.maxAge,
+                    expires: cookie.expires,
+                })
             })
             return redirectToProfile
         }
@@ -101,7 +109,15 @@ export async function GET(request: NextRequest) {
             )
             // Copy all cookies that Supabase set (session tokens)
             supabaseResponse.cookies.getAll().forEach(cookie => {
-                redirectToProfile.cookies.set(cookie.name, cookie.value, cookie)
+                redirectToProfile.cookies.set(cookie.name, cookie.value, {
+                    path: cookie.path,
+                    domain: cookie.domain,
+                    secure: cookie.secure,
+                    httpOnly: cookie.httpOnly,
+                    sameSite: cookie.sameSite as 'lax' | 'strict' | 'none' | undefined,
+                    maxAge: cookie.maxAge,
+                    expires: cookie.expires,
+                })
             })
             return redirectToProfile
         }
