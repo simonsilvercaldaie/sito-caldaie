@@ -103,46 +103,8 @@ export default function ProductShowcase() {
                     />
                 </div>
 
-                {/* SEZIONE TEAM */}
-                <div className="mb-20">
-                    <div className="text-center mb-12">
-                        <h2 className="text-3xl md:text-5xl font-extrabold text-primary mb-4">
-                            Sei un <span className="text-indigo-600">Team</span>?
-                        </h2>
-                        <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-                            Risparmia fino al 40% con le licenze aziendali. Accesso completo a tutti i livelli per i tuoi collaboratori.
-                        </p>
-                    </div>
+                {/* SEZIONE TEAM REMOVED */}
 
-                    <div className="max-w-4xl mx-auto bg-gradient-to-br from-indigo-50 to-white border-2 border-indigo-100 rounded-3xl p-8 shadow-xl">
-                        <div className="grid md:grid-cols-3 gap-6 text-center">
-                            <div className="p-4 bg-white rounded-xl border border-indigo-100 shadow-sm">
-                                <h3 className="text-indigo-900 font-bold text-lg mb-1">Team 5</h3>
-                                <p className="text-gray-500 text-sm mb-3">Fino a 5 Tecnici</p>
-                                <div className="text-2xl font-extrabold text-primary">€ 1.500</div>
-                            </div>
-                            <div className="p-4 bg-indigo-600 text-white rounded-xl shadow-md transform scale-105">
-                                <h3 className="font-bold text-lg mb-1">Team 10</h3>
-                                <p className="text-indigo-100 text-sm mb-3">Fino a 10 Tecnici</p>
-                                <div className="text-2xl font-extrabold">€ 2.000</div>
-                            </div>
-                            <div className="p-4 bg-white rounded-xl border border-indigo-100 shadow-sm">
-                                <h3 className="text-indigo-900 font-bold text-lg mb-1">Team 25</h3>
-                                <p className="text-gray-500 text-sm mb-3">Fino a 25 Tecnici</p>
-                                <div className="text-2xl font-extrabold text-primary">€ 3.000</div>
-                            </div>
-                        </div>
-                        <div className="mt-8 text-center">
-                            <p className="text-gray-600 mb-6 font-medium">
-                                Ogni tecnico ha il suo accesso personale. Monitoraggio completamento per il responsabile.
-                            </p>
-                            <Link href="/catalogo/base" className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">
-                                <Users className="w-5 h-5" />
-                                Vedi dettagli nei corsi
-                            </Link>
-                        </div>
-                    </div>
-                </div>
 
                 {/* FAQ SECTION */}
                 <div className="max-w-3xl mx-auto mb-20">

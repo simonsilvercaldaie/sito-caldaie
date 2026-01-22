@@ -591,26 +591,29 @@ export default function CorsoPage() {
                                             );
                                         })()}
 
-                                        {/* Team Teaser - Secondary */}
-                                        <div
-                                            onClick={() => setViewMode('team')}
-                                            className="bg-indigo-50/50 border border-indigo-200 rounded-2xl p-4 lg:p-5 cursor-pointer hover:border-indigo-400 hover:shadow-md transition-all duration-300 group"
+                                        {/* Team Teaser - Secondary (Link to Page) */}
+                                        <Link
+                                            href="/licenze-team"
+                                            className="block bg-indigo-50/50 border-2 border-indigo-200 rounded-2xl p-6 cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 hover:shadow-lg transition-all duration-300 group mt-6"
                                         >
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-indigo-100 text-indigo-600 rounded-xl">
-                                                        <Users className="w-6 h-6" />
+                                            <div className="flex items-center justify-between gap-4">
+                                                <div className="flex items-start gap-4">
+                                                    <div className="p-3 bg-indigo-100 text-indigo-600 rounded-xl group-hover:scale-110 transition-transform">
+                                                        <Users className="w-8 h-8" />
                                                     </div>
                                                     <div className="text-left">
-                                                        <h4 className="font-bold text-indigo-900">Sei un team di tecnici?</h4>
-                                                        <p className="text-sm text-gray-600">Accesso completo a <strong>tutti e 3 i livelli</strong> per più utenti.</p>
+                                                        <h4 className="font-bold text-xl text-indigo-900 mb-1">Sei un team di tecnici?</h4>
+                                                        <p className="text-slate-600 leading-relaxed">
+                                                            Scopri le licenze aziendali.<br />
+                                                            <span className="text-sm opacity-80">Risparmia fino al 40%</span>
+                                                        </p>
                                                     </div>
                                                 </div>
-                                                <div className="text-indigo-500 group-hover:translate-x-1 transition-transform">
+                                                <div className="text-indigo-500 group-hover:translate-x-1 transition-transform bg-white rounded-full p-2 shadow-sm">
                                                     →
                                                 </div>
                                             </div>
-                                        </div>
+                                        </Link>
                                     </div>
                                 )}
 
@@ -628,23 +631,17 @@ export default function CorsoPage() {
 
                                         {/* Header Prezzo */}
                                         <div className="text-center mb-6">
-                                            <div className={`inline-block p-3 rounded-full mb-3 ${viewMode === 'team' ? 'bg-indigo-100 text-indigo-600' : 'bg-primary/10 text-primary'}`}>
-                                                {viewMode === 'team' ? <Users className="w-8 h-8 mx-auto" /> : <Package className="w-8 h-8 mx-auto" />}
+                                            <div className="inline-block p-3 rounded-full mb-3 bg-primary/10 text-primary">
+                                                <Package className="w-8 h-8 mx-auto" />
                                             </div>
                                             <h3 className="font-bold text-gray-500 uppercase tracking-wider text-sm mb-1">
-                                                {viewMode === 'team' ? 'LICENZE TEAM (A VITA)' : `PACCHETTO ${course.level.toUpperCase()}`}
+                                                PACCHETTO {course.level.toUpperCase()}
                                             </h3>
 
-                                            {viewMode === 'individual' ? (
-                                                <>
-                                                    <div className="text-4xl font-extrabold text-primary mb-2">
-                                                        € {pricingInfo?.amountToPay}.00
-                                                    </div>
-                                                    <p className="text-gray-500 text-sm">Include tutti i 9 corsi del livello</p>
-                                                </>
-                                            ) : (
-                                                <p className="text-gray-500 text-sm">Risparmia fino al 40% con i pacchetti team</p>
-                                            )}
+                                            <div className="text-4xl font-extrabold text-primary mb-2">
+                                                € {pricingInfo?.amountToPay}.00
+                                            </div>
+                                            <p className="text-gray-500 text-sm">Include tutti i 9 corsi del livello</p>
                                         </div>
 
                                         {hasPurchased ? (
@@ -720,113 +717,7 @@ export default function CorsoPage() {
                                                     )
                                                 )}
 
-                                                {/* TEAM PLANS */}
-                                                {viewMode === 'team' && (
-                                                    <div className="space-y-4">
-                                                        {/* INTRO BLOCK - VALORE CORSO COMPLETO */}
-                                                        <div className="bg-gradient-to-br from-indigo-100 to-purple-50 border-2 border-indigo-200 rounded-2xl p-5 text-center mb-2">
-                                                            <h3 className="font-bold text-xl lg:text-2xl text-indigo-900 mb-2">
-                                                                Accesso Completo al Corso Caldaie
-                                                            </h3>
-                                                            <p className="text-sm font-semibold text-indigo-600 uppercase tracking-wide mb-3">
-                                                                27 video · 3 livelli · Base + Intermedio + Avanzato
-                                                            </p>
-                                                            <p className="text-base text-gray-700 font-medium mb-1">
-                                                                Include <strong>l'intero percorso formativo completo</strong>
-                                                            </p>
-                                                            <p className="text-sm text-gray-500">
-                                                                Accesso a vita per più utenti
-                                                            </p>
-                                                        </div>
 
-                                                        {/* TEAM 5 */}
-                                                        <div className="border border-indigo-100 rounded-xl p-4 hover:border-indigo-300 transition-colors bg-indigo-50/30">
-                                                            <div className="flex justify-between items-start mb-2">
-                                                                <div>
-                                                                    <h4 className="font-bold text-indigo-900">Team 5</h4>
-                                                                    <div className="text-xs text-indigo-600 flex items-center gap-1">
-                                                                        <Users className="w-3 h-3" /> Fino a 5 Utenti
-                                                                    </div>
-                                                                </div>
-                                                                <div className="text-right">
-                                                                    <div className="font-bold text-xl text-primary">€ 1.500</div>
-                                                                </div>
-                                                            </div>
-                                                            <ul className="text-xs text-gray-600 space-y-1 mb-3 border-t border-indigo-100 pt-2 mt-2">
-                                                                <li className="flex items-center gap-1">✓ Accesso completo a tutti i 27 video</li>
-                                                                <li className="flex items-center gap-1">✓ Include Base + Intermedio + Avanzato</li>
-                                                                <li className="flex items-center gap-1">✓ Accesso a vita</li>
-                                                            </ul>
-                                                            {tosAccepted ? (
-                                                                <PayPalBtn
-                                                                    amount="1500"
-                                                                    courseTitle="Licenza Team 5 (Lifetime)"
-                                                                    onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'team', product_code: 'team_5', amount_cents: 150000 })}
-                                                                />
-                                                            ) : (
-                                                                <button disabled className="w-full py-2 bg-gray-200 text-gray-400 font-bold rounded text-xs">Accetta Termini</button>
-                                                            )}
-                                                        </div>
-
-                                                        {/* TEAM 10 */}
-                                                        <div className="border border-indigo-100 rounded-xl p-4 hover:border-indigo-300 transition-colors bg-indigo-50/30">
-                                                            <div className="flex justify-between items-start mb-2">
-                                                                <div>
-                                                                    <h4 className="font-bold text-indigo-900">Team 10</h4>
-                                                                    <div className="text-xs text-indigo-600 flex items-center gap-1">
-                                                                        <Users className="w-3 h-3" /> Fino a 10 Utenti
-                                                                    </div>
-                                                                </div>
-                                                                <div className="text-right">
-                                                                    <div className="font-bold text-xl text-primary">€ 2.000</div>
-                                                                </div>
-                                                            </div>
-                                                            <ul className="text-xs text-gray-600 space-y-1 mb-3 border-t border-indigo-100 pt-2 mt-2">
-                                                                <li className="flex items-center gap-1">✓ Accesso completo a tutti i 27 video</li>
-                                                                <li className="flex items-center gap-1">✓ Include Base + Intermedio + Avanzato</li>
-                                                                <li className="flex items-center gap-1">✓ Accesso a vita</li>
-                                                            </ul>
-                                                            {tosAccepted ? (
-                                                                <PayPalBtn
-                                                                    amount="2000"
-                                                                    courseTitle="Licenza Team 10 (Lifetime)"
-                                                                    onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'team', product_code: 'team_10', amount_cents: 200000 })}
-                                                                />
-                                                            ) : (
-                                                                <button disabled className="w-full py-2 bg-gray-200 text-gray-400 font-bold rounded text-xs">Accetta Termini</button>
-                                                            )}
-                                                        </div>
-
-                                                        {/* TEAM 25 */}
-                                                        <div className="border border-indigo-100 rounded-xl p-4 hover:border-indigo-300 transition-colors bg-indigo-50/30">
-                                                            <div className="flex justify-between items-start mb-2">
-                                                                <div>
-                                                                    <h4 className="font-bold text-indigo-900">Team 25</h4>
-                                                                    <div className="text-xs text-indigo-600 flex items-center gap-1">
-                                                                        <Users className="w-3 h-3" /> Fino a 25 Utenti
-                                                                    </div>
-                                                                </div>
-                                                                <div className="text-right">
-                                                                    <div className="font-bold text-xl text-primary">€ 3.000</div>
-                                                                </div>
-                                                            </div>
-                                                            <ul className="text-xs text-gray-600 space-y-1 mb-3 border-t border-indigo-100 pt-2 mt-2">
-                                                                <li className="flex items-center gap-1">✓ Accesso completo a tutti i 27 video</li>
-                                                                <li className="flex items-center gap-1">✓ Include Base + Intermedio + Avanzato</li>
-                                                                <li className="flex items-center gap-1">✓ Accesso a vita</li>
-                                                            </ul>
-                                                            {tosAccepted ? (
-                                                                <PayPalBtn
-                                                                    amount="3000"
-                                                                    courseTitle="Licenza Team 25 (Lifetime)"
-                                                                    onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'team', product_code: 'team_25', amount_cents: 300000 })}
-                                                                />
-                                                            ) : (
-                                                                <button disabled className="w-full py-2 bg-gray-200 text-gray-400 font-bold rounded text-xs">Accetta Termini</button>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                )}
 
                                                 {!user && (
                                                     <p className="text-xs text-gray-400 text-center mt-2">
