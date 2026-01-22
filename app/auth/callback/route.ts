@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { cookies } from 'next/headers'
 
 export async function GET(request: NextRequest) {
     const requestUrl = new URL(request.url)
@@ -11,8 +12,7 @@ export async function GET(request: NextRequest) {
         return NextResponse.redirect(`${requestUrl.origin}/login?error=no_code`)
     }
 
-    // Create SSR client for cookie management
-    let supabaseResponse = NextResponse.redirect(`${requestUrl.origin}/`)
+    const cookieStore = await cookies()
 
     const supabase = createServerClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -20,12 +20,18 @@ export async function GET(request: NextRequest) {
         {
             cookies: {
                 getAll() {
-                    return request.cookies.getAll()
+                    return cookieStore.getAll()
                 },
                 setAll(cookiesToSet) {
-                    cookiesToSet.forEach(({ name, value, options }) => {
-                        supabaseResponse.cookies.set(name, value, options)
-                    })
+                    try {
+                        cookiesToSet.forEach(({ name, value, options }) =>
+                            cookieStore.set(name, value, options)
+                        )
+                    } catch {
+                        // The `setAll` method was called from a Server Component.
+                        // This can be ignored if you have middleware refreshing
+                        // user sessions.
+                    }
                 },
             },
         }
@@ -81,50 +87,19 @@ export async function GET(request: NextRequest) {
             // Send welcome email (async, don't block)
             sendWelcomeEmail(user.email!).catch(console.error)
 
-            // Redirect to complete profile - MUST copy cookies from supabaseResponse
-            const redirectToProfile = NextResponse.redirect(
-                `${requestUrl.origin}/completa-profilo`
-            )
-            // Copy all cookies that Supabase set (session tokens)
-            supabaseResponse.cookies.getAll().forEach(cookie => {
-                redirectToProfile.cookies.set(cookie.name, cookie.value, {
-                    path: '/', // FORCE ROOT PATH
-                    domain: cookie.domain,
-                    secure: cookie.secure,
-                    httpOnly: cookie.httpOnly,
-                    sameSite: cookie.sameSite as 'lax' | 'strict' | 'none' | undefined,
-                    maxAge: cookie.maxAge,
-                    expires: cookie.expires,
-                })
-            })
-            return redirectToProfile
+            // Redirect to complete profile
+            return NextResponse.redirect(`${requestUrl.origin}/completa-profilo`)
         }
 
         // Profile exists - check if complete
         if (!existingProfile.profile_completed) {
             console.log(`[auth/callback] Redirecting to profile completion: ${user.email}`)
-            // Redirect to complete profile - MUST copy cookies from supabaseResponse
-            const redirectToProfile = NextResponse.redirect(
-                `${requestUrl.origin}/completa-profilo`
-            )
-            // Copy all cookies that Supabase set (session tokens)
-            supabaseResponse.cookies.getAll().forEach(cookie => {
-                redirectToProfile.cookies.set(cookie.name, cookie.value, {
-                    path: '/', // FORCE ROOT PATH
-                    domain: cookie.domain,
-                    secure: cookie.secure,
-                    httpOnly: cookie.httpOnly,
-                    sameSite: cookie.sameSite as 'lax' | 'strict' | 'none' | undefined,
-                    maxAge: cookie.maxAge,
-                    expires: cookie.expires,
-                })
-            })
-            return redirectToProfile
+            return NextResponse.redirect(`${requestUrl.origin}/completa-profilo`)
         }
 
         // Profile complete - redirect to home
         console.log(`[auth/callback] Login successful: ${user.email}`)
-        return supabaseResponse
+        return NextResponse.redirect(`${requestUrl.origin}/`)
 
     } catch (err) {
         console.error('[auth/callback] Unexpected error:', err)
