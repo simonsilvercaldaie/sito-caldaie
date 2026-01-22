@@ -209,7 +209,7 @@ export default function TeamLicensePage() {
                             amount={2000}
                         />
                         <TeamCard
-                            title="Team 25"
+                            title="Team 25 / Formatore"
                             users={25}
                             price="3.000"
                             code="team_25"
