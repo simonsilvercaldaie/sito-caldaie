@@ -591,26 +591,20 @@ export default function CorsoPage() {
                                             );
                                         })()}
 
-                                        {/* Team Teaser - Secondary (Link to Page) */}
                                         <Link
                                             href="/licenze-team"
-                                            className="block bg-indigo-50/50 border-2 border-indigo-200 rounded-2xl p-6 cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 hover:shadow-lg transition-all duration-300 group mt-6"
+                                            className="block bg-indigo-50/50 border-2 border-indigo-200 rounded-2xl p-8 cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 hover:shadow-lg transition-all duration-300 group mt-6 text-center"
                                         >
-                                            <div className="flex items-center justify-between gap-4">
-                                                <div className="flex items-start gap-4">
-                                                    <div className="p-3 bg-indigo-100 text-indigo-600 rounded-xl group-hover:scale-110 transition-transform">
-                                                        <Users className="w-8 h-8" />
-                                                    </div>
-                                                    <div className="text-left">
-                                                        <h4 className="font-bold text-xl text-indigo-900 mb-1">Sei un team di tecnici?</h4>
-                                                        <p className="text-slate-600 leading-relaxed">
-                                                            Scopri le licenze aziendali.<br />
-                                                            <span className="text-sm opacity-80">Risparmia fino al 40%</span>
-                                                        </p>
-                                                    </div>
+                                            <div className="flex flex-col items-center gap-4">
+                                                <div className="p-4 bg-indigo-100 text-indigo-600 rounded-2xl group-hover:scale-110 transition-transform shadow-sm">
+                                                    <Users className="w-10 h-10" />
                                                 </div>
-                                                <div className="text-indigo-500 group-hover:translate-x-1 transition-transform bg-white rounded-full p-2 shadow-sm">
-                                                    →
+                                                <div>
+                                                    <h4 className="font-bold text-xl text-indigo-900 mb-2">Sei un team di tecnici?</h4>
+                                                    <p className="text-slate-600 leading-relaxed">
+                                                        Scopri le licenze aziendali.<br />
+                                                        <span className="text-sm font-semibold text-indigo-600/80">Risparmia fino al 40%</span>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </Link>
