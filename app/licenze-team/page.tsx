@@ -120,10 +120,7 @@ export default function TeamLicensePage() {
                     <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
                     <span>Accesso completo a <strong>tutti i 3 Livelli</strong></span>
                 </li>
-                <li className="flex items-start gap-3 text-slate-600">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                    <span>Monitoraggio progressi team</span>
-                </li>
+
                 <li className="flex items-start gap-3 text-slate-600">
                     <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
                     <span>Gestione utenti centralizzata</span>
