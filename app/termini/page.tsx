@@ -89,15 +89,15 @@ export default function TerminiPage() {
                             <h2 className="text-xl font-bold text-primary">7. Tipologie di Licenza</h2>
                             <p><strong>7.1.</strong> La piattaforma offre le seguenti tipologie di licenza:</p>
                             <ul className="list-disc pl-6 mt-2 space-y-1">
-                                <li><strong>Licenza Personale</strong>: per un singolo utente</li>
-                                <li><strong>Licenza Team</strong>: per 2-5 utenti nominativi</li>
-                                <li><strong>Licenza Azienda</strong>: per 6-20 utenti nominativi</li>
-                                <li><strong>Licenza Formatore</strong>: per uso didattico in aula, con preventivo personalizzato</li>
+                                <li><strong>Licenza Singola</strong>: per un singolo utente, accesso a vita al livello acquistato</li>
+                                <li><strong>Licenza Team 5</strong>: per fino a 5 utenti nominativi, accesso a vita a tutti i livelli</li>
+                                <li><strong>Licenza Team 10</strong>: per fino a 10 utenti nominativi, accesso a vita a tutti i livelli</li>
+                                <li><strong>Licenza Team 25 / Formatore</strong>: per fino a 25 utenti nominativi, accesso a vita a tutti i livelli. Consente anche l'uso didattico in aula.</li>
                             </ul>
-                            <p className="mt-4"><strong>7.2.</strong> Ogni licenza Team, Azienda o Formatore prevede esclusivamente account nominativi. Ogni account è associato a una singola persona fisica e non può essere condiviso.</p>
+                            <p className="mt-4"><strong>7.2.</strong> Ogni licenza Team prevede esclusivamente account nominativi. Ogni account è associato a una singola persona fisica e non può essere condiviso.</p>
                             <p className="mt-4">
                                 Per i dettagli completi sui tipi di licenza, consulta la pagina{' '}
-                                <Link href="/licenze" className="text-accent hover:underline font-semibold">Licenze</Link>.
+                                <Link href="/licenze-team" className="text-accent hover:underline font-semibold">Licenze Team</Link>.
                             </p>
                         </section>
 
@@ -112,7 +112,7 @@ export default function TerminiPage() {
                                 <li>utilizzare i Contenuti per attività di formazione aziendale, interna o esterna;</li>
                                 <li>registrare, scaricare, duplicare o redistribuire i Contenuti in qualsiasi forma.</li>
                             </ul>
-                            <p className="mt-4"><strong>8.3.</strong> Per usi aziendali, collettivi o formativi è obbligatorio acquistare la licenza appropriata (Team, Azienda o Formatore).</p>
+                            <p className="mt-4"><strong>8.3.</strong> Per usi aziendali, collettivi o formativi è obbligatorio acquistare una licenza Team appropriata (Team 5, Team 10 o Team 25/Formatore).</p>
                         </section>
 
                         <section>
