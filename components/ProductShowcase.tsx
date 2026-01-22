@@ -111,19 +111,7 @@ export default function ProductShowcase() {
 
             </div>
 
-            <div className="max-w-4xl mx-auto mt-20">
-                <div className="bg-white border-2 border-slate-200 rounded-2xl p-8 shadow-sm">
-                    <h3 className="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
-                        <Lock className="w-5 h-5 text-slate-500" />
-                        Accesso ai corsi e condizioni di utilizzo
-                    </h3>
-                    <div className="prose prose-sm text-slate-600 max-w-none">
-                        <p className="whitespace-pre-line leading-relaxed">
-                            {LEGAL_TEXT_HOMEPAGE}
-                        </p>
-                    </div>
-                </div>
-            </div>
+
         </section>
     )
 }

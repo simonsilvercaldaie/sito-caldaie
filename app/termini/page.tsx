@@ -116,10 +116,11 @@ export default function TerminiPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-bold text-primary">9. Modalità di Fruizione</h2>
+                            <h2 className="text-xl font-bold text-primary">9. Modalità di Fruizione e Dispositivi</h2>
                             <p><strong>9.1.</strong> I Contenuti sono erogati esclusivamente in modalità streaming. Non è previsto il download dei file video.</p>
                             <p className="mt-4"><strong>9.2.</strong> L'accesso è consentito su un solo dispositivo alla volta per ciascun account. L'avvio di una nuova sessione comporta la chiusura automatica della sessione precedente.</p>
-                            <p className="mt-4"><strong>9.3.</strong> I Contenuti possono riportare una filigrana digitale contenente l'indirizzo email dell'utente, a fini di tutela della proprietà intellettuale.</p>
+                            <p className="mt-4"><strong>9.3.</strong> Ogni account può registrare un massimo di <strong>2 dispositivi</strong> (es. PC e telefono). È possibile modificare i dispositivi associati una volta ogni <strong>30 giorni</strong> dalla propria dashboard personale.</p>
+                            <p className="mt-4"><strong>9.4.</strong> I Contenuti possono riportare una filigrana digitale contenente l'indirizzo email dell'utente, a fini di tutela della proprietà intellettuale.</p>
                         </section>
 
                         <section>
