@@ -15,27 +15,53 @@ const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID!
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET!
 const PAYPAL_ORDER_ID_REGEX = /^[A-Z0-9-]{10,32}$/i
 
+// Helper for Persistent Security Logging
+async function logSecurityEvent(userId: string | null, type: string, metadata: any) {
+    try {
+        const admin = getSupabaseAdmin();
+        await admin.from('security_events').insert({
+            user_id: userId,
+            event_type: type,
+            metadata: metadata,
+            ip_address: '0.0.0.0'
+        });
+    } catch (e) {
+        console.error('[logSecurityEvent] Failed to log:', e);
+    }
+}
+
 async function getPayPalAccessToken(): Promise<string> {
     const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64')
 
-    const res = await fetch(`${PAYPAL_API_URL}/v1/oauth2/token`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: 'grant_type=client_credentials'
-    })
+    // Timeout 10s
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 10000);
 
-    if (!res.ok) {
-        throw new Error('Errore autenticazione PayPal')
+    try {
+        const res = await fetch(`${PAYPAL_API_URL}/v1/oauth2/token`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${auth}`,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: 'grant_type=client_credentials',
+            signal: controller.signal
+        })
+        clearTimeout(id);
+
+        if (!res.ok) {
+            throw new Error('Errore autenticazione PayPal')
+        }
+
+        const data = await res.json()
+        return data.access_token
+    } catch (e) {
+        clearTimeout(id);
+        throw e;
     }
-
-    const data = await res.json()
-    return data.access_token
 }
 
-async function verifyPayPalOrder(orderId: string): Promise<{
+async function verifyPayPalOrder(orderId: string, userId: string): Promise<{
     valid: boolean
     captureId?: string
     amountCents?: number
@@ -45,25 +71,34 @@ async function verifyPayPalOrder(orderId: string): Promise<{
     try {
         const accessToken = await getPayPalAccessToken()
 
+        // Timeout 15s
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), 15000);
+
         const res = await fetch(`${PAYPAL_API_URL}/v2/checkout/orders/${orderId}`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json'
-            }
+            },
+            signal: controller.signal
         })
+        clearTimeout(id);
 
         if (!res.ok) {
+            await logSecurityEvent(userId, 'paypal_error', { context: 'replay', error: 'Order Not Found', orderId, status: res.status });
             return { valid: false, error: 'Ordine non trovato su PayPal', code: 'ORDER_NOT_FOUND' }
         }
 
         const order = await res.json()
 
         if (order.status !== 'COMPLETED') {
+            await logSecurityEvent(userId, 'paypal_error', { context: 'replay', error: 'Order Not Completed', orderId, status: order.status });
             return { valid: false, error: `Ordine non completato (${order.status})`, code: 'ORDER_NOT_COMPLETED' }
         }
 
         const capture = order.purchase_units?.[0]?.payments?.captures?.[0]
         if (!capture) {
+            await logSecurityEvent(userId, 'paypal_error', { context: 'replay', error: 'No Capture Found', orderId });
             return { valid: false, error: 'Pagamento non catturato', code: 'NO_CAPTURE' }
         }
 
@@ -71,13 +106,15 @@ async function verifyPayPalOrder(orderId: string): Promise<{
         const currency = capture.amount.currency_code
 
         if (currency !== 'EUR') {
+            await logSecurityEvent(userId, 'paypal_error', { context: 'replay', error: 'Wrong Currency', orderId, currency });
             return { valid: false, error: 'Valuta non valida', code: 'INVALID_CURRENCY' }
         }
 
         return { valid: true, amountCents: Math.round(paidAmount * 100), captureId: capture.id }
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('[replay-purchase] Errore verifica PayPal:', error)
+        await logSecurityEvent(userId, 'paypal_error', { context: 'replay', error: 'Exception', message: error.message, orderId });
         return { valid: false, error: 'Errore verifica pagamento', code: 'VERIFICATION_ERROR' }
     }
 }
@@ -140,7 +177,7 @@ export async function POST(request: NextRequest) {
         if (!userLimit.success) return NextResponse.json({ ok: false, error: 'rate_limit_exceeded' }, { status: 429 })
 
         // Verifica ordine PayPal
-        const verification = await verifyPayPalOrder(orderId)
+        const verification = await verifyPayPalOrder(orderId, user.id)
 
         if (!verification.valid || !verification.amountCents || !verification.captureId) {
             console.log(`[replay-purchase] Verifica fallita: ${verification.error}`)
@@ -212,6 +249,7 @@ export async function POST(request: NextRequest) {
 
         if (!productCode) {
             console.error(`[replay-purchase] Importo non riconosciuto: ${amountCents}`)
+            await logSecurityEvent(user.id, 'paypal_error', { context: 'replay', error: 'Unknown Amount', amountCents, orderId });
             return NextResponse.json({ ok: false, error: `Importo non riconosciuto: €${(amountCents / 100).toFixed(2)}` }, { status: 400 })
         }
 
@@ -306,4 +344,3 @@ export async function POST(request: NextRequest) {
         }, { status: 500 })
     }
 }
-

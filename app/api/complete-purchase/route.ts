@@ -29,51 +29,100 @@ function getSupabaseAdmin() {
 const PAYPAL_CLIENT_ID = process.env.PAYPAL_CLIENT_ID!
 const PAYPAL_CLIENT_SECRET = process.env.PAYPAL_CLIENT_SECRET!
 
-async function getPayPalAccessToken(): Promise<string> {
-    const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64')
-    const response = await fetch(`${PAYPAL_API_URL}/v1/oauth2/token`, {
-        method: 'POST',
-        headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'grant_type=client_credentials',
-    })
-    const data = await response.json()
-    return data.access_token
+// Helper for Persistent Security Logging
+async function logSecurityEvent(userId: string | null, type: string, metadata: any) {
+    try {
+        const admin = getSupabaseAdmin();
+        await admin.from('security_events').insert({
+            user_id: userId,
+            event_type: type, // Ensure 'paypal_error' is allowed in check constraint or use generic 'session_blocked' if strict, but ideally add 'paypal_error' to migration
+            metadata: metadata,
+            ip_address: '0.0.0.0' // Placeholder as we are in backend
+        });
+    } catch (e) {
+        console.error('[logSecurityEvent] Failed to log:', e);
+    }
 }
 
-async function verifyPayPalOrder(orderId: string, expectedAmountCents: number): Promise<{
+async function getPayPalAccessToken(): Promise<string> {
+    const auth = Buffer.from(`${PAYPAL_CLIENT_ID}:${PAYPAL_CLIENT_SECRET}`).toString('base64')
+
+    // Timeout 10s
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 10000);
+
+    try {
+        const response = await fetch(`${PAYPAL_API_URL}/v1/oauth2/token`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${auth}`,
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: 'grant_type=client_credentials',
+            signal: controller.signal
+        })
+        clearTimeout(id);
+        const data = await response.json()
+        return data.access_token
+    } catch (e) {
+        clearTimeout(id);
+        throw e;
+    }
+}
+
+async function verifyPayPalOrder(orderId: string, expectedAmountCents: number, userId: string): Promise<{
     valid: boolean
     captureId?: string
     error?: string
 }> {
     try {
         const accessToken = await getPayPalAccessToken()
-        const res = await fetch(`${PAYPAL_API_URL}/v2/checkout/orders/${orderId}`, {
-            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' }
-        })
 
-        if (!res.ok) return { valid: false, error: 'Ordine non trovato' }
+        // Timeout 15s for Verify
+        const controller = new AbortController();
+        const id = setTimeout(() => controller.abort(), 15000);
+
+        const res = await fetch(`${PAYPAL_API_URL}/v2/checkout/orders/${orderId}`, {
+            headers: { 'Authorization': `Bearer ${accessToken}`, 'Content-Type': 'application/json' },
+            signal: controller.signal
+        })
+        clearTimeout(id);
+
+        if (!res.ok) {
+            await logSecurityEvent(userId, 'paypal_error', { error: 'Order Not Found', orderId, status: res.status });
+            return { valid: false, error: 'Ordine non trovato' }
+        }
+
         const order = await res.json()
 
-        if (order.status !== 'COMPLETED') return { valid: false, error: 'Ordine non completato' }
+        if (order.status !== 'COMPLETED') {
+            await logSecurityEvent(userId, 'paypal_error', { error: 'Order Not Completed', orderId, status: order.status });
+            return { valid: false, error: 'Ordine non completato' }
+        }
 
         const capture = order.purchase_units?.[0]?.payments?.captures?.[0]
-        if (!capture) return { valid: false, error: 'Capture non trovato' }
+        if (!capture) {
+            await logSecurityEvent(userId, 'paypal_error', { error: 'No Capture Found', orderId });
+            return { valid: false, error: 'Capture non trovato' }
+        }
 
         const paidVal = parseFloat(capture.amount.value)
         const currency = capture.amount.currency_code
 
         // Tolleranza 1 cent
         if (Math.abs(paidVal - (expectedAmountCents / 100)) > 0.01) {
+            await logSecurityEvent(userId, 'paypal_error', { error: 'Price Mismatch', orderId, paid: paidVal, expected: expectedAmountCents / 100 });
             return { valid: false, error: 'Importo errato' }
         }
-        if (currency !== 'EUR') return { valid: false, error: 'Valuta errata' }
+        if (currency !== 'EUR') {
+            await logSecurityEvent(userId, 'paypal_error', { error: 'Wrong Currency', orderId, currency });
+            return { valid: false, error: 'Valuta errata' }
+        }
 
         return { valid: true, captureId: capture.id }
-    } catch (e) {
+    } catch (e: any) {
         console.error('PayPal Verify Error', e)
+        await logSecurityEvent(userId, 'paypal_error', { error: 'Exception', message: e.message, orderId });
         return { valid: false, error: 'Eccezione Verifica' }
     }
 }
@@ -89,13 +138,11 @@ export async function POST(request: NextRequest) {
         const token = authHeader.replace(/^Bearer\s+/i, '').trim()
         if (!token) return NextResponse.json({ ok: false, error: 'missing_token' }, { status: 401 })
 
-        // 2. Parse Body BEFORE Auth verification to fail fast on bad input? 
-        // No, Auth first for security.
         const supabaseAdmin = getSupabaseAdmin()
         const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
         if (authError || !user || !user.email) return NextResponse.json({ ok: false, error: 'invalid_token' }, { status: 401 })
 
-        // 3. Parse Body
+        // 2. Parse Body
         const body = await request.json()
         const { orderId, product_code, amount_cents } = body
 
@@ -103,7 +150,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ ok: false, error: 'missing_fields' }, { status: 400 })
         }
 
-        // 4. Price Validation (SERVER TRUTH)
+        // 3. Price Validation (SERVER TRUTH)
         let truthPrice = 0
         try {
             truthPrice = getExpectedPriceCents(product_code)
@@ -116,26 +163,25 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ ok: false, error: 'price_mismatch' }, { status: 400 })
         }
 
-        // 5. Rate Limit
+        // 4. Rate Limit
         const limitRes = await checkRateLimit(`purch_${user.id}`, 5, 60, false)
         if (!limitRes.success) return NextResponse.json({ ok: false, error: 'rate_limit' }, { status: 429 })
 
-        // 6. TOS
+        // 5. TOS
         const { data: tos } = await supabaseAdmin.from('tos_acceptances').select('id').eq('user_id', user.id).eq('tos_version', TOS_VERSION).maybeSingle()
         if (!tos) return NextResponse.json({ ok: false, error: 'tos_required' }, { status: 403 })
 
-        // 7. Verify PayPal
-        const ver = await verifyPayPalOrder(orderId, truthPrice)
+        // 6. Verify PayPal
+        const ver = await verifyPayPalOrder(orderId, truthPrice, user.id)
         if (!ver.valid || !ver.captureId) return NextResponse.json({ ok: false, error: ver.error }, { status: 402 })
         const captureId = ver.captureId
 
-        // 8. Idempotency on Capture ID
-        // Note: Using 'maybeSingle' to handle 0 or 1.
+        // 7. Idempotency on Capture ID
         const { data: existing } = await supabaseAdmin.from('purchases').select('id').eq('paypal_capture_id', captureId).maybeSingle()
         if (existing) return NextResponse.json({ ok: true, alreadyProcessed: true })
 
-        // 9. Execute Purchase (LIFETIME LOGIC)
-        // 9. Fetch Billing Profile for Snapshot & Invoice
+        // 8. Execute Purchase (Database Write)
+        // Fetch Billing Profile for Snapshot & Invoice
         const { data: billingData } = await supabaseAdmin
             .from('billing_profiles')
             .select('*')
@@ -143,8 +189,6 @@ export async function POST(request: NextRequest) {
             .maybeSingle()
 
         const billing = billingData as BillingProfile | null
-
-        // 10. Execute Purchase (LIFETIME LOGIC)
         const isTeam = product_code.startsWith('team_')
 
         // Common snapshot data
@@ -197,23 +241,27 @@ export async function POST(request: NextRequest) {
                 amount_cents: truthPrice,
                 paypal_capture_id: captureId,
                 team_license_id: null,
-                course_id: null, // DEPRECATED: Access logic now relies on product_code
+                course_id: null, // DEPRECATED
                 ...snapshotData
             })
             if (purErr) throw purErr
         }
 
-        // Send invoice notification if company
+        // 9. Async Invoice Notification (FIRE AND FORGET)
+        // Do NOT await this. Let it run in background.
+        // On Vercel Serverless, wrapping in waitUntil is ideal if available, 
+        // otherwise simply not awaiting works but unstable if lambda dies immediately.
+        // For reliability, we log error inside.
         if (billing && billing.customer_type === 'company' && billing.vat_number) {
-            sendInvoiceNotification(
-                billing,
-                user.email,
-                product_code,
-                truthPrice,
-                captureId
-            ).catch(console.error)
+            // Use setImmediate or similar to detach if needed, but in NextJS route handlers
+            // simply calling without await continues execution until response flush.
+            // However, Vercel might freeze execution after response.
+            // Best effort: Log start, try send, log end.
+            sendInvoiceNotificationClean(billing, user.email, product_code, truthPrice, captureId)
+                .catch(e => console.error('[complete-purchase] Invoice Send Background Error:', e));
         }
 
+        // Return immediately to user
         return NextResponse.json({ ok: true })
 
     } catch (e) {
@@ -222,13 +270,17 @@ export async function POST(request: NextRequest) {
     }
 }
 
-async function sendInvoiceNotification(
+async function sendInvoiceNotificationClean(
     billing: BillingProfile,
     userEmail: string,
     productCode: string,
     amountCents: number,
     captureId: string
 ): Promise<void> {
+    // 5 Second Timeout for Email Service
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), 5000);
+
     try {
         const emailData = {
             service_id: 'service_fwvybtr',
@@ -261,8 +313,10 @@ Data: ${new Date().toLocaleString('it-IT', { timeZone: 'Europe/Rome' })}
         const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(emailData)
+            body: JSON.stringify(emailData),
+            signal: controller.signal
         })
+        clearTimeout(id);
 
         if (response.ok) {
             console.log(`[complete-purchase] Invoice notification sent for ${userEmail}`)
@@ -270,6 +324,8 @@ Data: ${new Date().toLocaleString('it-IT', { timeZone: 'Europe/Rome' })}
             console.error(`[complete-purchase] Invoice notification failed: ${response.status}`)
         }
     } catch (err) {
+        clearTimeout(id);
         console.error('[complete-purchase] Invoice notification error:', err)
+        // Non-blocking for user, but we log strictly.
     }
 }
