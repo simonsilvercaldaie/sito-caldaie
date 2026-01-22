@@ -3,6 +3,7 @@ import { useParams } from "next/navigation"
 import { getCourseBySlug, getAllCourses, Course } from "@/lib/coursesData"
 import { getLevelPricing, PRICES } from "@/lib/pricingLogic"
 import { PayPalBtn } from "@/components/PayPalBtn"
+import { LEGAL_TEXT_CHECKOUT } from "@/lib/legalTexts"
 import { supabase } from "@/lib/supabaseClient"
 import { useEffect, useState } from "react"
 import Link from "next/link"
@@ -663,29 +664,39 @@ export default function CorsoPage() {
                                             <div className="space-y-4">
                                                 {/* Checkbox ToS */}
                                                 {user && (
-                                                    <label className={`flex items-start gap-3 text-sm text-gray-600 cursor-pointer p-3 bg-gray-50 rounded-xl border border-gray-200 hover:border-accent/30 transition-colors ${tosLoading ? 'opacity-50 pointer-events-none' : ''}`}>
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={tosAccepted}
-                                                            onChange={(e) => handleTosCheckbox(e.target.checked)}
-                                                            disabled={tosLoading}
-                                                            className="mt-0.5 w-4 h-4 accent-accent flex-shrink-0"
-                                                        />
-                                                        <span className="leading-relaxed">
-                                                            {tosLoading ? 'Registrazione in corso...' : (
-                                                                <>
-                                                                    Ho letto e accetto i{' '}
-                                                                    <Link href="/termini" target="_blank" className="text-accent underline font-semibold">
-                                                                        Termini e Condizioni
-                                                                    </Link>
-                                                                    {' '}e confermo che questo accesso è per {viewMode === 'team' ? 'il mio team' : 'mio uso personale'} (vedi{' '}
-                                                                    <Link href="/licenze" target="_blank" className="text-accent underline font-semibold">
-                                                                        Licenze
-                                                                    </Link>).
-                                                                </>
-                                                            )}
-                                                        </span>
-                                                    </label>
+                                                    <div className="space-y-4">
+                                                        <label className={`flex items-start gap-3 text-sm text-gray-700 font-medium cursor-pointer p-4 bg-gray-50 rounded-xl border-2 ${tosAccepted ? 'border-accent/50 bg-accent/5' : 'border-gray-200'} transition-all hover:border-accent/30 ${tosLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={tosAccepted}
+                                                                onChange={(e) => handleTosCheckbox(e.target.checked)}
+                                                                disabled={tosLoading}
+                                                                className="mt-1 w-5 h-5 accent-accent flex-shrink-0"
+                                                            />
+                                                            <span className="leading-relaxed">
+                                                                {tosLoading ? 'Registrazione accettazione in corso...' : (
+                                                                    <>
+                                                                        Dichiaro di aver letto e accettato i{' '}
+                                                                        <Link href="/termini" target="_blank" className="text-accent underline font-bold hover:text-accent/80">
+                                                                            Termini d’Uso
+                                                                        </Link>
+                                                                        {' '}e le regole di{' '}
+                                                                        <Link href="/licenze" target="_blank" className="text-accent underline font-bold hover:text-accent/80">
+                                                                            Accesso & Licenze
+                                                                        </Link>
+                                                                        {' '}della piattaforma SimonSilverCaldaie.it.
+                                                                    </>
+                                                                )}
+                                                            </span>
+                                                        </label>
+
+                                                        {/* TESTO B */}
+                                                        <div className="text-xs text-slate-500 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                                                            <div className="whitespace-pre-line leading-relaxed">
+                                                                {LEGAL_TEXT_CHECKOUT}
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 )}
 
                                                 {/* INDIVIDUAL PURCHASE */}

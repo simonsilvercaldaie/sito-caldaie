@@ -146,77 +146,23 @@ export default function AccountPage() {
                 </section>
 
                 {/* Sezione password */}
-                <section className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-100">
-                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-                        <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center text-red-500">
+                <section className="bg-white p-6 md:p-8 rounded-xl shadow-sm border border-gray-100 opacity-70">
+                    <div className="flex items-center gap-3 mb-4 border-b border-gray-100 pb-4">
+                        <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center text-gray-500">
                             <Lock className="w-5 h-5" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-primary">Sicurezza</h2>
-                            <p className="text-sm text-gray-500">Aggiorna la tua password di accesso</p>
+                            <h2 className="text-xl font-bold text-gray-700">Sicurezza</h2>
+                            <p className="text-sm text-gray-500">Gestione accesso</p>
                         </div>
                     </div>
 
-                    <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-md">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Nuova Password</label>
-                            <div className="relative">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none pr-12"
-                                    placeholder="Nuova password sicura"
-                                    minLength={6}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
-                                >
-                                    {showPassword ? (
-                                        <EyeOff className="w-5 h-5" />
-                                    ) : (
-                                        <Eye className="w-5 h-5" />
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Conferma Password</label>
-                            <div className="relative">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none pr-12"
-                                    placeholder="Ripeti la password"
-                                    minLength={6}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
-                                >
-                                    {showPassword ? (
-                                        <EyeOff className="w-5 h-5" />
-                                    ) : (
-                                        <Eye className="w-5 h-5" />
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={updatingPassword}
-                            className="flex items-center gap-2 px-6 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
-                        >
-                            {updatingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                            Aggiorna Password
-                        </button>
-                    </form>
+                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-100">
+                        <p className="text-sm text-blue-800">
+                            <strong>Accesso Gestito da Google.</strong><br />
+                            Non è necessario gestire password su questa piattaforma. L'autenticazione è sicura e centralizzata tramite Google.
+                        </p>
+                    </div>
                 </section>
 
             </main>

@@ -1,8 +1,22 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL } from '@/lib/constants'
+import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL, INVOICE_NOTIFICATION_EMAIL } from '@/lib/constants'
 import { getExpectedPriceCents } from '@/lib/serverPricing'
 import { checkRateLimit } from '@/lib/rateLimit'
+
+// Type for billing profile
+interface BillingProfile {
+    customer_type: 'private' | 'company'
+    first_name: string
+    last_name: string
+    company_name: string | null
+    vat_number: string | null
+    sdi_code: string | null
+    fiscal_code: string | null
+    address: string
+    city: string
+    postal_code: string
+}
 
 // Admin Client
 function getSupabaseAdmin() {
@@ -121,33 +135,47 @@ export async function POST(request: NextRequest) {
         if (existing) return NextResponse.json({ ok: true, alreadyProcessed: true })
 
         // 9. Execute Purchase (LIFETIME LOGIC)
+        // 9. Fetch Billing Profile for Snapshot & Invoice
+        const { data: billingData } = await supabaseAdmin
+            .from('billing_profiles')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle()
+
+        const billing = billingData as BillingProfile | null
+
+        // 10. Execute Purchase (LIFETIME LOGIC)
         const isTeam = product_code.startsWith('team_')
+
+        // Common snapshot data
+        const snapshotData = {
+            snapshot_company_name: billing?.company_name || null,
+            snapshot_vat_number: billing?.vat_number || null,
+            snapshot_sdi_code: billing?.sdi_code || null,
+            snapshot_fiscal_code: billing?.fiscal_code || null,
+            snapshot_address: billing?.address || null,
+            snapshot_city: billing?.city || null,
+            snapshot_postal_code: billing?.postal_code || null
+        }
 
         if (isTeam) {
             // --- RAMO TEAM ---
             const seats = parseInt(product_code.split('_')[1])
 
-            // Create License
-            // Ignore legacy fields. Provide defaults only if DB requires them.
-            // company_name might be required in legacy schema? 
-            // Providing generic name just in case constraint exists. User said "ignore", but SQL might complain if NOT NULL.
             const { data: lic, error: licErr } = await supabaseAdmin.from('team_licenses').insert({
                 owner_user_id: user.id,
                 seats: seats,
-                company_name: user.email // Fallback in case of constraint
+                company_name: billing?.company_name || user.email
             }).select().single()
 
             if (licErr || !lic) throw licErr
 
-            // Add Owner
             const { error: memErr } = await supabaseAdmin.from('team_members').insert({
                 team_license_id: lic.id,
                 user_id: user.id
             })
             if (memErr) throw memErr
 
-            // Record Purchase
-            // ignore course_id (set null as per last instruction)
             const { error: purErr } = await supabaseAdmin.from('purchases').insert({
                 user_id: user.id,
                 plan_type: 'team',
@@ -155,15 +183,13 @@ export async function POST(request: NextRequest) {
                 amount_cents: truthPrice,
                 paypal_capture_id: captureId,
                 team_license_id: lic.id,
-                course_id: null
+                course_id: null,
+                ...snapshotData
             })
             if (purErr) throw purErr
 
         } else {
             // --- RAMO INDIVIDUAL ---
-            // plan_type = 'individual'
-            // course_id = product_code upper (Legacy compat) or null? user said ignore for Team. 
-            // For individual, let's keep it populated for legacy queries.
             const { error: purErr } = await supabaseAdmin.from('purchases').insert({
                 user_id: user.id,
                 plan_type: 'individual',
@@ -171,9 +197,21 @@ export async function POST(request: NextRequest) {
                 amount_cents: truthPrice,
                 paypal_capture_id: captureId,
                 team_license_id: null,
-                course_id: product_code.toUpperCase()
+                course_id: product_code.toUpperCase(),
+                ...snapshotData
             })
             if (purErr) throw purErr
+        }
+
+        // Send invoice notification if company
+        if (billing && billing.customer_type === 'company' && billing.vat_number) {
+            sendInvoiceNotification(
+                billing,
+                user.email,
+                product_code,
+                truthPrice,
+                captureId
+            ).catch(console.error)
         }
 
         return NextResponse.json({ ok: true })
@@ -181,5 +219,57 @@ export async function POST(request: NextRequest) {
     } catch (e) {
         console.error('Internal Error', e)
         return NextResponse.json({ ok: false, error: 'internal_server_error' }, { status: 500 })
+    }
+}
+
+async function sendInvoiceNotification(
+    billing: BillingProfile,
+    userEmail: string,
+    productCode: string,
+    amountCents: number,
+    captureId: string
+): Promise<void> {
+    try {
+        const emailData = {
+            service_id: 'service_fwvybtr',
+            template_id: 'template_b8p58ci',
+            user_id: 'NcJg5-hiu3gVJiJZ-',
+            template_params: {
+                from_name: 'FATTURAZIONE AUTOMATICA',
+                from_email: INVOICE_NOTIFICATION_EMAIL,
+                subject: `NUOVA FATTURA DA EMETTERE - ${billing.company_name || 'Azienda'}`,
+                message: `
+DATI FATTURAZIONE:
+------------------
+Nome: ${billing.first_name} ${billing.last_name}
+Ragione Sociale: ${billing.company_name}
+Partita IVA: ${billing.vat_number}
+Codice SDI/PEC: ${billing.sdi_code || 'N/A'}
+Email: ${userEmail}
+Indirizzo: ${billing.address}, ${billing.postal_code} ${billing.city}
+
+DETTAGLI ORDINE:
+----------------
+Prodotto: ${productCode}
+Importo: €${(amountCents / 100).toFixed(2)}
+ID PayPal: ${captureId}
+Data: ${new Date().toLocaleString('it-IT', { timeZone: 'Europe/Rome' })}
+                `.trim()
+            }
+        }
+
+        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(emailData)
+        })
+
+        if (response.ok) {
+            console.log(`[complete-purchase] Invoice notification sent for ${userEmail}`)
+        } else {
+            console.error(`[complete-purchase] Invoice notification failed: ${response.status}`)
+        }
+    } catch (err) {
+        console.error('[complete-purchase] Invoice notification error:', err)
     }
 }

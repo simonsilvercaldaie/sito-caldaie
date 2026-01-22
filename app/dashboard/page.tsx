@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
-import { LogOut, User, Lock, Save, Loader2, Eye, EyeOff } from 'lucide-react'
+import { LogOut, User, Smartphone, Save, Loader2, RefreshCw, Shield } from 'lucide-react'
 import Link from 'next/link'
 import Image from 'next/image'
 import TeamDashboard from '@/components/TeamDashboard'
@@ -22,12 +22,13 @@ export default function DashboardPage() {
     const [pec, setPec] = useState('')
 
     const [updatingProfile, setUpdatingProfile] = useState(false)
-    const [updatingPassword, setUpdatingPassword] = useState(false)
 
-    // Password change state
-    const [newPassword, setNewPassword] = useState('')
-    const [confirmPassword, setConfirmPassword] = useState('')
-    const [showPassword, setShowPassword] = useState(false)
+    // Device management state
+    const [devices, setDevices] = useState<any[]>([])
+    const [loadingDevices, setLoadingDevices] = useState(false)
+    const [canResetDevices, setCanResetDevices] = useState(false)
+    const [daysUntilReset, setDaysUntilReset] = useState<number | null>(null)
+    const [resettingDevices, setResettingDevices] = useState(false)
 
     // Delete Account State
     const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -93,30 +94,40 @@ export default function DashboardPage() {
         }
     }
 
-    const handleUpdatePassword = async (e: React.FormEvent) => {
-        e.preventDefault()
-        if (newPassword !== confirmPassword) {
-            alert('Le password non coincidono')
-            return
-        }
-        if (newPassword.length < 6) {
-            alert('La password deve essere di almeno 6 caratteri')
+    const handleResetDevices = async () => {
+        if (!canResetDevices) {
+            alert(`Puoi resettare i dispositivi tra ${daysUntilReset} giorni.`)
             return
         }
 
-        setUpdatingPassword(true)
+        if (!confirm('Sei sicuro di voler resettare tutti i dispositivi? Dovrai rieffettuare l\'accesso.')) {
+            return
+        }
+
+        setResettingDevices(true)
         try {
-            const { error } = await supabase.auth.updateUser({
-                password: newPassword
+            const { data: { session } } = await supabase.auth.getSession()
+            if (!session) throw new Error('Sessione non valida')
+
+            const response = await fetch('/api/devices/reset', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${session.access_token}`
+                }
             })
-            if (error) throw error
-            alert('Password aggiornata con successo!')
-            setNewPassword('')
-            setConfirmPassword('')
+
+            const data = await response.json()
+            if (!data.success) {
+                throw new Error(data.error || 'Errore durante il reset')
+            }
+
+            alert('Dispositivi resettati. Verrai disconnesso.')
+            await supabase.auth.signOut()
+            router.push('/login')
         } catch (error: any) {
             alert('Errore: ' + error.message)
         } finally {
-            setUpdatingPassword(false)
+            setResettingDevices(false)
         }
     }
 
@@ -318,69 +329,78 @@ export default function DashboardPage() {
                     </form>
                 </section>
 
-                {/* Sezione password */}
+                {/* Sezione Dispositivi e Sicurezza */}
                 <section className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
                     <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-                        <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center text-red-500">
-                            <Lock className="w-5 h-5" />
+                        <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500">
+                            <Shield className="w-5 h-5" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-primary">Sicurezza</h2>
-                            <p className="text-sm text-gray-600">Modifica la passowrd del tuo account</p>
+                            <h2 className="text-xl font-bold text-primary">Sicurezza e Dispositivi</h2>
+                            <p className="text-sm text-gray-600">Gestisci i dispositivi autorizzati ad accedere al tuo account</p>
                         </div>
                     </div>
 
-                    <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-md">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-800 mb-1">Nuova Password</label>
-                            <div className="relative">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    value={newPassword}
-                                    onChange={(e) => setNewPassword(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none pr-12 text-black"
-                                    placeholder="Nuova password sicura"
-                                    minLength={6}
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-2.5 text-gray-400 hover:text-gray-600"
-                                >
-                                    {showPassword ? (
-                                        <EyeOff className="w-5 h-5" />
-                                    ) : (
-                                        <Eye className="w-5 h-5" />
-                                    )}
-                                </button>
-                            </div>
-                        </div>
+                    {/* Info Box */}
+                    <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 mb-6">
+                        <p className="text-sm text-blue-800">
+                            <strong>🔒 Accesso con Google</strong><br />
+                            Il tuo account è protetto dall'autenticazione Google. Puoi accedere da un massimo di 2 dispositivi.
+                        </p>
+                    </div>
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-800 mb-1">Conferma Password</label>
-                            <div className="relative">
-                                <input
-                                    type={showPassword ? "text" : "password"}
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none pr-12 text-black"
-                                    placeholder="Ripeti la password"
-                                    minLength={6}
-                                />
-                            </div>
-                        </div>
+                    {/* Devices List */}
+                    <div className="space-y-3 mb-6">
+                        <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                            <Smartphone className="w-4 h-4" />
+                            Dispositivi Autorizzati ({devices.length}/2)
+                        </h3>
 
-                        <div className="flex justify-end">
+                        {devices.length === 0 ? (
+                            <p className="text-sm text-gray-500 italic">Nessun dispositivo registrato</p>
+                        ) : (
+                            <div className="space-y-2">
+                                {devices.map((device: any) => (
+                                    <div key={device.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                        <div className="flex items-center gap-3">
+                                            <Smartphone className="w-5 h-5 text-gray-400" />
+                                            <div>
+                                                <p className="text-sm font-medium text-gray-800">{device.device_name || 'Dispositivo'}</p>
+                                                <p className="text-xs text-gray-500">
+                                                    Aggiunto: {new Date(device.created_at).toLocaleDateString('it-IT')}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Reset Devices */}
+                    <div className="pt-4 border-t border-gray-100">
+                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                            <div>
+                                <p className="text-sm text-gray-600">
+                                    Hai raggiunto il limite di dispositivi?
+                                </p>
+                                <p className="text-xs text-gray-400 mt-1">
+                                    {canResetDevices
+                                        ? 'Puoi resettare i dispositivi ora.'
+                                        : `Potrai resettare tra ${daysUntilReset || '?'} giorni.`
+                                    }
+                                </p>
+                            </div>
                             <button
-                                type="submit"
-                                disabled={updatingPassword}
-                                className="flex items-center gap-2 px-6 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+                                onClick={handleResetDevices}
+                                disabled={!canResetDevices || resettingDevices}
+                                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {updatingPassword ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                                Aggiorna Password
+                                {resettingDevices ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                                Reset Dispositivi
                             </button>
                         </div>
-                    </form>
+                    </div>
                 </section>
 
                 {/* Zona Pericolo - Eliminazione Account */}

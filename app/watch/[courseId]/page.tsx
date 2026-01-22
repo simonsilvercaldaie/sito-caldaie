@@ -2,15 +2,19 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter, useParams } from 'next/navigation'
-import { Loader2, Lock, ArrowLeft, PlayCircle } from 'lucide-react'
+import { Loader2, Lock, ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
+import VideoPlayerSecured from '@/components/VideoPlayerSecured'
 
 export default function WatchPage() {
     const [loading, setLoading] = useState(true)
     const [authorized, setAuthorized] = useState(false)
     const [courseTitle, setCourseTitle] = useState("")
     const [videoUrl, setVideoUrl] = useState("")
+    const [userEmail, setUserEmail] = useState("")
+    const [orderId, setOrderId] = useState("")
+
     const params = useParams()
     const router = useRouter()
 
@@ -27,8 +31,11 @@ export default function WatchPage() {
                 router.push('/login')
                 return
             }
+            setUserEmail(session.user.email || '')
 
             // 2. Check Purchase per questo specifico corso
+            // Cerchiamo sia acquisti individuali che tramite team license (se applicabile)
+            // Per ora manteniamo la logica semplice su 'purchases'
             const { data, error } = await supabase
                 .from('purchases')
                 .select('*')
@@ -38,6 +45,8 @@ export default function WatchPage() {
 
             if (data) {
                 setAuthorized(true)
+                // Use paypal_capture_id if available, otherwise purchase ID
+                setOrderId(data.paypal_capture_id || data.id)
 
                 // Logica per determinare quale file caricare in base al Product Name
                 // In produzione, avremmo una colonna 'video_filename' nella tabella 'courses' o 'products'.
@@ -57,7 +66,7 @@ export default function WatchPage() {
 
                 if (fileError) {
                     console.error("Errore caricamento video:", fileError)
-                    // Fallback se il file non esiste ancora
+                    // Fallback se il file non esiste ancora (per evitare errore critico in UI)
                     setVideoUrl("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
                 } else {
                     setVideoUrl(fileData.signedUrl)
@@ -105,17 +114,13 @@ export default function WatchPage() {
                     </div>
                 </div>
 
-                {/* Video Player Container */}
-                <div className="aspect-video w-full bg-black rounded-2xl overflow-hidden shadow-2xl relative border border-gray-800">
-                    <video
-                        className="w-full h-full object-cover"
-                        controls
-                        autoPlay
-                        src={videoUrl}
-                    >
-                        Il tuo browser non supporta il tag video.
-                    </video>
-                </div>
+                {/* Video Player Secured Container */}
+                <VideoPlayerSecured
+                    videoUrl={videoUrl}
+                    userEmail={userEmail}
+                    orderId={orderId}
+                    className="border border-gray-800"
+                />
 
                 <div className="mt-8 grid md:grid-cols-3 gap-8">
                     <div className="md:col-span-2 space-y-4">
