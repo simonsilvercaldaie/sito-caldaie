@@ -83,6 +83,9 @@ export function PayPalBtn({ amount, courseTitle, onSuccess, showDisclaimer = tru
                     Questo accesso è personale e nominativo. Per team o aziende, contattaci per le licenze dedicate.
                 </p>
             )}
+            <p className="text-xs text-blue-600 text-center mt-2 font-medium">
+                📱 Max 2 dispositivi · Cambio: 1×/mese dalla Dashboard
+            </p>
             {PAYPAL_ENV === 'sandbox' && (
                 <p className="text-xs text-amber-600 text-center font-semibold">
                     ⚠️ Ambiente di test (sandbox)

@@ -178,6 +178,15 @@ export default function OrderStatusPage() {
                             >
                                 Vai alla Dashboard
                             </Link>
+
+                            {/* Device Policy Info Box */}
+                            <div className="mt-6 p-4 bg-blue-50 border border-blue-100 rounded-xl text-left">
+                                <p className="text-sm text-blue-800 font-medium mb-1">📱 Ricorda</p>
+                                <p className="text-xs text-blue-700">
+                                    Puoi accedere da massimo <strong>2 dispositivi</strong> (es. PC e telefono).
+                                    Se hai bisogno di cambiarli, vai nella tua Dashboard — è possibile 1 volta ogni 30 giorni.
+                                </p>
+                            </div>
                         </>
                     )}
 
