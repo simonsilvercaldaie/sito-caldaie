@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
             // Copy all cookies that Supabase set (session tokens)
             supabaseResponse.cookies.getAll().forEach(cookie => {
                 redirectToProfile.cookies.set(cookie.name, cookie.value, {
-                    path: cookie.path,
+                    path: '/', // FORCE ROOT PATH
                     domain: cookie.domain,
                     secure: cookie.secure,
                     httpOnly: cookie.httpOnly,
@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
             // Copy all cookies that Supabase set (session tokens)
             supabaseResponse.cookies.getAll().forEach(cookie => {
                 redirectToProfile.cookies.set(cookie.name, cookie.value, {
-                    path: cookie.path,
+                    path: '/', // FORCE ROOT PATH
                     domain: cookie.domain,
                     secure: cookie.secure,
                     httpOnly: cookie.httpOnly,
