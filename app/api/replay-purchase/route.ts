@@ -1,8 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL, PAYPAL_ENV } from '@/lib/constants'
-import { getExpectedPriceCents } from '@/lib/serverPricing'
-import { getAllCourses } from '@/lib/coursesData'
+import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL } from '@/lib/constants'
+import { getExpectedPriceCents, PRODUCT_PRICES_CENTS, ProductCode } from '@/lib/serverPricing'
 import { checkRateLimit } from '@/lib/rateLimit'
 
 function getSupabaseAdmin() {
@@ -39,8 +38,7 @@ async function getPayPalAccessToken(): Promise<string> {
 async function verifyPayPalOrder(orderId: string): Promise<{
     valid: boolean
     captureId?: string
-    level?: string
-    amount?: number
+    amountCents?: number
     error?: string
     code?: string
 }> {
@@ -76,16 +74,7 @@ async function verifyPayPalOrder(orderId: string): Promise<{
             return { valid: false, error: 'Valuta non valida', code: 'INVALID_CURRENCY' }
         }
 
-        // Determina il livello dall'importo
-        let level: string
-        if (Math.abs(paidAmount - (getExpectedPriceCents('base') / 100)) < 0.01) level = 'Base'
-        else if (Math.abs(paidAmount - (getExpectedPriceCents('intermediate') / 100)) < 0.01) level = 'Intermedio'
-        else if (Math.abs(paidAmount - (getExpectedPriceCents('advanced') / 100)) < 0.01) level = 'Avanzato'
-        else {
-            return { valid: false, error: `Importo non riconosciuto: €${paidAmount}`, code: 'AMOUNT_UNKNOWN' }
-        }
-
-        return { valid: true, level, amount: paidAmount, captureId: capture.id }
+        return { valid: true, amountCents: Math.round(paidAmount * 100), captureId: capture.id }
 
     } catch (error) {
         console.error('[replay-purchase] Errore verifica PayPal:', error)
@@ -98,6 +87,7 @@ async function verifyPayPalOrder(orderId: string): Promise<{
  * 
  * Riprova l'attivazione per un ordine PayPal già completato.
  * Idempotente: se già attivato, risponde OK.
+ * Supporta: Livelli Singoli E Licenze Team.
  * 
  * Body: { orderId: string }
  * Auth: Bearer token
@@ -111,7 +101,8 @@ export async function POST(request: NextRequest) {
         }
 
         const token = authHeader.replace(/^Bearer\s+/i, '').trim()
-        const { data: { user }, error: authError } = await getSupabaseAdmin().auth.getUser(token)
+        const supabaseAdmin = getSupabaseAdmin()
+        const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
 
         if (authError || !user) {
             return NextResponse.json({ ok: false, error: 'invalid_token', status: 'error' }, { status: 401 })
@@ -127,45 +118,32 @@ export async function POST(request: NextRequest) {
 
         console.log(`[replay-purchase] Richiesta per orderId: ${orderId}, user: ${user.id}`)
 
-        // Check se già attivato
-        const { data: existingPurchase } = await getSupabaseAdmin()
+        // Check Legacy Order ID Check (Ottimizzazione rapida)
+        const { data: existingPurchase } = await supabaseAdmin
             .from('purchases')
             .select('id, course_id')
             .eq('paypal_order_id', orderId)
-            .limit(1)
+            .maybeSingle()
 
-        if (existingPurchase && existingPurchase.length > 0) {
-            console.log(`[replay-purchase] Ordine ${orderId} già attivato`)
+        if (existingPurchase) {
+            console.log(`[replay-purchase] Ordine ${orderId} già attivato (by OrderID)`)
             return NextResponse.json({
                 ok: true,
                 status: 'activated',
-                message: 'Ordine già attivato',
-                coursesUnlocked: existingPurchase.length
+                message: 'Ordine già attivato'
             })
         }
 
-        // RATE LIMITING (Package 2)
+        // RATE LIMITING
         const ip = request.headers.get('x-forwarded-for') || 'unknown'
-
-        // Limit 1: User-based (3 requests / minute) - FAIL CLOSED
         const userLimit = await checkRateLimit(`replay_user_${user.id}`, 3, 60, false)
-        if (!userLimit.success) {
-            console.warn(`[RateLimit] User ${user.id} exceeded limit (replay)`)
-            return NextResponse.json({ ok: false, error: 'rate_limit_exceeded' }, { status: 429 })
-        }
-
-        // Limit 2: IP-based (6 requests / minute) - FAIL CLOSED
-        const ipLimit = await checkRateLimit(`replay_ip_${ip}`, 6, 60, false)
-        if (!ipLimit.success) {
-            console.warn(`[RateLimit] IP ${ip} exceeded limit (replay)`)
-            return NextResponse.json({ ok: false, error: 'rate_limit_exceeded' }, { status: 429 })
-        }
+        if (!userLimit.success) return NextResponse.json({ ok: false, error: 'rate_limit_exceeded' }, { status: 429 })
 
         // Verifica ordine PayPal
         const verification = await verifyPayPalOrder(orderId)
 
-        if (!verification.valid) {
-            console.log(`[replay-purchase] Ordine ${orderId} non valido: ${verification.error}`)
+        if (!verification.valid || !verification.amountCents || !verification.captureId) {
+            console.log(`[replay-purchase] Verifica fallita: ${verification.error}`)
             return NextResponse.json({
                 ok: false,
                 status: 'invalid',
@@ -175,29 +153,26 @@ export async function POST(request: NextRequest) {
         }
 
         const captureId = verification.captureId
-        const level = verification.level!
-        const amount = verification.amount!
+        const amountCents = verification.amountCents
 
-        // IDEMPOTENZA SU CAPTURE ID
-        if (captureId) {
-            const { data: existingCap } = await getSupabaseAdmin()
-                .from('purchases')
-                .select('id')
-                .eq('paypal_capture_id', captureId)
-                .maybeSingle()
+        // IDEMPOTENZA SU CAPTURE ID (Strict Truth)
+        const { data: existingCap } = await supabaseAdmin
+            .from('purchases')
+            .select('id')
+            .eq('paypal_capture_id', captureId)
+            .maybeSingle()
 
-            if (existingCap) {
-                console.log(`[replay-purchase] Capture ${captureId} già attivato`)
-                return NextResponse.json({
-                    ok: true,
-                    status: 'activated',
-                    message: 'Ordine già attivato'
-                })
-            }
+        if (existingCap) {
+            console.log(`[replay-purchase] Capture ${captureId} già attivato`)
+            return NextResponse.json({
+                ok: true,
+                status: 'activated',
+                message: 'Ordine già attivato'
+            })
         }
 
         // Verifica ToS
-        const { data: tosAcceptance } = await getSupabaseAdmin()
+        const { data: tosAcceptance } = await supabaseAdmin
             .from('tos_acceptances')
             .select('id')
             .eq('user_id', user.id)
@@ -205,6 +180,7 @@ export async function POST(request: NextRequest) {
             .maybeSingle()
 
         if (!tosAcceptance) {
+            // Nota: in replay è un caso limite, ma lo manteniamo per conformità.
             return NextResponse.json({
                 ok: false,
                 status: 'tos_required',
@@ -212,59 +188,113 @@ export async function POST(request: NextRequest) {
             }, { status: 403 })
         }
 
-        // Determina Product Code
-        const levelMap: Record<string, string> = {
-            'Base': 'base',
-            'Intermedio': 'intermediate',
-            'Avanzato': 'advanced'
+        // DETERMINA PRODUCT CODE DALL'IMPORTO (Source of Truth: serverPricing)
+        let productCode: string | null = null
+
+        // Cerca match esatto nella mappa prezzi
+        // PRODUCT_PRICES_CENTS è { "base": 20000, "team_5": 150000, ... }
+        for (const [code, price] of Object.entries(PRODUCT_PRICES_CENTS)) {
+            if (price === amountCents) {
+                productCode = code
+                break
+            }
         }
-        const productCode = levelMap[level]
 
         if (!productCode) {
-            return NextResponse.json({ ok: false, error: 'invalid_level_mapping' }, { status: 500 })
+            // Fallback: tolleranza +/- 1 cent per arrotondamenti
+            for (const [code, price] of Object.entries(PRODUCT_PRICES_CENTS)) {
+                if (Math.abs(price - amountCents) <= 1) {
+                    productCode = code
+                    break
+                }
+            }
         }
 
-        // Inserimento Singolo Record (Forensic Clean Schema)
-        const { error: insertError } = await getSupabaseAdmin()
-            .from('purchases')
-            .insert({
+        if (!productCode) {
+            console.error(`[replay-purchase] Importo non riconosciuto: ${amountCents}`)
+            return NextResponse.json({ ok: false, error: `Importo non riconosciuto: €${(amountCents / 100).toFixed(2)}` }, { status: 400 })
+        }
+
+        console.log(`[replay-purchase] Match prodotto: ${productCode} per €${amountCents / 100}`)
+
+        // Logica Differenziata (Team vs Individual)
+        const isTeam = productCode.startsWith('team_')
+
+        if (isTeam) {
+            // --- LOGICA TEAM (Copiata da complete-purchase per coerenza) ---
+            const seats = parseInt(productCode.split('_')[1])
+
+            // 1. Crea Licenza
+            // Nota: in replay non abbiamo i dati di fatturazione freschi del body, usiamo quelli nel profilo billing se ci sono.
+            // L'importante è attivare l'accesso.
+            const { data: lic, error: licErr } = await supabaseAdmin.from('team_licenses').insert({
+                owner_user_id: user.id,
+                seats: seats,
+                company_name: user.email // Fallback temporaneo, l'utente aggiornerà il profilo billing
+            }).select().single()
+
+            if (licErr || !lic) {
+                console.error('[replay-purchase] Errore creazione licenza team:', licErr)
+                throw licErr
+            }
+
+            // 2. Aggiungi Owner ai membri
+            const { error: memErr } = await supabaseAdmin.from('team_members').insert({
+                team_license_id: lic.id,
+                user_id: user.id
+            })
+            if (memErr) throw memErr
+
+            // 3. Registra Acquisto
+            const { error: purErr } = await supabaseAdmin.from('purchases').insert({
                 user_id: user.id,
-                plan_type: 'individual',
+                plan_type: 'team',
                 product_code: productCode,
-                amount_cents: Math.round(amount * 100),
-                paypal_order_id: orderId, // Legacy keeper
-                paypal_capture_id: captureId, // New idempotency truth
+                amount_cents: amountCents,
+                paypal_order_id: orderId,
+                paypal_capture_id: captureId,
+                team_license_id: lic.id,
                 course_id: null,
                 validated_at: new Date().toISOString()
             })
-
-        if (insertError) {
-            // Idempotenza constraint
-            if (insertError.code === '23505') {
-                console.log(`[replay-purchase] Ordine ${orderId} già presente (constraint)`)
-                return NextResponse.json({
-                    ok: true,
-                    status: 'activated',
-                    message: 'Ordine già attivato'
-                })
+            if (purErr) {
+                if (purErr.code === '23505') { // Unique constraint violation (race condition)
+                    return NextResponse.json({ ok: true, status: 'activated', message: 'Ordine già attivato' })
+                }
+                throw purErr
             }
 
-            console.error('[replay-purchase] Errore insert:', insertError)
-            return NextResponse.json({
-                ok: false,
-                status: 'error',
-                error: 'Errore salvataggio'
-            }, { status: 500 })
+        } else {
+            // --- LOGICA INDIVIDUAL ---
+            const { error: insertError } = await supabaseAdmin
+                .from('purchases')
+                .insert({
+                    user_id: user.id,
+                    plan_type: 'individual',
+                    product_code: productCode,
+                    amount_cents: amountCents,
+                    paypal_order_id: orderId,
+                    paypal_capture_id: captureId,
+                    course_id: null,
+                    validated_at: new Date().toISOString()
+                })
+
+            if (insertError) {
+                if (insertError.code === '23505') {
+                    return NextResponse.json({ ok: true, status: 'activated', message: 'Ordine già attivato' })
+                }
+                throw insertError
+            }
         }
 
-        console.log(`[replay-purchase] Ordine ${orderId} attivato: ${level} (${productCode})`)
+        console.log(`[replay-purchase] Successo attivazione ${productCode}`)
 
         return NextResponse.json({
             ok: true,
             status: 'activated',
             message: 'Attivazione completata',
-            level: level,
-            coursesUnlocked: 9 // Fixed number per level, UI update
+            product_code: productCode,
+            restored: true
         })
 
     } catch (error) {
@@ -272,7 +302,8 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({
             ok: false,
             status: 'error',
-            error: 'Errore interno'
+            error: 'Errore interno server'
         }, { status: 500 })
     }
 }
+
