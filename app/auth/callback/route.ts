@@ -81,20 +81,29 @@ export async function GET(request: NextRequest) {
             // Send welcome email (async, don't block)
             sendWelcomeEmail(user.email!).catch(console.error)
 
-            // Redirect to complete profile
-            return NextResponse.redirect(
-                `${requestUrl.origin}/completa-profilo`,
-                { headers: supabaseResponse.headers }
+            // Redirect to complete profile - MUST copy cookies from supabaseResponse
+            const redirectToProfile = NextResponse.redirect(
+                `${requestUrl.origin}/completa-profilo`
             )
+            // Copy all cookies that Supabase set (session tokens)
+            supabaseResponse.cookies.getAll().forEach(cookie => {
+                redirectToProfile.cookies.set(cookie.name, cookie.value, cookie)
+            })
+            return redirectToProfile
         }
 
         // Profile exists - check if complete
         if (!existingProfile.profile_completed) {
             console.log(`[auth/callback] Redirecting to profile completion: ${user.email}`)
-            return NextResponse.redirect(
-                `${requestUrl.origin}/completa-profilo`,
-                { headers: supabaseResponse.headers }
+            // Redirect to complete profile - MUST copy cookies from supabaseResponse
+            const redirectToProfile = NextResponse.redirect(
+                `${requestUrl.origin}/completa-profilo`
             )
+            // Copy all cookies that Supabase set (session tokens)
+            supabaseResponse.cookies.getAll().forEach(cookie => {
+                redirectToProfile.cookies.set(cookie.name, cookie.value, cookie)
+            })
+            return redirectToProfile
         }
 
         // Profile complete - redirect to home
