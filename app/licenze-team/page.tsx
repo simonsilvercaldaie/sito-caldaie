@@ -204,20 +204,13 @@ export default function TeamLicensePage() {
                             code="team_5"
                             amount={1500}
                         />
-                        <div className="relative transform md:-translate-y-4">
-                            <div className="absolute -top-4 left-0 right-0 text-center">
-                                <span className="bg-indigo-600 text-white px-4 py-1 rounded-full text-sm font-bold shadow-lg">
-                                    Più Popolare
-                                </span>
-                            </div>
-                            <TeamCard
-                                title="Team 10"
-                                users={10}
-                                price="2.000"
-                                code="team_10"
-                                amount={2000}
-                            />
-                        </div>
+                        <TeamCard
+                            title="Team 10"
+                            users={10}
+                            price="2.000"
+                            code="team_10"
+                            amount={2000}
+                        />
                         <TeamCard
                             title="Team 25"
                             users={25}
@@ -227,10 +220,7 @@ export default function TeamLicensePage() {
                         />
                     </div>
 
-                    <div className="mt-16 text-center text-slate-500">
-                        <p>Hai bisogno di una soluzione personalizzata per più di 25 tecnici?</p>
-                        <Link href="/contatti" className="text-indigo-600 font-bold hover:underline">Contattaci per un preventivo</Link>
-                    </div>
+
                 </div>
             </main>
         </div>
