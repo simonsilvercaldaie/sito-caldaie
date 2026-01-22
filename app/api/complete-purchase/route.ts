@@ -197,7 +197,7 @@ export async function POST(request: NextRequest) {
                 amount_cents: truthPrice,
                 paypal_capture_id: captureId,
                 team_license_id: null,
-                course_id: product_code.toUpperCase(),
+                course_id: null, // DEPRECATED: Access logic now relies on product_code
                 ...snapshotData
             })
             if (purErr) throw purErr

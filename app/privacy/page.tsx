@@ -1,5 +1,6 @@
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
+import Footer from '@/components/Footer'
 
 export default function PrivacyPage() {
     return (
@@ -16,11 +17,10 @@ export default function PrivacyPage() {
                         <section>
                             <h2 className="text-xl font-bold text-primary">1. Titolare del Trattamento</h2>
                             <p>
-                                Il Titolare del trattamento dei dati è <strong>Simon Silver Caldaie</strong>,
-                                P.IVA 03235620121, contattabile all'indirizzo email: {' '}
-                                <a href="mailto:simonsilvercaldaie@gmail.com" className="text-accent hover:underline">
-                                    simonsilvercaldaie@gmail.com
-                                </a>
+                                Il Titolare del trattamento dei dati è <strong>Simon Silver Caldaie</strong> di Caroleo Simone.<br />
+                                Sede Legale: Via San Martino 14L, 21020 Casciago (VA), Italia<br />
+                                P.IVA 03235620121<br />
+                                Contatto: <a href="mailto:simonsilvercaldaie@gmail.com" className="text-accent hover:underline">simonsilvercaldaie@gmail.com</a>
                             </p>
                         </section>
 
@@ -33,8 +33,9 @@ export default function PrivacyPage() {
                                 <li><strong>Dati di navigazione</strong>: indirizzo IP, browser, pagine visitate (solo cookie tecnici).</li>
                             </ul>
                             <p>
-                                <strong>Non raccogliamo dati di pagamento</strong>: le transazioni sono gestite
-                                interamente da PayPal, che ha una propria informativa privacy.
+                                <strong>Dati di Fatturazione</strong>: In caso di acquisto, raccogliamo dati fiscali necessari per la fatturazione
+                                (indirizzo, codice fiscale/P.IVA, codice SDI/PEC) che vengono salvati nei nostri database sicuri per obblighi di legge.
+                                Non memorizziamo numeri di carte di credito (gestiti interamente da PayPal).
                             </p>
                         </section>
 
@@ -67,9 +68,10 @@ export default function PrivacyPage() {
                             <h2 className="text-xl font-bold text-primary">6. Condivisione dei Dati</h2>
                             <p>I dati possono essere condivisi con:</p>
                             <ul className="list-disc pl-5 space-y-1">
-                                <li><strong>Supabase</strong>: per l'autenticazione e il database (server EU).</li>
-                                <li><strong>Vercel</strong>: per l'hosting del sito.</li>
-                                <li><strong>PayPal</strong>: per la gestione dei pagamenti.</li>
+                                <li><strong>Supabase</strong>: per l'autenticazione, database e hosting dati (server EU/US con clausole standard).</li>
+                                <li><strong>Vercel</strong>: per l'hosting del sito e log infrastrutturali.</li>
+                                <li><strong>PayPal</strong>: per la gestione sicura dei pagamenti.</li>
+                                <li><strong>EmailJS</strong>: provider tecnico per l'invio di email transazionali (conferme ordine, fatture, reset password).</li>
                             </ul>
                         </section>
 
@@ -118,11 +120,7 @@ export default function PrivacyPage() {
                 </div>
             </main>
 
-            <footer className="bg-slate-900 text-slate-400 py-8 px-4 border-t border-slate-800">
-                <div className="max-w-6xl mx-auto text-center text-sm">
-                    &copy; {new Date().getFullYear()} Simon Silver. P.IVA 03235620121
-                </div>
-            </footer>
+            <Footer />
         </div>
     )
 }

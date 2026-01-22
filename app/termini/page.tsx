@@ -1,6 +1,7 @@
 'use client'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
+import Footer from '@/components/Footer'
 
 export default function TerminiPage() {
     return (
@@ -171,11 +172,7 @@ export default function TerminiPage() {
                 </div>
             </main>
 
-            <footer className="bg-slate-900 text-slate-400 py-8 px-4 border-t border-slate-800">
-                <div className="max-w-6xl mx-auto text-center text-sm">
-                    &copy; {new Date().getFullYear()} Simon Silver. P.IVA 03235620121
-                </div>
-            </footer>
+            <Footer />
         </div>
     )
 }

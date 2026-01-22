@@ -38,6 +38,7 @@ async function getPayPalAccessToken(): Promise<string> {
 
 async function verifyPayPalOrder(orderId: string): Promise<{
     valid: boolean
+    captureId?: string
     level?: string
     amount?: number
     error?: string
@@ -84,7 +85,7 @@ async function verifyPayPalOrder(orderId: string): Promise<{
             return { valid: false, error: `Importo non riconosciuto: €${paidAmount}`, code: 'AMOUNT_UNKNOWN' }
         }
 
-        return { valid: true, level, amount: paidAmount }
+        return { valid: true, level, amount: paidAmount, captureId: capture.id }
 
     } catch (error) {
         console.error('[replay-purchase] Errore verifica PayPal:', error)
@@ -173,8 +174,27 @@ export async function POST(request: NextRequest) {
             }, { status: 402 })
         }
 
+        const captureId = verification.captureId
         const level = verification.level!
         const amount = verification.amount!
+
+        // IDEMPOTENZA SU CAPTURE ID
+        if (captureId) {
+            const { data: existingCap } = await getSupabaseAdmin()
+                .from('purchases')
+                .select('id')
+                .eq('paypal_capture_id', captureId)
+                .maybeSingle()
+
+            if (existingCap) {
+                console.log(`[replay-purchase] Capture ${captureId} già attivato`)
+                return NextResponse.json({
+                    ok: true,
+                    status: 'activated',
+                    message: 'Ordine già attivato'
+                })
+            }
+        }
 
         // Verifica ToS
         const { data: tosAcceptance } = await getSupabaseAdmin()
@@ -192,28 +212,31 @@ export async function POST(request: NextRequest) {
             }, { status: 403 })
         }
 
-        // Sblocca corsi
-        const allCourses = getAllCourses()
-        const coursesToUnlock = allCourses.filter(c => c.level === level)
+        // Determina Product Code
+        const levelMap: Record<string, string> = {
+            'Base': 'base',
+            'Intermedio': 'intermediate',
+            'Avanzato': 'advanced'
+        }
+        const productCode = levelMap[level]
 
-        if (coursesToUnlock.length === 0) {
-            return NextResponse.json({
-                ok: false,
-                status: 'error',
-                error: 'Nessun corso trovato per questo livello'
-            }, { status: 500 })
+        if (!productCode) {
+            return NextResponse.json({ ok: false, error: 'invalid_level_mapping' }, { status: 500 })
         }
 
-        const purchaseRecords = coursesToUnlock.map(course => ({
-            user_id: user.id,
-            course_id: course.title,
-            amount: amount / coursesToUnlock.length,
-            paypal_order_id: orderId
-        }))
-
+        // Inserimento Singolo Record (Forensic Clean Schema)
         const { error: insertError } = await getSupabaseAdmin()
             .from('purchases')
-            .insert(purchaseRecords)
+            .insert({
+                user_id: user.id,
+                plan_type: 'individual',
+                product_code: productCode,
+                amount_cents: Math.round(amount * 100),
+                paypal_order_id: orderId, // Legacy keeper
+                paypal_capture_id: captureId, // New idempotency truth
+                course_id: null,
+                validated_at: new Date().toISOString()
+            })
 
         if (insertError) {
             // Idempotenza constraint
@@ -234,14 +257,14 @@ export async function POST(request: NextRequest) {
             }, { status: 500 })
         }
 
-        console.log(`[replay-purchase] Ordine ${orderId} attivato: ${coursesToUnlock.length} corsi`)
+        console.log(`[replay-purchase] Ordine ${orderId} attivato: ${level} (${productCode})`)
 
         return NextResponse.json({
             ok: true,
             status: 'activated',
             message: 'Attivazione completata',
             level: level,
-            coursesUnlocked: coursesToUnlock.length
+            coursesUnlocked: 9 // Fixed number per level, UI update
         })
 
     } catch (error) {

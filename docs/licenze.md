@@ -55,7 +55,7 @@ Per centri di formazione, scuole tecniche, enti accreditati.
 - Uso didattico consentito
 - Preventivo personalizzato in base al numero di partecipanti
 
-**Richiedi preventivo:** [inserire email o link al modulo]
+**Richiedi preventivo:** simonsilvercaldaie@gmail.com
 
 ---
 

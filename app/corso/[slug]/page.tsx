@@ -71,14 +71,14 @@ export default function CorsoPage() {
                 // 1. Carica acquisti Individuali
                 const { data: purchases } = await supabase
                     .from('purchases')
-                    .select('course_id')
+                    .select('product_code')
                     .eq('user_id', currentUser.id)
 
                 let hasAccess = false
                 let userCourseIds: string[] = []
 
                 if (purchases) {
-                    userCourseIds = purchases.map(p => p.course_id)
+                    userCourseIds = purchases.map(p => p.product_code)
                 }
 
                 // 2. Check Team Membership (Accesso Totale)
@@ -100,15 +100,27 @@ export default function CorsoPage() {
                     const now = new Date()
                     const validUntil = new Date(lic.valid_until)
 
-                    if (lic.status === 'active' && validUntil > now) {
+                    // Handle lifetime licenses (valid_until = null)
+                    if (lic.status === 'active' && (!lic.valid_until || validUntil > now)) {
                         setTeamAccess(true)
                         hasAccess = true // Team ha accesso a tutto
                     }
                 }
 
-                // Verifica se ha accesso a QUESTO corso
+                // Verifica se ha accesso a QUESTO corso (via individual purchase)
+                // product_code stored: 'base', 'intermediate', 'advanced', or 'complete'
                 if (!hasAccess && course) {
-                    hasAccess = userCourseIds.includes(course.title)
+                    const levelMap: Record<string, string> = {
+                        'Base': 'base',
+                        'Intermedio': 'intermediate',
+                        'Avanzato': 'advanced'
+                    }
+                    const expectedProductCode = levelMap[course.level] || ''
+                    // Check if user has this level OR 'complete' (all levels)
+                    hasAccess = userCourseIds.some(id =>
+                        id?.toUpperCase() === expectedProductCode.toUpperCase() ||
+                        id?.toUpperCase() === 'COMPLETE'
+                    )
                 }
 
                 setPurchasedCourses(userCourseIds)

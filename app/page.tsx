@@ -8,6 +8,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
 import { FaqJsonLd } from "@/components/seo/JsonLd";
+import Footer from "@/components/Footer";
 
 export default function Home() {
     const [session, setSession] = useState<any>(null)
@@ -99,26 +100,7 @@ export default function Home() {
                 </section>
             </main>
 
-            <footer className="bg-slate-900 text-slate-400 py-12 px-4 border-t border-slate-800">
-                <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-                    <div className="flex items-center gap-2">
-                        <div className="relative w-8 h-8 opacity-50">
-                            <Image src="/logo.png" alt="Logo Footer" fill className="object-contain grayscale" />
-                        </div>
-                        <span className="font-semibold text-slate-200">Simon Silver Caldaie</span>
-                    </div>
-                    <div className="text-sm">
-                        &copy; {new Date().getFullYear()} Simon Silver. P.IVA 03235620121
-                    </div>
-                    <div className="flex flex-wrap gap-4 justify-center">
-                        <a href="https://www.youtube.com/@SimonSilverCaldaie" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">YouTube</a>
-                        <a href="https://www.instagram.com/simon_silver" target="_blank" rel="noopener noreferrer" className="hover:text-white transition-colors">Instagram</a>
-                        <Link href="/contatti" className="hover:text-white transition-colors">Contatti</Link>
-                        <Link href="/privacy" className="hover:text-white transition-colors">Privacy</Link>
-                        <Link href="/termini" className="hover:text-white transition-colors">Termini</Link>
-                    </div>
-                </div>
-            </footer>
+            <Footer />
         </div>
     );
 }

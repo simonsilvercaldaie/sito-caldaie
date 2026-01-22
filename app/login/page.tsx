@@ -16,10 +16,19 @@ export default function LoginPage() {
 
         try {
             const supabase = createClient()
+
+            // 1. Force logout to clean any stale local session
+            await supabase.auth.signOut()
+
+            // 2. Start OAuth flow with forced account selection
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: `${window.location.origin}/auth/callback`
+                    redirectTo: `${window.location.origin}/auth/callback`,
+                    queryParams: {
+                        prompt: 'select_account', // Forces Google to show account chooser
+                        access_type: 'offline'    // Ensures we get a refresh token
+                    }
                 }
             })
 

@@ -46,18 +46,47 @@ export default function DashboardPage() {
             }
             setUser(session.user)
 
-            // Carica metadati
-            const meta = session.user.user_metadata || {}
-            setFullName(meta.full_name || '')
-            setAddress(meta.address || '')
-            setCity(meta.city || '')
-            setCap(meta.cap || '')
-            setCf(meta.cf || '')
-            setPiva(meta.piva || '') // Se azienda
-            setSdi(meta.sdi || '')
-            setPec(meta.pec || '')
+            // 1. Carica Billing Profile (Source of Truth)
+            const { data: billing } = await supabase
+                .from('billing_profiles')
+                .select('*')
+                .eq('user_id', session.user.id)
+                .maybeSingle()
+
+            if (billing) {
+                setFullName(billing.company_name || `${billing.first_name} ${billing.last_name}`.trim())
+                setAddress(billing.address || '')
+                setCity(billing.city || '')
+                setCap(billing.postal_code || '')
+                setCf(billing.fiscal_code || '')
+                setPiva(billing.vat_number || '')
+                setSdi(billing.sdi_code || '')
+                // PEC handling if separate column exists, otherwise reuse SDI logic or ignore
+            } else {
+                // Fallback to metadata only if no billing profile exists (legacy)
+                const meta = session.user.user_metadata || {}
+                setFullName(meta.full_name || '')
+            }
 
             setLoading(false)
+
+            // 2. Carica Dispositivi (Bug 2.3 Fix)
+            setLoadingDevices(true)
+            try {
+                const res = await fetch('/api/devices', {
+                    headers: { 'Authorization': `Bearer ${session.access_token}` }
+                })
+                if (res.ok) {
+                    const data = await res.json()
+                    setDevices(data.devices || [])
+                    setCanResetDevices(data.canReset)
+                    setDaysUntilReset(data.daysRemaining)
+                }
+            } catch (e) {
+                console.error('Error fetching devices', e)
+            } finally {
+                setLoadingDevices(false)
+            }
         }
         checkUser()
     }, [router])
@@ -71,24 +100,44 @@ export default function DashboardPage() {
         e.preventDefault()
         setUpdatingProfile(true)
         try {
-            const updates = {
-                full_name: fullName,
+            const { data: { session } } = await supabase.auth.getSession()
+            if (!session) throw new Error("Sessione scaduta")
+
+            // Determine names
+            let first_name = fullName.split(' ')[0] || ''
+            let last_name = fullName.substring(first_name.length).trim() || ''
+
+            // Upsert Billing Profile (Bug 2.2 Fix)
+            const billingData = {
+                user_id: session.user.id,
+                customer_type: piva ? 'company' : 'private',
+                first_name,
+                last_name,
+                company_name: piva ? fullName : null,
+                vat_number: piva || null,
+                sdi_code: sdi || null, // Shared with PEC input
                 address,
                 city,
-                cap,
-                cf,
-                piva,
-                sdi,
-                pec
+                postal_code: cap,
+                fiscal_code: cf,
+                updated_at: new Date().toISOString()
             }
 
-            const { error } = await supabase.auth.updateUser({
-                data: updates
-            })
+            const { error } = await supabase
+                .from('billing_profiles')
+                .upsert(billingData)
+
             if (error) throw error
+
+            // Optional: Also update basic auth metadata for UI consistency elsewhere
+            await supabase.auth.updateUser({
+                data: { full_name: fullName }
+            })
+
             alert('Profilo aggiornato con successo!')
         } catch (error: any) {
-            alert('Errore: ' + error.message)
+            console.error(error)
+            alert('Errore aggiornamento: ' + error.message)
         } finally {
             setUpdatingProfile(false)
         }
@@ -356,7 +405,9 @@ export default function DashboardPage() {
                             Dispositivi Autorizzati ({devices.length}/2)
                         </h3>
 
-                        {devices.length === 0 ? (
+                        {loadingDevices ? (
+                            <p className="text-sm text-gray-500 italic"><Loader2 className="inline w-3 h-3 animate-spin" /> Caricamento dispositivi...</p>
+                        ) : devices.length === 0 ? (
                             <p className="text-sm text-gray-500 italic">Nessun dispositivo registrato</p>
                         ) : (
                             <div className="space-y-2">

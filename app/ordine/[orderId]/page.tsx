@@ -35,11 +35,11 @@ export default function OrderStatusPage() {
 
             setUser(session.user)
 
-            // Verifica se già attivato in DB
+            // Verifica se già attivato in DB (check both columns for compatibility)
             const { data: purchases } = await supabase
                 .from('purchases')
                 .select('id')
-                .eq('paypal_order_id', orderId)
+                .or(`paypal_order_id.eq.${orderId},paypal_capture_id.eq.${orderId}`)
 
             if (purchases && purchases.length > 0) {
                 setStatus('activated')
