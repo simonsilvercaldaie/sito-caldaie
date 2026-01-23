@@ -687,14 +687,12 @@ export default function CorsoPage() {
 
                                                 {viewMode === 'individual' && (
                                                     tosAccepted ? (
-                                                        <PayPalBtn
-                                                            amount={user?.email === 'simonsilvercaldaie@gmail.com' ? "1.00" : String(pricingInfo?.amountToPay || 0)}
-                                                            courseTitle={`Pacchetto ${course.level}`}
-                                                            onSuccess={(id) => handlePurchaseSuccess(id, {
-                                                                plan_type: 'individual',
-                                                                amount_cents: user?.email === 'simonsilvercaldaie@gmail.com' ? 100 : undefined
-                                                            })}
-                                                        />
+                                                        // DISABILITATO TEMPORANEAMENTE
+                                                        // <PayPalBtn ... />
+                                                        <div className="text-center p-4 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300">
+                                                            <p className="font-bold text-gray-500 mb-1">Acquisti momentaneamente sospesi</p>
+                                                            <p className="text-xs text-gray-400">In attesa del caricamento dei video definitivi.</p>
+                                                        </div>
                                                     ) : (
                                                         !user ? (
                                                             <p className="text-xs text-gray-400 text-center mt-2">

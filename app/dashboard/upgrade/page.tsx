@@ -432,12 +432,11 @@ function UpgradeCard({ title, users, price, enabled, onSuccess, highlight = fals
 
             <div className="mt-auto">
                 {enabled ? (
-                    <PayPalBtn
-                        amount={price.toString()}
-                        courseTitle={`Upgrade a ${title}`}
-                        onSuccess={onSuccess}
-                        showDisclaimer={false}
-                    />
+                    // DISABILITATO TEMPORANEAMENTE
+                    // <PayPalBtn ... />
+                    <div className="text-center p-3 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
+                        <p className="font-bold text-gray-400 text-xs">Acquisti Upgrade Sospesi</p>
+                    </div>
                 ) : (
                     <button disabled className="w-full py-3 bg-gray-100 text-gray-400 font-bold rounded-xl cursor-not-allowed">
                         Accetta i termini sopra
