@@ -539,6 +539,24 @@ export default function CorsoPage() {
                                 {/* BLOCCO PRINCIPALE — LICENZA SINGOLA (DEFAULT) */}
                                 {!hasPurchased && viewMode === null && (
                                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                        <Link
+                                            href="/licenze-team"
+                                            className="block bg-indigo-50/50 border-2 border-indigo-200 rounded-2xl p-8 cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 hover:shadow-lg transition-all duration-300 group text-center"
+                                        >
+                                            <div className="flex flex-col items-center gap-4">
+                                                <div className="p-4 bg-indigo-100 text-indigo-600 rounded-2xl group-hover:scale-110 transition-transform shadow-sm">
+                                                    <Users className="w-10 h-10" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="font-bold text-xl text-indigo-900 mb-2">Sei un team di tecnici?</h4>
+                                                    <p className="text-slate-600 leading-relaxed">
+                                                        Scopri le licenze aziendali.<br />
+                                                        <span className="text-sm font-semibold text-indigo-600/80">Risparmia fino al 40%</span>
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </Link>
+
                                         {/* Singola Card - Dominant with Dynamic Colors */}
                                         {(() => {
                                             // Dynamic color theming based on level
@@ -602,24 +620,6 @@ export default function CorsoPage() {
                                                 </div>
                                             );
                                         })()}
-
-                                        <Link
-                                            href="/licenze-team"
-                                            className="block bg-indigo-50/50 border-2 border-indigo-200 rounded-2xl p-8 cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 hover:shadow-lg transition-all duration-300 group mt-6 text-center"
-                                        >
-                                            <div className="flex flex-col items-center gap-4">
-                                                <div className="p-4 bg-indigo-100 text-indigo-600 rounded-2xl group-hover:scale-110 transition-transform shadow-sm">
-                                                    <Users className="w-10 h-10" />
-                                                </div>
-                                                <div>
-                                                    <h4 className="font-bold text-xl text-indigo-900 mb-2">Sei un team di tecnici?</h4>
-                                                    <p className="text-slate-600 leading-relaxed">
-                                                        Scopri le licenze aziendali.<br />
-                                                        <span className="text-sm font-semibold text-indigo-600/80">Risparmia fino al 40%</span>
-                                                    </p>
-                                                </div>
-                                            </div>
-                                        </Link>
                                     </div>
                                 )}
 
