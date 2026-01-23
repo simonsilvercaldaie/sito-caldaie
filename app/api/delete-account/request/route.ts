@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
         const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
         if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-        // 2. Rate Limit (3 requests per hour per user)
-        const limitRes = await checkRateLimit(`del_req_${user.id}`, 3, 3600, false)
+        // 2. Rate Limit (10 requests per hour per user) - Increased for testing
+        const limitRes = await checkRateLimit(`del_req_${user.id}`, 10, 3600, false)
         if (!limitRes.success) {
             return NextResponse.json({ error: 'rate_limit_exceeded', message: 'Troppe richieste. Riprova più tardi.' }, { status: 429 })
         }
