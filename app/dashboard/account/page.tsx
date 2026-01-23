@@ -53,6 +53,41 @@ export default function AccountPage() {
                 throw new Error(data.message || data.error || 'Errore nella richiesta')
             }
 
+            const responseData = await res.json()
+
+            // Send email from client (EmailJS works only from browser)
+            const emailData = {
+                service_id: 'service_i4y7ewt',
+                template_id: 'template_sotc25n',
+                user_id: 'NcJg5-hiu3gVJiJZ-',
+                template_params: {
+                    from_name: 'Simon Silver Caldaie',
+                    to_email: responseData.email,
+                    subject: 'CONFERMA CANCELLAZIONE ACCOUNT',
+                    message: `
+Hai richiesto la cancellazione del tuo account su Simon Silver Caldaie.
+
+Questa operazione è DEFINITIVA e irreversibile.
+Tutti i tuoi dati, progressi e acquisti verranno rimossi permanentemente.
+
+Se sei sicuro, clicca sul link seguente entro 15 minuti:
+${responseData.confirmUrl}
+
+Se non hai richiesto tu la cancellazione, ignora questa email e contatta l'assistenza.
+                    `.trim()
+                }
+            }
+
+            const emailRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(emailData)
+            })
+
+            if (!emailRes.ok) {
+                throw new Error('Impossibile inviare l\'email di conferma.')
+            }
+
             setDeleteRequestSent(true)
         } catch (error: any) {
             alert('Errore: ' + error.message)

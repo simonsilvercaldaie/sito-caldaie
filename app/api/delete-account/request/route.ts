@@ -50,29 +50,16 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Internal Error' }, { status: 500 })
         }
 
-
-        // 5. Send Email
+        // 5. Return confirm URL to client (client will send email via EmailJS)
         const confirmUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.simonsilvercaldaie.it'}/account/delete/confirm?token=${rawToken}`
 
-        console.log(`[DELETE-ACCOUNT-DEBUG] Preparing to send email to: "${user.email}"`)
-        console.log(`[DELETE-ACCOUNT-DEBUG] Confirm URL: ${confirmUrl}`)
+        console.log(`[DELETE-ACCOUNT] Token created for: "${user.email}"`)
 
-        const emailSent = await sendEmail('CANCELLAZIONE', {
-            to_email: user.email || '',
-            confirmUrl
+        return NextResponse.json({
+            success: true,
+            confirmUrl,
+            email: user.email
         })
-
-        if (!emailSent) {
-            console.error('[DELETE-ACCOUNT] CRITICAL: Failed to send deletion email to', user.email)
-            // BLOCKING: return error if email fails
-            return NextResponse.json({
-                error: 'email_failed',
-                message: 'Impossibile inviare l\'email di conferma. Riprova tra qualche minuto.'
-            }, { status: 500 })
-        }
-
-        console.log(`[DELETE-ACCOUNT] Email successfully sent to ${user.email}`)
-        return NextResponse.json({ success: true })
 
     } catch (e: any) {
         console.error('Delete Request Error:', e)
