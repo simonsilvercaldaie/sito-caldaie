@@ -53,8 +53,8 @@ export async function POST(request: NextRequest) {
         const confirmUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.simonsilvercaldaie.it'}/account/delete/confirm?token=${rawToken}`
 
         const emailData = {
-            service_id: 'service_fwvybtr', // Keeping existing service ID
-            template_id: 'template_b8p58ci', // Generic/Custom template - verifying if we need a specific one
+            service_id: 'service_i4y7ewt', // Switching to the service ID used in auth/callback and contact form
+            template_id: 'template_sotc25n', // Switching to the unified styled template
             // Ideally we should use a specific template for deletion confirmation.
             // Using the same template structure as seen in other files for consistency.
             user_id: 'NcJg5-hiu3gVJiJZ-',
