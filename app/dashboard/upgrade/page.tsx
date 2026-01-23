@@ -95,7 +95,15 @@ export default function UpgradePage() {
                 setLicenseStatus('full_individual')
             } else if (levels.length > 0) {
                 setLicenseStatus('partial_individual')
+            } else {
+                // No purchases at all, redirect
+                router.push('/catalogo')
+                return
             }
+        } else {
+            // No purchases, redirect to catalogo
+            router.push('/catalogo')
+            return
         }
 
         setLoading(false)
@@ -209,9 +217,9 @@ export default function UpgradePage() {
             {/* Header */}
             <header className="bg-white shadow-sm px-4 py-4 mb-8">
                 <div className="max-w-4xl mx-auto flex items-center">
-                    <Link href="/dashboard/account" className="flex items-center gap-2 text-gray-500 hover:text-primary transition-colors">
+                    <Link href="/dashboard" className="flex items-center gap-2 text-gray-500 hover:text-primary transition-colors">
                         <ArrowLeft className="w-5 h-5" />
-                        Torna all'Account
+                        Torna alla Dashboard
                     </Link>
                     <h1 className="ml-auto font-bold text-xl text-primary">Upgrade Licenza</h1>
                 </div>

@@ -30,6 +30,9 @@ export default function DashboardPage() {
     const [daysUntilReset, setDaysUntilReset] = useState<number | null>(null)
     const [resettingDevices, setResettingDevices] = useState(false)
 
+    // Upgrade eligibility state
+    const [canUpgrade, setCanUpgrade] = useState(false)
+
 
 
     const router = useRouter()
@@ -83,6 +86,41 @@ export default function DashboardPage() {
                 console.error('Error fetching devices', e)
             } finally {
                 setLoadingDevices(false)
+            }
+
+            // 3. Check upgrade eligibility (has all 3 levels OR has team < 25)
+            try {
+                // Check if user is team owner with < 25 members
+                const { data: teamLicense } = await supabase
+                    .from('team_licenses')
+                    .select('max_members')
+                    .eq('owner_id', session.user.id)
+                    .eq('status', 'active')
+                    .maybeSingle()
+
+                if (teamLicense && teamLicense.max_members < 25) {
+                    setCanUpgrade(true)
+                } else if (!teamLicense) {
+                    // Check individual purchases
+                    const { data: purchases } = await supabase
+                        .from('purchases')
+                        .select('product_code')
+                        .eq('user_id', session.user.id)
+
+                    if (purchases && purchases.length > 0) {
+                        const codes = purchases.map(p => p.product_code?.toLowerCase())
+                        const hasBase = codes.some(c => c?.includes('base'))
+                        const hasInter = codes.some(c => c?.includes('intermedi') || c?.includes('intermediate'))
+                        const hasAdvanced = codes.some(c => c?.includes('avanzat') || c?.includes('advanced'))
+                        const hasComplete = codes.some(c => c?.includes('complete'))
+
+                        if ((hasBase && hasInter && hasAdvanced) || hasComplete) {
+                            setCanUpgrade(true)
+                        }
+                    }
+                }
+            } catch (e) {
+                console.error('Error checking upgrade eligibility', e)
             }
         }
         checkUser()
@@ -418,30 +456,32 @@ export default function DashboardPage() {
                     </div>
                 </section>
 
-                {/* UPGRADE LICENZA CTA */}
-                <section className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 md:p-8 rounded-2xl shadow-sm border-2 border-indigo-200">
-                    <div className="text-center">
-                        <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                            <svg className="w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                            </svg>
+                {/* UPGRADE LICENZA CTA - Solo per utenti con tutti e 3 i livelli o team < 25 */}
+                {canUpgrade && (
+                    <section className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 md:p-8 rounded-2xl shadow-sm border-2 border-indigo-200">
+                        <div className="text-center">
+                            <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <svg className="w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                                </svg>
+                            </div>
+                            <h2 className="text-2xl font-bold text-indigo-900 mb-2">Vuoi fare un Upgrade?</h2>
+                            <p className="text-indigo-700 mb-6 max-w-md mx-auto">
+                                Hai già una licenza singola e vuoi passare a Team?<br />
+                                O hai già un Team e vuoi espanderlo?
+                            </p>
+                            <Link
+                                href="/dashboard/upgrade"
+                                className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                            >
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                                </svg>
+                                Esplora le Opzioni di Upgrade
+                            </Link>
                         </div>
-                        <h2 className="text-2xl font-bold text-indigo-900 mb-2">Vuoi fare un Upgrade?</h2>
-                        <p className="text-indigo-700 mb-6 max-w-md mx-auto">
-                            Hai già una licenza singola e vuoi passare a Team?<br />
-                            O hai già un Team e vuoi espanderlo?
-                        </p>
-                        <Link
-                            href="/dashboard/upgrade"
-                            className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
-                        >
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
-                            </svg>
-                            Esplora le Opzioni di Upgrade
-                        </Link>
-                    </div>
-                </section>
+                    </section>
+                )}
 
                 {/* Zona Pericolo - Eliminazione Account */}
                 <section className="bg-red-50 p-6 md:p-8 rounded-2xl shadow-sm border border-red-100">
