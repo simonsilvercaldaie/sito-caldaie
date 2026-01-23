@@ -248,8 +248,7 @@ export async function POST(request: NextRequest) {
             if (purErr) throw purErr
         }
 
-        // 8.1 Send Purchase Confirmation Email
-        // Determine Email Type
+        // 8.1 Determine Email Type for client-side sending
         let emailType: 'ACQUISTO_BASE' | 'ACQUISTO_INTERMEDIO' | 'ACQUISTO_AVANZATO' | 'ACQUISTO_TEAM' | null = null
 
         if (isTeam) {
@@ -260,12 +259,6 @@ export async function POST(request: NextRequest) {
             emailType = 'ACQUISTO_INTERMEDIO'
         } else if (product_code.includes('avanzato')) {
             emailType = 'ACQUISTO_AVANZATO'
-        }
-
-        if (emailType && user.email) {
-            // Non-blocking email send
-            sendEmail(emailType, { to_email: user.email })
-                .catch((err: any) => console.error('[complete-purchase] Email send error:', err))
         }
 
         // 9. Async Invoice Notification (FIRE AND FORGET)
@@ -282,8 +275,12 @@ export async function POST(request: NextRequest) {
                 .catch(e => console.error('[complete-purchase] Invoice Send Background Error:', e));
         }
 
-        // Return immediately to user
-        return NextResponse.json({ ok: true })
+        // Return with email info for client-side email sending
+        return NextResponse.json({
+            ok: true,
+            emailType,
+            email: user.email
+        })
 
     } catch (e) {
         console.error('Internal Error', e)

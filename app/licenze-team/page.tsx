@@ -89,7 +89,32 @@ export default function TeamLicensePage() {
                 })
             })
 
+            const data = await res.json()
+
             if (res.ok) {
+                // Send team purchase confirmation email from client
+                if (data.emailType && data.email) {
+                    try {
+                        const emailData = {
+                            service_id: 'service_i4y7ewt',
+                            template_id: 'template_sotc25n',
+                            user_id: 'NcJg5-hiu3gVJiJZ-',
+                            template_params: {
+                                from_name: 'Simon Silver Caldaie',
+                                to_email: data.email,
+                                subject: '✅ Conferma Acquisto - Licenza Team',
+                                message: `Ciao! Grazie per il tuo acquisto.\n\nHai sbloccato con successo una Licenza TEAM.\nOra puoi invitare i membri del tuo team dalla tua Dashboard.\n\nAccedi qui:\nhttps://simonsilvercaldaie.it/dashboard\n\nBuon lavoro!\nSimon Silver`
+                            }
+                        }
+                        await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(emailData)
+                        })
+                    } catch (emailErr) {
+                        console.error('Team purchase email error:', emailErr)
+                    }
+                }
                 window.location.href = `/ordine/${orderId}`
             } else {
                 alert('Errore nel completamento dell\'ordine. Contatta l\'assistenza.')

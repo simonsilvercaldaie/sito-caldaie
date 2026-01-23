@@ -114,15 +114,12 @@ export async function POST(request: NextRequest) {
 
         console.log(`[complete-profile] Profile completed for user: ${user.email}`)
 
-        // 7. Send Welcome Email
-        if (user.email) {
-            await sendEmail('REGISTRAZIONE_OK', {
-                to_email: user.email,
-                name: first_name.trim()
-            })
-        }
-
-        return NextResponse.json({ ok: true })
+        // Return data for client-side email sending (EmailJS works only from browser)
+        return NextResponse.json({
+            ok: true,
+            email: user.email,
+            name: first_name.trim()
+        })
 
     } catch (e) {
         console.error('[complete-profile] Unexpected error:', e)

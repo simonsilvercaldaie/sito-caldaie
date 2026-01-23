@@ -242,6 +242,52 @@ export default function CorsoPage() {
 
                 if (res.ok) {
                     console.log(`[handlePurchaseSuccess] Successo:`, data)
+
+                    // Send purchase confirmation email from client (EmailJS works only from browser)
+                    if (data.emailType && data.email) {
+                        try {
+                            const emailMessages: Record<string, { subject: string, message: string }> = {
+                                'ACQUISTO_BASE': {
+                                    subject: '✅ Conferma Acquisto - Base',
+                                    message: `Ciao! Grazie per il tuo acquisto.\n\nHai sbloccato con successo:\nPacchetto BASE (9 Video)\n\nPuoi accedere subito ai tuoi corsi qui:\nhttps://simonsilvercaldaie.it/catalogo/base\n\nBuono studio!\nSimon Silver`
+                                },
+                                'ACQUISTO_INTERMEDIO': {
+                                    subject: '✅ Conferma Acquisto - Intermedio',
+                                    message: `Ciao! Grazie per il tuo acquisto.\n\nHai sbloccato con successo:\nPacchetto INTERMEDIO (9 Video)\n\nPuoi accedere subito ai tuoi corsi qui:\nhttps://simonsilvercaldaie.it/catalogo/intermedio\n\nBuono studio!\nSimon Silver`
+                                },
+                                'ACQUISTO_AVANZATO': {
+                                    subject: '✅ Conferma Acquisto - Avanzato',
+                                    message: `Ciao! Grazie per il tuo acquisto.\n\nHai sbloccato con successo:\nPacchetto AVANZATO (9 Video)\n\nPuoi accedere subito ai tuoi corsi qui:\nhttps://simonsilvercaldaie.it/catalogo/avanzato\n\nBuono studio!\nSimon Silver`
+                                },
+                                'ACQUISTO_TEAM': {
+                                    subject: '✅ Conferma Acquisto - Licenza Team',
+                                    message: `Ciao! Grazie per il tuo acquisto.\n\nHai sbloccato con successo una Licenza TEAM.\nOra puoi invitare i membri del tuo team dalla tua Dashboard.\n\nAccedi qui:\nhttps://simonsilvercaldaie.it/dashboard\n\nBuon lavoro!\nSimon Silver`
+                                }
+                            }
+                            const emailContent = emailMessages[data.emailType]
+                            if (emailContent) {
+                                const emailData = {
+                                    service_id: 'service_i4y7ewt',
+                                    template_id: 'template_sotc25n',
+                                    user_id: 'NcJg5-hiu3gVJiJZ-',
+                                    template_params: {
+                                        from_name: 'Simon Silver Caldaie',
+                                        to_email: data.email,
+                                        subject: emailContent.subject,
+                                        message: emailContent.message
+                                    }
+                                }
+                                await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify(emailData)
+                                })
+                            }
+                        } catch (emailErr) {
+                            console.error('Purchase email error:', emailErr)
+                        }
+                    }
+
                     return true
                 }
 

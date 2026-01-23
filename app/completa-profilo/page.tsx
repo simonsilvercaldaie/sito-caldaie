@@ -111,6 +111,42 @@ export default function CompletaProfiloPage() {
                 throw new Error(data.error || 'Errore durante il salvataggio')
             }
 
+            // Send welcome email from client (EmailJS works only from browser)
+            if (data.email) {
+                try {
+                    const emailData = {
+                        service_id: 'service_i4y7ewt',
+                        template_id: 'template_sotc25n',
+                        user_id: 'NcJg5-hiu3gVJiJZ-',
+                        template_params: {
+                            from_name: 'Simon Silver Caldaie',
+                            to_email: data.email,
+                            subject: '🎉 Benvenuto in Simon Silver Caldaie',
+                            message: `
+Benvenuto ${data.name || ''}!
+
+Il tuo account è stato creato con successo.
+Ora puoi accedere alla piattaforma e iniziare a esplorare i corsi.
+
+Vai al Sito:
+https://simonsilvercaldaie.it/
+
+Buon lavoro,
+Simon Silver
+                            `.trim()
+                        }
+                    }
+                    await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(emailData)
+                    })
+                } catch (emailErr) {
+                    console.error('Welcome email error:', emailErr)
+                    // Non-blocking - continue to redirect
+                }
+            }
+
             // Success - redirect to home
             router.push('/')
             router.refresh()
