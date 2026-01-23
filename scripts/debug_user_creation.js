@@ -11,7 +11,12 @@ envContent.split('\n').forEach(line => {
 });
 
 const SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL;
-const SERVICE_KEY = "sb_secret_6VeLcB2Kc1dcbuIThccdTA_YjqsSC24";
+const SERVICE_KEY = env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+if (!SERVICE_KEY) {
+    console.error("ERROR: Missing SUPABASE_SERVICE_ROLE_KEY in environment");
+    process.exit(1);
+}
 
 const admin = createClient(SUPABASE_URL, SERVICE_KEY);
 

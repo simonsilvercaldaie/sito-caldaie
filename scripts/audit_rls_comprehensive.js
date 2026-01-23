@@ -14,7 +14,8 @@ envContent.split('\n').forEach(line => {
 const SUPABASE_URL = env.NEXT_PUBLIC_SUPABASE_URL;
 const ANON_KEY = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 // User provided key
-const SERVICE_KEY = "sb_secret_6VeLcB2Kc1dcbuIThccdTA_YjqsSC24";
+// User provided key - REPLACED WITH ENV VAR
+const SERVICE_KEY = env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!SUPABASE_URL || !ANON_KEY || !SERVICE_KEY) {
     console.error("Missing credentials.");

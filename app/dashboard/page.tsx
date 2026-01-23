@@ -30,10 +30,7 @@ export default function DashboardPage() {
     const [daysUntilReset, setDaysUntilReset] = useState<number | null>(null)
     const [resettingDevices, setResettingDevices] = useState(false)
 
-    // Delete Account State
-    const [showDeleteModal, setShowDeleteModal] = useState(false)
-    const [deleteConfirmChecked, setDeleteConfirmChecked] = useState(false)
-    const [deletingAccount, setDeletingAccount] = useState(false)
+
 
     const router = useRouter()
 
@@ -180,39 +177,6 @@ export default function DashboardPage() {
         }
     }
 
-    const handleDeleteAccount = async () => {
-        if (!deleteConfirmChecked) return
-
-        setDeletingAccount(true)
-        try {
-            const { data: { session } } = await supabase.auth.getSession()
-            if (!session) throw new Error("No session")
-
-            const response = await fetch('/api/delete-account', {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${session.access_token}`
-                }
-            })
-
-            const data = await response.json()
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Errore durante l\'eliminazione')
-            }
-
-            // Logout steps
-            await supabase.auth.signOut()
-            alert('Account eliminato correttamente.')
-            router.push('/')
-
-        } catch (error: any) {
-            alert('Errore: ' + error.message)
-        } finally {
-            setDeletingAccount(false)
-            setShowDeleteModal(false)
-        }
-    }
 
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 gap-2 text-primary">
@@ -468,73 +432,20 @@ export default function DashboardPage() {
 
                     <div className="flex flex-col md:flex-row items-center justify-between gap-4">
                         <p className="text-gray-600 text-sm">
-                            Vuoi eliminare il tuo account? Questa azione è irreversibile e perderai l'accesso a tutti i contenuti.
+                            Vuoi eliminare il tuo account? Puoi gestire la cancellazione nelle impostazioni del profilo.
                         </p>
-                        <button
-                            onClick={() => setShowDeleteModal(true)}
+                        <Link
+                            href="/dashboard/account"
                             className="px-6 py-2 bg-white border border-red-200 text-red-600 font-bold rounded-lg hover:bg-red-600 hover:text-white transition-colors text-sm shadow-sm whitespace-nowrap"
                         >
-                            Elimina Account
-                        </button>
+                            Vai alle Impostazioni Account
+                        </Link>
                     </div>
                 </section>
 
             </main>
 
-            {/* Modal Conferma Eliminazione */}
-            {showDeleteModal && (
-                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
-                    <div className="bg-white rounded-2xl max-w-lg w-full p-8 shadow-2xl animate-in fade-in zoom-in duration-200">
-                        <h3 className="text-2xl font-bold text-gray-900 mb-4">Eliminazione Account</h3>
 
-                        <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
-                            <p className="text-red-700 font-medium">
-                                Attenzione: Azione Irreversibile
-                            </p>
-                            <p className="text-red-600 text-sm mt-1">
-                                Eliminando l'account perderai permanentemente l'accesso a tutti i corsi acquistati e allo storico ordini.
-                            </p>
-                        </div>
-
-                        <p className="text-gray-600 mb-6">
-                            Sei sicuro di voler procedere? Per confermare, devi accettare esplicitamente la rinuncia ai tuoi diritti sui contenuti acquistati.
-                        </p>
-
-                        <div className="flex items-start gap-3 mb-8 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                            <input
-                                type="checkbox"
-                                id="confirm-delete"
-                                checked={deleteConfirmChecked}
-                                onChange={(e) => setDeleteConfirmChecked(e.target.checked)}
-                                className="mt-1 w-5 h-5 text-red-600 rounded border-gray-300 focus:ring-red-500"
-                            />
-                            <label htmlFor="confirm-delete" className="text-sm text-gray-700 font-medium cursor-pointer select-none">
-                                Dichiaro di essere consapevole che eliminando l'account rinuncio ai diritti sugli acquisti fatti e perdo l'accesso ai corsi.
-                            </label>
-                        </div>
-
-                        <div className="flex justify-end gap-3">
-                            <button
-                                onClick={() => {
-                                    setShowDeleteModal(false)
-                                    setDeleteConfirmChecked(false)
-                                }}
-                                className="px-4 py-2 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors"
-                            >
-                                Annulla
-                            </button>
-                            <button
-                                onClick={handleDeleteAccount}
-                                disabled={!deleteConfirmChecked || deletingAccount}
-                                className="px-6 py-2 bg-red-600 text-white font-bold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                            >
-                                {deletingAccount ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-                                Conferma Eliminazione
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </div>
     )
 }
