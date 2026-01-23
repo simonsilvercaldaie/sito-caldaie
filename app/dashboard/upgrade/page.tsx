@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Loader2, ArrowLeft, Users, CheckCircle2, ArrowUpCircle, AlertCircle } from 'lucide-react'
 import { PayPalBtn } from '@/components/PayPalBtn'
@@ -28,10 +28,8 @@ type LicenseStatus =
     | 'team_10'
     | 'team_25'
 
-function UpgradeContent() {
+export default function UpgradePage() {
     const router = useRouter()
-    const searchParams = useSearchParams()
-    const isPreview = searchParams.get('preview') === 'true'
 
     const [user, setUser] = useState<any>(null)
     const [loading, setLoading] = useState(true)
@@ -105,13 +103,13 @@ function UpgradeContent() {
                 setLicenseStatus('full_individual')
             } else if (levels.length > 0) {
                 setLicenseStatus('partial_individual')
-            } else if (!isPreview) {
-                // No purchases at all, redirect (unless preview mode)
+            } else {
+                // No purchases at all, redirect
                 router.push('/catalogo')
                 return
             }
-        } else if (!isPreview) {
-            // No purchases, redirect to catalogo (unless preview mode)
+        } else {
+            // No purchases, redirect to catalogo
             router.push('/catalogo')
             return
         }
@@ -450,13 +448,5 @@ function UpgradeCard({ title, users, price, enabled, onSuccess, highlight = fals
                 )}
             </div>
         </div>
-    )
-}
-
-export default function UpgradePage() {
-    return (
-        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50"><Loader2 className="w-8 h-8 animate-spin text-indigo-600" /></div>}>
-            <UpgradeContent />
-        </Suspense>
     )
 }
