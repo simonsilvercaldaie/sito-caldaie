@@ -1,10 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
 import { Loader2, ArrowLeft, Users, CheckCircle2, ArrowUpCircle, AlertCircle } from 'lucide-react'
 import { PayPalBtn } from '@/components/PayPalBtn'
 import { LEGAL_TEXT_CHECKOUT } from '@/lib/legalTexts'
@@ -29,7 +28,7 @@ type LicenseStatus =
     | 'team_10'
     | 'team_25'
 
-export default function UpgradePage() {
+function UpgradeContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const isPreview = searchParams.get('preview') === 'true'
@@ -388,7 +387,6 @@ export default function UpgradePage() {
     )
 }
 
-// Upgrade Card Component
 function UpgradeCard({ title, users, price, enabled, onSuccess, highlight = false }: {
     title: string
     users: number
@@ -445,5 +443,13 @@ function UpgradeCard({ title, users, price, enabled, onSuccess, highlight = fals
                 )}
             </div>
         </div>
+    )
+}
+
+export default function UpgradePage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50"><Loader2 className="w-8 h-8 animate-spin text-indigo-600" /></div>}>
+            <UpgradeContent />
+        </Suspense>
     )
 }
