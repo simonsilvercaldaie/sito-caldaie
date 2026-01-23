@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { sendEmail, EmailType } from '@/lib/email'
 
 export default function TestEmailPage() {
     const [email, setEmail] = useState('')
@@ -8,7 +9,7 @@ export default function TestEmailPage() {
     const [loading, setLoading] = useState(false)
 
     // Funzione generica per inviare email
-    const sendTestEmail = async (type: string) => {
+    const handleSendTestEmail = async (type: EmailType) => {
         if (!email) {
             setStatus('❌ Inserisci prima la tua email')
             return
@@ -18,132 +19,22 @@ export default function TestEmailPage() {
         setLoading(true)
 
         try {
-            // Costruiamo i parametri in base al tipo di email richiesto
-            let templateParams = {}
+            let params: any = { to_email: email }
 
-            if (type === 'ACQUISTO_BASE') {
-                templateParams = {
-                    from_name: 'Simon Silver Caldaie',
-                    to_email: email,
-                    subject: '✅ Conferma Acquisto - Base',
-                    message: `
-Ciao! Grazie per il tuo acquisto.
-
-Hai sbloccato con successo:
-Pacchetto BASE (9 Video)
-
-Puoi accedere subito ai tuoi corsi qui:
-https://simonsilvercaldaie.it/catalogo/base
-
-Buono studio!
-Simon Silver
-                    `.trim()
-                }
-            } else if (type === 'ACQUISTO_INTERMEDIO') {
-                templateParams = {
-                    from_name: 'Simon Silver Caldaie',
-                    to_email: email,
-                    subject: '✅ Conferma Acquisto - Intermedio',
-                    message: `
-Ciao! Grazie per il tuo acquisto.
-
-Hai sbloccato con successo:
-Pacchetto INTERMEDIO (9 Video)
-
-Puoi accedere subito ai tuoi corsi qui:
-https://simonsilvercaldaie.it/catalogo/intermedio
-
-Buono studio!
-Simon Silver
-                    `.trim()
-                }
-            } else if (type === 'ACQUISTO_AVANZATO') {
-                templateParams = {
-                    from_name: 'Simon Silver Caldaie',
-                    to_email: email,
-                    subject: '✅ Conferma Acquisto - Avanzato',
-                    message: `
-Ciao! Grazie per il tuo acquisto.
-
-Hai sbloccato con successo:
-Pacchetto AVANZATO (9 Video)
-
-Puoi accedere subito ai tuoi corsi qui:
-https://simonsilvercaldaie.it/catalogo/avanzato
-
-Buono studio!
-Simon Silver
-                    `.trim()
-                }
-            } else if (type === 'CANCELLAZIONE') {
-                templateParams = {
-                    from_name: 'Simon Silver Caldaie',
-                    to_email: email,
-                    subject: '❌ Account Cancellato',
-                    message: `
-Ciao.
-
-Come da tua richiesta, ti confermiamo che il tuo account e tutti i dati associati sono stati cancellati.
-
-Un saluto,
-Simon Silver
-                    `.trim()
-                }
-            } else if (type === 'REGISTRAZIONE_OK') {
-                templateParams = {
-                    from_name: 'Simon Silver Caldaie',
-                    to_email: email,
-                    subject: '🎉 Benvenuto in Simon Silver Caldaie',
-                    message: `
-Benvenuto!
-
-Il tuo account è stato creato con successo.
-Ora puoi accedere alla piattaforma e iniziare a esplorare i corsi.
-
-Vai al Sito:
-https://simonsilvercaldaie.it/
-
-Buon lavoro,
-Simon Silver
-                    `.trim()
-                }
-            } else if (type === 'CONFERMA_MAIL') {
-                templateParams = {
-                    from_name: 'Simon Silver Caldaie',
-                    to_email: email,
-                    subject: '✉️ Conferma la tua email (Simulazione)',
-                    message: `
-Ciao!
-
-Per attivare il tuo account, clicca sul link qui sotto (questo è un test):
-https://simonsilvercaldaie.it/auth/confirm?token=test12345
-
-Se non hai richiesto tu questa iscrizione, ignora questa email.
-
-Simon Silver
-                    `.trim()
-                }
+            // Parametri specifici per mock
+            if (type === 'REGISTRAZIONE_OK') {
+                params.name = 'Tester'
+            }
+            if (type === 'CANCELLAZIONE') {
+                params.confirmUrl = 'https://simonsilvercaldaie.it/account/delete/confirm?token=TEST_TOKEN'
             }
 
-            const data = {
-                service_id: 'service_i4y7ewt',
-                template_id: 'template_sotc25n',
-                user_id: 'NcJg5-hiu3gVJiJZ-',
-                template_params: templateParams
-            }
+            const success = await sendEmail(type, params)
 
-            // Invia richiesta REST a EmailJS
-            const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-
-            if (res.ok) {
+            if (success) {
                 setStatus(`✅ Email ${type} Inviata con successo! Controlla la posta.`)
             } else {
-                const text = await res.text()
-                setStatus(`❌ Errore EmailJS: ${text}`)
+                setStatus(`❌ Errore durante l'invio. Controlla la console.`)
             }
 
         } catch (error: any) {
@@ -156,7 +47,7 @@ Simon Silver
 
     return (
         <div style={{ padding: '40px', maxWidth: '600px', margin: '0 auto', fontFamily: 'sans-serif', color: '#333' }}>
-            <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px' }}>🧪 Test Email PRO</h1>
+            <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '20px' }}>🧪 Test Email PRO (Refactored)</h1>
             <p style={{ marginBottom: '20px' }}>Inserisci la tua email e prova tutti i tipi di notifica.</p>
 
             <div style={{ marginBottom: '20px' }}>
@@ -182,7 +73,7 @@ Simon Silver
                 {/* ACQUISTI */}
                 <h3 style={{ borderBottom: '1px solid #ddd', paddingBottom: '5px', marginTop: '0' }}>🛒 Acquisti</h3>
                 <button
-                    onClick={() => sendTestEmail('ACQUISTO_BASE')}
+                    onClick={() => handleSendTestEmail('ACQUISTO_BASE')}
                     disabled={loading}
                     style={btnStyle}
                 >
@@ -190,7 +81,7 @@ Simon Silver
                 </button>
 
                 <button
-                    onClick={() => sendTestEmail('ACQUISTO_INTERMEDIO')}
+                    onClick={() => handleSendTestEmail('ACQUISTO_INTERMEDIO')}
                     disabled={loading}
                     style={btnStyle}
                 >
@@ -198,17 +89,26 @@ Simon Silver
                 </button>
 
                 <button
-                    onClick={() => sendTestEmail('ACQUISTO_AVANZATO')}
+                    onClick={() => handleSendTestEmail('ACQUISTO_AVANZATO')}
                     disabled={loading}
                     style={btnStyle}
                 >
                     Test Acquisto AVANZATO (9 Video)
                 </button>
 
+                <button
+                    onClick={() => handleSendTestEmail('ACQUISTO_TEAM')}
+                    disabled={loading}
+                    style={btnStyle}
+                >
+                    Test Acquisto TEAM
+                </button>
+
+
                 {/* ACCOUNT */}
                 <h3 style={{ borderBottom: '1px solid #ddd', paddingBottom: '5px', marginTop: '20px' }}>👤 Gestione Account</h3>
                 <button
-                    onClick={() => sendTestEmail('REGISTRAZIONE_OK')}
+                    onClick={() => handleSendTestEmail('REGISTRAZIONE_OK')}
                     disabled={loading}
                     style={{ ...btnStyle, backgroundColor: '#4CAF50' }}
                 >
@@ -216,15 +116,7 @@ Simon Silver
                 </button>
 
                 <button
-                    onClick={() => sendTestEmail('CONFERMA_MAIL')}
-                    disabled={loading}
-                    style={{ ...btnStyle, backgroundColor: '#2196F3' }}
-                >
-                    Test Conferma Mail (Simulazione)
-                </button>
-
-                <button
-                    onClick={() => sendTestEmail('CANCELLAZIONE')}
+                    onClick={() => handleSendTestEmail('CANCELLAZIONE')}
                     disabled={loading}
                     style={{ ...btnStyle, backgroundColor: '#F44336' }}
                 >

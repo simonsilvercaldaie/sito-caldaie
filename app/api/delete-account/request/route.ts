@@ -2,6 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 import { checkRateLimit } from '@/lib/rateLimit'
+import { sendEmail } from '@/lib/email'
 
 // Service Role Client
 const supabaseAdmin = createClient(
@@ -49,41 +50,19 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Internal Error' }, { status: 500 })
         }
 
+
         // 5. Send Email
         const confirmUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.simonsilvercaldaie.it'}/account/delete/confirm?token=${rawToken}`
 
-        const emailData = {
-            service_id: 'service_i4y7ewt', // Switching to the service ID used in auth/callback and contact form
-            template_id: 'template_sotc25n', // Switching to the unified styled template
-            // Ideally we should use a specific template for deletion confirmation.
-            // Using the same template structure as seen in other files for consistency.
-            user_id: 'NcJg5-hiu3gVJiJZ-',
-            template_params: {
-                from_name: 'Simon Silver Caldaie',
-                to_email: user.email,
-                subject: 'CONFERMA CANCELLAZIONE ACCOUNT',
-                message: `
-Hai richiesto la cancellazione del tuo account su Simon Silver Caldaie.
+        console.log(`[DELETE-ACCOUNT-DEBUG] Preparing to send email to: "${user.email}"`) // DEBUG LOG
 
-Questa operazione è DEFINITIVA e irreversibile.
-Tutti i tuoi dati, progressi e acquisti verranno rimossi permanentemente.
-
-Se sei sicuro, clicca sul link seguente entro 15 minuti:
-${confirmUrl}
-
-Se non hai richiesto tu la cancellazione, ignora questa email e contatta l'assistenza.
-                `.trim()
-            }
-        }
-
-        const emailRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(emailData)
+        const emailSent = await sendEmail('CANCELLAZIONE', {
+            to_email: user.email || '',
+            confirmUrl
         })
 
-        if (!emailRes.ok) {
-            console.error('[DELETE-ACCOUNT] EmailJS Error:', await emailRes.text())
+        if (!emailSent) {
+            console.error('[DELETE-ACCOUNT] Failed to send email to', user.email)
             // Non-blocking but warning
         } else {
             console.log(`[DELETE-ACCOUNT] Email successfully sent to ${user.email}`)

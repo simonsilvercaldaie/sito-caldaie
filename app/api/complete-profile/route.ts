@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { sendEmail } from '@/lib/email'
 
 function getSupabaseAdmin() {
     return createClient(
@@ -112,6 +113,14 @@ export async function POST(request: NextRequest) {
         })
 
         console.log(`[complete-profile] Profile completed for user: ${user.email}`)
+
+        // 7. Send Welcome Email
+        if (user.email) {
+            await sendEmail('REGISTRAZIONE_OK', {
+                to_email: user.email,
+                name: first_name.trim()
+            })
+        }
 
         return NextResponse.json({ ok: true })
 

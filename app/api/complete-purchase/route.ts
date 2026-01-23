@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL, INVOICE_NOTIFICATION_EMAIL } from '@/lib/constants'
 import { getExpectedPriceCents } from '@/lib/serverPricing'
 import { checkRateLimit } from '@/lib/rateLimit'
+import { sendEmail } from '@/lib/email'
 
 // Type for billing profile
 interface BillingProfile {
@@ -245,6 +246,26 @@ export async function POST(request: NextRequest) {
                 ...snapshotData
             })
             if (purErr) throw purErr
+        }
+
+        // 8.1 Send Purchase Confirmation Email
+        // Determine Email Type
+        let emailType: 'ACQUISTO_BASE' | 'ACQUISTO_INTERMEDIO' | 'ACQUISTO_AVANZATO' | 'ACQUISTO_TEAM' | null = null
+
+        if (isTeam) {
+            emailType = 'ACQUISTO_TEAM'
+        } else if (product_code.includes('base')) {
+            emailType = 'ACQUISTO_BASE'
+        } else if (product_code.includes('intermedio')) {
+            emailType = 'ACQUISTO_INTERMEDIO'
+        } else if (product_code.includes('avanzato')) {
+            emailType = 'ACQUISTO_AVANZATO'
+        }
+
+        if (emailType && user.email) {
+            // Non-blocking email send
+            sendEmail(emailType, { to_email: user.email })
+                .catch((err: any) => console.error('[complete-purchase] Email send error:', err))
         }
 
         // 9. Async Invoice Notification (FIRE AND FORGET)
