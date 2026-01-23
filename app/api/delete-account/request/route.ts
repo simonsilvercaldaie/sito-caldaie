@@ -60,7 +60,6 @@ export async function POST(request: NextRequest) {
             user_id: 'NcJg5-hiu3gVJiJZ-',
             template_params: {
                 from_name: 'Simon Silver Caldaie',
-                from_email: 'admin@simonsilvercaldaie.it',
                 to_email: user.email,
                 subject: 'CONFERMA CANCELLAZIONE ACCOUNT',
                 message: `
