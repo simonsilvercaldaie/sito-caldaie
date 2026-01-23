@@ -7,7 +7,7 @@ import Link from 'next/link'
 
 export default function AccountPage() {
     const [user, setUser] = useState<any>(null)
-    const [user, setUser] = useState<any>(null)
+
     const [loading, setLoading] = useState(true)
 
 
