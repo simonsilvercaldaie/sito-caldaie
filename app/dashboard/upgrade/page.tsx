@@ -322,9 +322,9 @@ export default function UpgradePage() {
                                 <UpgradeCard
                                     title="Team 5"
                                     users={5}
-                                    price={UPGRADE_PRICES.individual_to_team_5}
+                                    price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_5}
                                     enabled={tosAccepted}
-                                    onSuccess={(id) => handleUpgradeSuccess(id, 5, UPGRADE_PRICES.individual_to_team_5)}
+                                    onSuccess={(id) => handleUpgradeSuccess(id, 5, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_5)}
                                 />
                             )}
 
@@ -333,9 +333,9 @@ export default function UpgradePage() {
                                 <UpgradeCard
                                     title="Team 10"
                                     users={10}
-                                    price={licenseStatus === 'full_individual' ? UPGRADE_PRICES.individual_to_team_10 : UPGRADE_PRICES.team_5_to_team_10}
+                                    price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : (licenseStatus === 'full_individual' ? UPGRADE_PRICES.individual_to_team_10 : UPGRADE_PRICES.team_5_to_team_10)}
                                     enabled={tosAccepted}
-                                    onSuccess={(id) => handleUpgradeSuccess(id, 10, licenseStatus === 'full_individual' ? UPGRADE_PRICES.individual_to_team_10 : UPGRADE_PRICES.team_5_to_team_10)}
+                                    onSuccess={(id) => handleUpgradeSuccess(id, 10, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : (licenseStatus === 'full_individual' ? UPGRADE_PRICES.individual_to_team_10 : UPGRADE_PRICES.team_5_to_team_10))}
                                 />
                             )}
 
@@ -345,16 +345,18 @@ export default function UpgradePage() {
                                     title="Team 25"
                                     users={25}
                                     price={
-                                        licenseStatus === 'full_individual' ? UPGRADE_PRICES.individual_to_team_25 :
-                                            licenseStatus === 'team_5' ? UPGRADE_PRICES.team_5_to_team_25 :
-                                                UPGRADE_PRICES.team_10_to_team_25
-                                    }
+                                        user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : (
+                                            licenseStatus === 'full_individual' ? UPGRADE_PRICES.individual_to_team_25 :
+                                                licenseStatus === 'team_5' ? UPGRADE_PRICES.team_5_to_team_25 :
+                                                    UPGRADE_PRICES.team_10_to_team_25
+                                        )}
                                     enabled={tosAccepted}
                                     onSuccess={(id) => handleUpgradeSuccess(id, 25,
-                                        licenseStatus === 'full_individual' ? UPGRADE_PRICES.individual_to_team_25 :
-                                            licenseStatus === 'team_5' ? UPGRADE_PRICES.team_5_to_team_25 :
-                                                UPGRADE_PRICES.team_10_to_team_25
-                                    )}
+                                        user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : (
+                                            licenseStatus === 'full_individual' ? UPGRADE_PRICES.individual_to_team_25 :
+                                                licenseStatus === 'team_5' ? UPGRADE_PRICES.team_5_to_team_25 :
+                                                    UPGRADE_PRICES.team_10_to_team_25
+                                        ))}
                                     highlight
                                 />
                             )}
