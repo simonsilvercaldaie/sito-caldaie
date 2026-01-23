@@ -54,7 +54,8 @@ export async function POST(request: NextRequest) {
         // 5. Send Email
         const confirmUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.simonsilvercaldaie.it'}/account/delete/confirm?token=${rawToken}`
 
-        console.log(`[DELETE-ACCOUNT-DEBUG] Preparing to send email to: "${user.email}"`) // DEBUG LOG
+        console.log(`[DELETE-ACCOUNT-DEBUG] Preparing to send email to: "${user.email}"`)
+        console.log(`[DELETE-ACCOUNT-DEBUG] Confirm URL: ${confirmUrl}`)
 
         const emailSent = await sendEmail('CANCELLAZIONE', {
             to_email: user.email || '',
@@ -62,12 +63,15 @@ export async function POST(request: NextRequest) {
         })
 
         if (!emailSent) {
-            console.error('[DELETE-ACCOUNT] Failed to send email to', user.email)
-            // Non-blocking but warning
-        } else {
-            console.log(`[DELETE-ACCOUNT] Email successfully sent to ${user.email}`)
+            console.error('[DELETE-ACCOUNT] CRITICAL: Failed to send deletion email to', user.email)
+            // BLOCKING: return error if email fails
+            return NextResponse.json({
+                error: 'email_failed',
+                message: 'Impossibile inviare l\'email di conferma. Riprova tra qualche minuto.'
+            }, { status: 500 })
         }
 
+        console.log(`[DELETE-ACCOUNT] Email successfully sent to ${user.email}`)
         return NextResponse.json({ success: true })
 
     } catch (e: any) {

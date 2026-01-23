@@ -26,6 +26,9 @@ export async function sendEmail(type: EmailType, params: EmailParams): Promise<b
         template_params: templateParams
     }
 
+    console.log(`[EMAIL] Attempting to send ${type} to ${params.to_email}`)
+    console.log(`[EMAIL] Using service: ${EMAILJS_SERVICE_ID}, template: ${EMAILJS_TEMPLATE_ID}`)
+
     try {
         const res = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
             method: 'POST',
