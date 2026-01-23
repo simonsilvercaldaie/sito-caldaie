@@ -15,6 +15,7 @@ export interface Course {
     premiumContent: string[]
     featured?: boolean
     coverImage?: string
+    premiumVideoUrl?: string
 }
 
 export const courses: Course[] = [
@@ -41,7 +42,8 @@ export const courses: Course[] = [
             "Esempi pratici di 'rifiuto' all'avvio"
         ],
         featured: true,
-        coverImage: "/images/courses/01-caldaia-decisioni.webp"
+        coverImage: "/images/courses/01-caldaia-decisioni.webp",
+        premiumVideoUrl: "/videos/test.mp4" // PLACEHOLDER: Carica il tuo video qui
     },
     {
         id: "02-check-iniziale",
