@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { Loader2, ArrowLeft, Users, CheckCircle2, ArrowUpCircle, AlertCircle } from 'lucide-react'
 import { PayPalBtn } from '@/components/PayPalBtn'
 import { LEGAL_TEXT_CHECKOUT } from '@/lib/legalTexts'
@@ -30,6 +31,9 @@ type LicenseStatus =
 
 export default function UpgradePage() {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const isPreview = searchParams.get('preview') === 'true'
+
     const [user, setUser] = useState<any>(null)
     const [loading, setLoading] = useState(true)
     const [licenseStatus, setLicenseStatus] = useState<LicenseStatus>('none')
@@ -95,13 +99,13 @@ export default function UpgradePage() {
                 setLicenseStatus('full_individual')
             } else if (levels.length > 0) {
                 setLicenseStatus('partial_individual')
-            } else {
-                // No purchases at all, redirect
+            } else if (!isPreview) {
+                // No purchases at all, redirect (unless preview mode)
                 router.push('/catalogo')
                 return
             }
-        } else {
-            // No purchases, redirect to catalogo
+        } else if (!isPreview) {
+            // No purchases, redirect to catalogo (unless preview mode)
             router.push('/catalogo')
             return
         }
