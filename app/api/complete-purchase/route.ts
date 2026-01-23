@@ -159,6 +159,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ ok: false, error: 'invalid_product_code' }, { status: 400 })
         }
 
+        // ADMIN BYPASS FOR TESTING: Force price to 1.00 EUR (100 cents) if admin
+        if (user.email === 'simonsilvercaldaie@gmail.com') {
+            truthPrice = 100
+        }
+
         // Security Check: Client vs Server amount
         if (amount_cents !== truthPrice) {
             return NextResponse.json({ ok: false, error: 'price_mismatch' }, { status: 400 })

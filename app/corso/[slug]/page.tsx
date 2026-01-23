@@ -646,7 +646,7 @@ export default function CorsoPage() {
 
                                                     {/* Prezzo in evidenza */}
                                                     <div className="text-4xl lg:text-5xl font-extrabold text-primary mb-2">
-                                                        € {pricingInfo?.amountToPay}.00
+                                                        € {user?.email === 'simonsilvercaldaie@gmail.com' ? "1.00" : `${pricingInfo?.amountToPay}.00`}
                                                     </div>
 
                                                     <p className="text-base lg:text-lg text-gray-700 font-medium mb-1">
@@ -752,9 +752,13 @@ export default function CorsoPage() {
                                                 {viewMode === 'individual' && (
                                                     tosAccepted ? (
                                                         <PayPalBtn
-                                                            amount={String(pricingInfo?.amountToPay || 0)}
+                                                            amount={user?.email === 'simonsilvercaldaie@gmail.com' ? "1.00" : String(pricingInfo?.amountToPay || 0)}
                                                             courseTitle={`Pacchetto ${course.level}`}
-                                                            onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'individual' })}
+                                                            onSuccess={(id) => handlePurchaseSuccess(id, {
+                                                                plan_type: 'individual',
+                                                                // Pass correct amount for validation (100 cents if admin, standard otherwise)
+                                                                amount_cents: user?.email === 'simonsilvercaldaie@gmail.com' ? 100 : undefined
+                                                            })}
                                                         />
                                                     ) : (
                                                         !user ? (
