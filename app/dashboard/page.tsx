@@ -124,12 +124,13 @@ export default function DashboardPage() {
                             }
                         }
                     }
-                } catch (e) {
-                    console.error('Error checking upgrade eligibility', e)
                 }
+            } catch (e) {
+                console.error('Error checking upgrade eligibility', e)
             }
+        }
         checkUser()
-        }, [router])
+    }, [router])
 
     const handleLogout = async () => {
         await supabase.auth.signOut()
