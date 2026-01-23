@@ -90,41 +90,46 @@ export default function DashboardPage() {
 
             // 3. Check upgrade eligibility (has all 3 levels OR has team < 25)
             try {
-                // Check if user is team owner with < 25 members
-                const { data: teamLicense } = await supabase
-                    .from('team_licenses')
-                    .select('max_members')
-                    .eq('owner_id', session.user.id)
-                    .eq('status', 'active')
-                    .maybeSingle()
-
-                if (teamLicense && teamLicense.max_members < 25) {
+                // ADMIN BYPASS
+                if (session.user.email === 'simonsilvercaldaie@gmail.com') {
                     setCanUpgrade(true)
-                } else if (!teamLicense) {
-                    // Check individual purchases
-                    const { data: purchases } = await supabase
-                        .from('purchases')
-                        .select('product_code')
-                        .eq('user_id', session.user.id)
+                }
+                else {
+                    // Check if user is team owner with < 25 members
+                    const { data: teamLicense } = await supabase
+                        .from('team_licenses')
+                        .select('max_members')
+                        .eq('owner_id', session.user.id)
+                        .eq('status', 'active')
+                        .maybeSingle()
 
-                    if (purchases && purchases.length > 0) {
-                        const codes = purchases.map(p => p.product_code?.toLowerCase())
-                        const hasBase = codes.some(c => c?.includes('base'))
-                        const hasInter = codes.some(c => c?.includes('intermedi') || c?.includes('intermediate'))
-                        const hasAdvanced = codes.some(c => c?.includes('avanzat') || c?.includes('advanced'))
-                        const hasComplete = codes.some(c => c?.includes('complete'))
+                    if (teamLicense && teamLicense.max_members < 25) {
+                        setCanUpgrade(true)
+                    } else if (!teamLicense) {
+                        // Check individual purchases
+                        const { data: purchases } = await supabase
+                            .from('purchases')
+                            .select('product_code')
+                            .eq('user_id', session.user.id)
 
-                        if ((hasBase && hasInter && hasAdvanced) || hasComplete) {
-                            setCanUpgrade(true)
+                        if (purchases && purchases.length > 0) {
+                            const codes = purchases.map(p => p.product_code?.toLowerCase())
+                            const hasBase = codes.some(c => c?.includes('base'))
+                            const hasInter = codes.some(c => c?.includes('intermedi') || c?.includes('intermediate'))
+                            const hasAdvanced = codes.some(c => c?.includes('avanzat') || c?.includes('advanced'))
+                            const hasComplete = codes.some(c => c?.includes('complete'))
+
+                            if ((hasBase && hasInter && hasAdvanced) || hasComplete) {
+                                setCanUpgrade(true)
+                            }
                         }
                     }
+                } catch (e) {
+                    console.error('Error checking upgrade eligibility', e)
                 }
-            } catch (e) {
-                console.error('Error checking upgrade eligibility', e)
             }
-        }
         checkUser()
-    }, [router])
+        }, [router])
 
     const handleLogout = async () => {
         await supabase.auth.signOut()

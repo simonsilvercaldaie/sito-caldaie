@@ -53,6 +53,13 @@ function UpgradeContent() {
         }
         setUser(session.user)
 
+        // ADMIN BYPASS
+        if (session.user.email === 'simonsilvercaldaie@gmail.com') {
+            setLicenseStatus('full_individual')
+            setLoading(false)
+            return
+        }
+
         // Check team license (owner)
         const { data: teamLicense } = await supabase
             .from('team_licenses')
