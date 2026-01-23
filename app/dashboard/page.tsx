@@ -418,6 +418,31 @@ export default function DashboardPage() {
                     </div>
                 </section>
 
+                {/* UPGRADE LICENZA CTA */}
+                <section className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 md:p-8 rounded-2xl shadow-sm border-2 border-indigo-200">
+                    <div className="text-center">
+                        <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <svg className="w-8 h-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                            </svg>
+                        </div>
+                        <h2 className="text-2xl font-bold text-indigo-900 mb-2">Vuoi fare un Upgrade?</h2>
+                        <p className="text-indigo-700 mb-6 max-w-md mx-auto">
+                            Hai già una licenza singola e vuoi passare a Team?<br />
+                            O hai già un Team e vuoi espanderlo?
+                        </p>
+                        <Link
+                            href="/dashboard/upgrade"
+                            className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5"
+                        >
+                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 10l7-7m0 0l7 7m-7-7v18" />
+                            </svg>
+                            Esplora le Opzioni di Upgrade
+                        </Link>
+                    </div>
+                </section>
+
                 {/* Zona Pericolo - Eliminazione Account */}
                 <section className="bg-red-50 p-6 md:p-8 rounded-2xl shadow-sm border border-red-100">
                     <div className="flex items-center gap-3 mb-6 pb-4 border-b border-red-100">
