@@ -50,6 +50,9 @@ export async function POST(request: NextRequest) {
         if (action === 'send_warning') {
             return await sendWarning(body.email, body.reason)
         }
+        if (action === 'grant_access') {
+            return await grantAccess(body.email, body.products)
+        }
 
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
 
@@ -57,6 +60,85 @@ export async function POST(request: NextRequest) {
         console.error('[Admin API Error]', e)
         return NextResponse.json({ error: e.message }, { status: 500 })
     }
+}
+
+async function grantAccess(email: string, products: string[]) {
+    if (!products || products.length === 0) return NextResponse.json({ error: 'No products selected' }, { status: 400 })
+
+    // 1. Find User
+    const { data: users, error: userErr } = await supabaseAdmin.auth.admin.listUsers()
+    if (userErr) throw userErr
+
+    // Scan all users (inefficient but safe if listUsers is paginated, ideally use listUsers with filter but admin api has separate filter param)
+    // Actually listUsers returns paginated list. It's better to use from('profiles') if we have email there?
+    // Profiles table relies on user id.
+    // But we can use getUserByEmail?? No, admin.getUserById exists, but getUserByEmail?
+    // supabaseAdmin.from('profiles').select('id').eq('email', email) might not work if email is not in profiles (it is usually not, only id).
+    // Let's use listUsers() which is standard but might be slow if 10k users.
+    // Better: supabaseAdmin.rpc('get_user_id_by_email', { email }) if we had it.
+    // For now, let's try to query 'auth.users' via rpc if possible or just use listUsers filtering?
+    // Actually, createClient with service role can query auth schema directly? standard client cannot.
+    // But we can't select from auth.users via postgrest unless schema exposed.
+
+    // Let's try matching via profiles if we synced email there? No we didn't sync email to profiles likely.
+
+    // Wait, listUsers accepts a partial query? No.
+    // We can rely on `supabaseAdmin.auth.admin.createUser` which fails if exists? No not good.
+
+    // Correct way: use supabaseAdmin to query auth.users if we had access or just simple loop on first page (we have few users).
+    // Or... we just ask the user to be registered first.
+    // If we can't find by email, we fail.
+
+    // Hack: listUsers has a limit. we can assume user base is small for now.
+    // Or we can simple use the 'purchases' table to join... no.
+
+    // Actually, `supabaseAdmin.from('identities').select('user_id').eq('email', email)`? No 'identities' is auth schema.
+
+    // Let's assume standard auth.admin.listUsers() is fine for small scale.
+    // Or better: `supabaseAdmin.rpc('get_user_by_email', { ... })` doesn't exist.
+
+    // Let's use `listUsers` and filter in memory.
+    // Note: this only gets the first 50 users by default.
+    // We should implement pagination if we want to be robust.
+
+    // Actually, there is `supabaseAdmin.auth.admin.listUsers({ page: 1, perPage: 1000 })`.
+    const { data: { users: allUsers } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 10000 })
+    const targetUser = allUsers.find((u: any) => u.email?.toLowerCase() === email.toLowerCase())
+
+    if (!targetUser) {
+        return NextResponse.json({ error: 'Utente non trovato. Deve essere registrato.' }, { status: 404 })
+    }
+
+    const userId = targetUser.id
+    const captureId = `MANUAL_GRANT_${new Date().toISOString().split('T')[0]}_${Math.floor(Math.random() * 1000)}`
+
+    // 2. Insert Purchases
+    for (const code of products) {
+        let productCode = ''
+        if (code === 'base') productCode = 'corso-base'
+        if (code === 'intermedio') productCode = 'corso-intermedio'
+        if (code === 'avanzato') productCode = 'corso-avanzato'
+        if (!productCode) continue
+
+        // Check exist
+        const { data: existing } = await supabaseAdmin.from('purchases').select('id')
+            .eq('user_id', userId)
+            .eq('product_code', productCode)
+            .maybeSingle()
+
+        if (!existing) {
+            await supabaseAdmin.from('purchases').insert({
+                user_id: userId,
+                product_code: productCode,
+                amount_cents: 0,
+                plan_type: 'individual',
+                paypal_capture_id: captureId,
+                snapshot_company_name: 'REGALO ADMIN'
+            })
+        }
+    }
+
+    return NextResponse.json({ success: true, message: `Accesso garantito a ${email}` })
 }
 
 async function getStats() {

@@ -150,7 +150,14 @@ export default function AdminPage() {
                 </div>
             </div>
 
+
+
             <div className="grid lg:grid-cols-3 gap-8">
+                {/* GRANT ACCESS FORM */}
+                <div className="lg:col-span-1">
+                    <GrantAccessForm />
+                </div>
+
                 {/* ORDERS LIST */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
@@ -250,6 +257,100 @@ export default function AdminPage() {
                     </div>
                 </div>
             </div>
+        </div >
+    )
+}
+
+function GrantAccessForm() {
+    const [email, setEmail] = useState('')
+    const [selected, setSelected] = useState<string[]>(['base', 'intermedio', 'avanzato'])
+    const [loading, setLoading] = useState(false)
+
+    const handleGrant = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!email) return
+        if (selected.length === 0) return alert('Seleziona almeno un livello')
+
+        if (!confirm(`Vuoi davvero regalare l'accesso (${selected.join(', ')}) a ${email}?`)) return
+
+        setLoading(true)
+        const { data: { session } } = await supabase.auth.getSession()
+
+        try {
+            const res = await fetch('/api/admin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session?.access_token}`
+                },
+                body: JSON.stringify({ action: 'grant_access', email, products: selected })
+            })
+
+            const data = await res.json()
+            if (res.ok) {
+                alert('Successo! ' + data.message)
+                setEmail('')
+            } else {
+                alert('Errore: ' + data.error)
+            }
+        } catch (err) {
+            console.error(err)
+            alert('Errore di rete')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    const toggle = (val: string) => {
+        if (selected.includes(val)) setSelected(selected.filter(s => s !== val))
+        else setSelected([...selected, val])
+    }
+
+    return (
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6 h-fit">
+            <h2 className="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">
+                <span className="bg-green-100 text-green-700 p-1 rounded text-xs">NUOVO</span>
+                Regala Accesso
+            </h2>
+            <form onSubmit={handleGrant} className="space-y-4">
+                <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-1">Email Utente</label>
+                    <input
+                        type="email"
+                        required
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        placeholder="amico@esempio.com"
+                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                    />
+                    <p className="text-xs text-slate-400 mt-1">L'utente deve essere già registrato.</p>
+                </div>
+
+                <div>
+                    <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Livelli da Sbloccare</label>
+                    <div className="space-y-2">
+                        {['base', 'intermedio', 'avanzato'].map(l => (
+                            <label key={l} className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                                <input
+                                    type="checkbox"
+                                    checked={selected.includes(l)}
+                                    onChange={() => toggle(l)}
+                                    className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500"
+                                />
+                                <span className="capitalize">{l}</span>
+                            </label>
+                        ))}
+                    </div>
+                </div>
+
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors flex justify-center items-center gap-2"
+                >
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Sblocca Gratis'}
+                </button>
+            </form>
         </div>
     )
 }
