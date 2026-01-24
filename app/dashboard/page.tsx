@@ -6,10 +6,12 @@ import { LogOut, User, Smartphone, Save, Loader2, RefreshCw, Shield } from 'luci
 import Link from 'next/link'
 import Image from 'next/image'
 import TeamDashboard from '@/components/TeamDashboard'
+import SupportSection from '@/components/dashboard/SupportSection'
 
 export default function DashboardPage() {
     const [user, setUser] = useState<any>(null)
     const [loading, setLoading] = useState(true)
+    const [activeTab, setActiveTab] = useState<'profile' | 'devices' | 'support'>('profile')
 
     // Form States
     const [fullName, setFullName] = useState('')
@@ -36,6 +38,21 @@ export default function DashboardPage() {
 
 
     const router = useRouter()
+
+    useEffect(() => {
+        const ping = async () => {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (session) {
+                fetch('/api/heartbeat', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${session.access_token}` }
+                }).catch(() => { })
+            }
+        }
+        ping()
+        const t = setInterval(ping, 60000)
+        return () => clearInterval(t)
+    }, [])
 
     useEffect(() => {
         const checkUser = async () => {
@@ -273,200 +290,230 @@ export default function DashboardPage() {
 
                 <TeamDashboard />
 
+                {/* TABS Navigation */}
+                <div className="flex gap-4 border-b border-gray-200 mb-6 overflow-x-auto">
+                    {['profile', 'devices', 'support'].map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab as any)}
+                            className={`pb-2 px-4 font-medium transition-colors capitalize ${activeTab === tab
+                                ? 'text-primary border-b-2 border-primary'
+                                : 'text-gray-500 hover:text-gray-700'
+                                }`}
+                        >
+                            {tab === 'profile' && 'Profilo'}
+                            {tab === 'devices' && 'Dispositivi'}
+                            {tab === 'support' && 'Assistenza'}
+                        </button>
+                    ))}
+                </div>
+
+                {/* TAB CONTENT */}
+                {activeTab === 'support' && <SupportSection userEmail={user?.email} />}
+
                 {/* Sezione Profilo */}
-                <section className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
-                            <User className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <h2 className="text-xl font-bold text-primary">Dati Fatturazione</h2>
-                            <p className="text-sm text-gray-600">I dati per le fatture dei tuoi acquisti</p>
-                        </div>
-                    </div>
-
-                    <form onSubmit={handleUpdateProfile} className="space-y-6">
-
-                        <div className="grid md:grid-cols-2 gap-4">
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                                <input type="text" value={user?.email} disabled className="w-full px-4 py-2 bg-gray-50 border rounded-lg text-gray-500 cursor-not-allowed" />
+                {activeTab === 'profile' && (
+                    <section className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+                        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary">
+                                <User className="w-5 h-5" />
                             </div>
-
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-800 mb-1">
-                                    {isCompany ? 'Ragione Sociale' : 'Nome e Cognome'}
-                                </label>
-                                <input
-                                    type="text"
-                                    value={fullName}
-                                    onChange={(e) => setFullName(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
-                                />
-                            </div>
-
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-800 mb-1">Indirizzo</label>
-                                <input
-                                    type="text"
-                                    value={address}
-                                    onChange={(e) => setAddress(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
-                                    placeholder="Via Roma 10"
-                                />
-                            </div>
-
                             <div>
-                                <label className="block text-sm font-medium text-gray-800 mb-1">Città</label>
-                                <input
-                                    type="text"
-                                    value={city}
-                                    onChange={(e) => setCity(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-800 mb-1">CAP</label>
-                                <input
-                                    type="text"
-                                    value={cap}
-                                    onChange={(e) => setCap(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-800 mb-1">Codice Fiscale</label>
-                                <input
-                                    type="text"
-                                    value={cf}
-                                    onChange={(e) => setCf(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none uppercase text-black"
-                                />
-                            </div>
-
-                            <div className="md:col-span-2 border-t pt-4 mt-2">
-                                <p className="text-sm font-bold text-gray-500 mb-4">Dati Aziendali (Opzionali)</p>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-800 mb-1">Partita IVA</label>
-                                <input
-                                    type="text"
-                                    value={piva}
-                                    onChange={(e) => setPiva(e.target.value)}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
-                                    placeholder="Solo se richiedi fattura"
-                                />
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-gray-800 mb-1">Codice SDI / PEC</label>
-                                <input
-                                    type="text"
-                                    value={sdi || pec}
-                                    onChange={(e) => {
-                                        // Semplificazione: salviamo nello stesso campo sdi o entrambi se l'utente li scrive
-                                        setSdi(e.target.value)
-                                    }}
-                                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
-                                    placeholder="Codice Univoco o PEC"
-                                />
+                                <h2 className="text-xl font-bold text-primary">Dati Fatturazione</h2>
+                                <p className="text-sm text-gray-600">I dati per le fatture dei tuoi acquisti</p>
                             </div>
                         </div>
 
-                        <div className="flex justify-end pt-4">
-                            <button
-                                type="submit"
-                                disabled={updatingProfile}
-                                className="flex items-center gap-2 px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 shadow-lg shadow-primary/20"
-                            >
-                                {updatingProfile ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                                Salva Dati
-                            </button>
-                        </div>
-                    </form>
-                </section>
+                        <form onSubmit={handleUpdateProfile} className="space-y-6">
+
+                            <div className="grid md:grid-cols-2 gap-4">
+                                <div className="md:col-span-2">
+                                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                    <input id="email" type="text" value={user?.email} disabled className="w-full px-4 py-2 bg-gray-50 border rounded-lg text-gray-500 cursor-not-allowed" />
+                                </div>
+
+                                <div className="md:col-span-2">
+                                    <label htmlFor="fullName" className="block text-sm font-medium text-gray-800 mb-1">
+                                        {isCompany ? 'Ragione Sociale' : 'Nome e Cognome'}
+                                    </label>
+                                    <input
+                                        id="fullName"
+                                        type="text"
+                                        value={fullName}
+                                        onChange={(e) => setFullName(e.target.value)}
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
+                                    />
+                                </div>
+
+                                <div className="md:col-span-2">
+                                    <label htmlFor="address" className="block text-sm font-medium text-gray-800 mb-1">Indirizzo</label>
+                                    <input
+                                        id="address"
+                                        type="text"
+                                        value={address}
+                                        onChange={(e) => setAddress(e.target.value)}
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
+                                        placeholder="Via Roma 10"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="city" className="block text-sm font-medium text-gray-800 mb-1">Città</label>
+                                    <input
+                                        id="city"
+                                        type="text"
+                                        value={city}
+                                        onChange={(e) => setCity(e.target.value)}
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="cap" className="block text-sm font-medium text-gray-800 mb-1">CAP</label>
+                                    <input
+                                        id="cap"
+                                        type="text"
+                                        value={cap}
+                                        onChange={(e) => setCap(e.target.value)}
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="cf" className="block text-sm font-medium text-gray-800 mb-1">Codice Fiscale</label>
+                                    <input
+                                        id="cf"
+                                        type="text"
+                                        value={cf}
+                                        onChange={(e) => setCf(e.target.value)}
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none uppercase text-black"
+                                    />
+                                </div>
+
+                                <div className="md:col-span-2 border-t pt-4 mt-2">
+                                    <p className="text-sm font-bold text-gray-500 mb-4">Dati Aziendali (Opzionali)</p>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-800 mb-1">Partita IVA</label>
+                                    <input
+                                        type="text"
+                                        value={piva}
+                                        onChange={(e) => setPiva(e.target.value)}
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
+                                        placeholder="Solo se richiedi fattura"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-800 mb-1">Codice SDI / PEC</label>
+                                    <input
+                                        type="text"
+                                        value={sdi || pec}
+                                        onChange={(e) => {
+                                            // Semplificazione: salviamo nello stesso campo sdi o entrambi se l'utente li scrive
+                                            setSdi(e.target.value)
+                                        }}
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
+                                        placeholder="Codice Univoco o PEC"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex justify-end pt-4">
+                                <button
+                                    type="submit"
+                                    disabled={updatingProfile}
+                                    className="flex items-center gap-2 px-8 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors disabled:opacity-50 shadow-lg shadow-primary/20"
+                                >
+                                    {updatingProfile ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                                    Salva Dati
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+                )}
 
                 {/* Sezione Dispositivi e Sicurezza */}
-                <section className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
-                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
-                        <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500">
-                            <Shield className="w-5 h-5" />
+                {activeTab === 'devices' && (
+                    <section className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100">
+                        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-gray-100">
+                            <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-500">
+                                <Shield className="w-5 h-5" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold text-primary">Sicurezza e Dispositivi</h2>
+                                <p className="text-sm text-gray-600">Gestisci i dispositivi autorizzati ad accedere al tuo account</p>
+                            </div>
                         </div>
-                        <div>
-                            <h2 className="text-xl font-bold text-primary">Sicurezza e Dispositivi</h2>
-                            <p className="text-sm text-gray-600">Gestisci i dispositivi autorizzati ad accedere al tuo account</p>
+
+                        {/* Info Box */}
+                        <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 mb-6">
+                            <p className="text-sm text-blue-800">
+                                <strong>🔒 Accesso con Google</strong><br />
+                                Il tuo account è protetto dall'autenticazione Google. Puoi accedere da un massimo di 2 dispositivi.
+                            </p>
                         </div>
-                    </div>
 
-                    {/* Info Box */}
-                    <div className="p-4 bg-blue-50 rounded-xl border border-blue-100 mb-6">
-                        <p className="text-sm text-blue-800">
-                            <strong>🔒 Accesso con Google</strong><br />
-                            Il tuo account è protetto dall'autenticazione Google. Puoi accedere da un massimo di 2 dispositivi.
-                        </p>
-                    </div>
+                        {/* Devices List */}
+                        <div className="space-y-3 mb-6">
+                            <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
+                                <Smartphone className="w-4 h-4" />
+                                Dispositivi Autorizzati ({devices.length}/2)
+                            </h3>
 
-                    {/* Devices List */}
-                    <div className="space-y-3 mb-6">
-                        <h3 className="text-sm font-bold text-gray-700 flex items-center gap-2">
-                            <Smartphone className="w-4 h-4" />
-                            Dispositivi Autorizzati ({devices.length}/2)
-                        </h3>
-
-                        {loadingDevices ? (
-                            <p className="text-sm text-gray-500 italic"><Loader2 className="inline w-3 h-3 animate-spin" /> Caricamento dispositivi...</p>
-                        ) : devices.length === 0 ? (
-                            <p className="text-sm text-gray-500 italic">Nessun dispositivo registrato</p>
-                        ) : (
-                            <div className="space-y-2">
-                                {devices.map((device: any) => (
-                                    <div key={device.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-                                        <div className="flex items-center gap-3">
-                                            <Smartphone className="w-5 h-5 text-gray-400" />
-                                            <div>
-                                                <p className="text-sm font-medium text-gray-800">{device.device_name || 'Dispositivo'}</p>
-                                                <p className="text-xs text-gray-500">
-                                                    Aggiunto: {new Date(device.created_at).toLocaleDateString('it-IT')}
-                                                </p>
+                            {loadingDevices ? (
+                                <p className="text-sm text-gray-500 italic"><Loader2 className="inline w-3 h-3 animate-spin" /> Caricamento dispositivi...</p>
+                            ) : devices.length === 0 ? (
+                                <p className="text-sm text-gray-500 italic">Nessun dispositivo registrato</p>
+                            ) : (
+                                <div className="space-y-2">
+                                    {devices.map((device: any) => (
+                                        <div key={device.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
+                                            <div className="flex items-center gap-3">
+                                                <Smartphone className="w-5 h-5 text-gray-400" />
+                                                <div>
+                                                    <p className="text-sm font-medium text-gray-800">{device.device_name || 'Dispositivo'}</p>
+                                                    <p className="text-xs text-gray-500">
+                                                        Aggiunto: {new Date(device.created_at).toLocaleDateString('it-IT')}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Reset Devices */}
-                    <div className="pt-4 border-t border-gray-100">
-                        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                            <div>
-                                <p className="text-sm text-gray-600">
-                                    Hai raggiunto il limite di dispositivi?
-                                </p>
-                                <p className="text-xs text-gray-400 mt-1">
-                                    {canResetDevices
-                                        ? 'Puoi resettare i dispositivi ora.'
-                                        : `Potrai resettare tra ${daysUntilReset || '?'} giorni.`
-                                    }
-                                </p>
-                            </div>
-                            <button
-                                onClick={handleResetDevices}
-                                disabled={!canResetDevices || resettingDevices}
-                                className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                {resettingDevices ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-                                Reset Dispositivi
-                            </button>
+                                    ))}
+                                </div>
+                            )}
                         </div>
-                    </div>
-                </section>
+
+                        {/* Reset Devices */}
+                        <div className="pt-4 border-t border-gray-100">
+                            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                                <div>
+                                    <p className="text-sm text-gray-600">
+                                        Hai raggiunto il limite di dispositivi?
+                                    </p>
+                                    <p className="text-xs text-gray-400 mt-1">
+                                        {canResetDevices
+                                            ? 'Puoi resettare i dispositivi ora.'
+                                            : `Potrai resettare tra ${daysUntilReset || '?'} giorni.`
+                                        }
+                                    </p>
+                                </div>
+                                <button
+                                    onClick={handleResetDevices}
+                                    disabled={!canResetDevices || resettingDevices}
+                                    className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {resettingDevices ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                                    Reset Dispositivi
+                                </button>
+                            </div>
+                        </div>
+                    </section>
+                )}
 
                 {/* UPGRADE LICENZA CTA - Solo per utenti con tutti e 3 i livelli o team < 25 */}
-                {canUpgrade && (
+                {canUpgrade && activeTab === 'profile' && (
                     <section className="bg-gradient-to-br from-indigo-50 to-purple-50 p-6 md:p-8 rounded-2xl shadow-sm border-2 border-indigo-200">
                         <div className="text-center">
                             <div className="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
@@ -493,29 +540,31 @@ export default function DashboardPage() {
                 )}
 
                 {/* Zona Pericolo - Eliminazione Account */}
-                <section className="bg-red-50 p-6 md:p-8 rounded-2xl shadow-sm border border-red-100">
-                    <div className="flex items-center gap-3 mb-6 pb-4 border-b border-red-100">
-                        <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-600">
-                            <LogOut className="w-5 h-5 rotate-180" />
+                {activeTab === 'profile' && (
+                    <section className="bg-red-50 p-6 md:p-8 rounded-2xl shadow-sm border border-red-100">
+                        <div className="flex items-center gap-3 mb-6 pb-4 border-b border-red-100">
+                            <div className="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center text-red-600">
+                                <LogOut className="w-5 h-5 rotate-180" />
+                            </div>
+                            <div>
+                                <h2 className="text-xl font-bold text-red-700">Zona Pericolo</h2>
+                                <p className="text-sm text-red-500">Gestione eliminazione account</p>
+                            </div>
                         </div>
-                        <div>
-                            <h2 className="text-xl font-bold text-red-700">Zona Pericolo</h2>
-                            <p className="text-sm text-red-500">Gestione eliminazione account</p>
-                        </div>
-                    </div>
 
-                    <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-                        <p className="text-gray-600 text-sm">
-                            Vuoi eliminare il tuo account? Puoi gestire la cancellazione nelle impostazioni del profilo.
-                        </p>
-                        <Link
-                            href="/dashboard/account"
-                            className="px-6 py-2 bg-white border border-red-200 text-red-600 font-bold rounded-lg hover:bg-red-600 hover:text-white transition-colors text-sm shadow-sm whitespace-nowrap"
-                        >
-                            Vai alle Impostazioni Account
-                        </Link>
-                    </div>
-                </section>
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+                            <p className="text-gray-600 text-sm">
+                                Vuoi eliminare il tuo account? Puoi gestire la cancellazione nelle impostazioni del profilo.
+                            </p>
+                            <Link
+                                href="/dashboard/account"
+                                className="px-6 py-2 bg-white border border-red-200 text-red-600 font-bold rounded-lg hover:bg-red-600 hover:text-white transition-colors text-sm shadow-sm whitespace-nowrap"
+                            >
+                                Vai alle Impostazioni Account
+                            </Link>
+                        </div>
+                    </section>
+                )}
 
             </main>
 

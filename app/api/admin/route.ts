@@ -53,6 +53,12 @@ export async function POST(request: NextRequest) {
         if (action === 'grant_access') {
             return await grantAccess(body.email, body.products)
         }
+        if (action === 'get_tickets') {
+            return await getTickets()
+        }
+        if (action === 'get_live_users') {
+            return await getLiveUsers()
+        }
 
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
 
@@ -230,4 +236,48 @@ async function sendWarning(email: string, reason: string) {
     })
 
     return NextResponse.json({ success: true })
+}
+
+async function getTickets() {
+    // Fetch tickets with user email
+    // We try to join with auth.users via user_id foreign key if allowed, 
+    // otherwise we just get user_id and client might need to fetch names, but let's try the join first as commonly configured.
+    // If auth schema is not exposed to PostgREST, this join might fail. 
+    // However, purchases query uses it, so it likely works.
+
+    const { data: tickets, error } = await supabaseAdmin
+        .from('tickets')
+        .select(`
+            *,
+            user:user_id (email)
+        `)
+        .order('updated_at', { ascending: false })
+        .limit(50)
+
+    if (error) {
+        console.error('Error fetching tickets:', error)
+        return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    return NextResponse.json({ tickets })
+}
+
+async function getLiveUsers() {
+    // Count active sessions in the last 15 minutes
+    const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000).toISOString()
+
+    // Check user_presence table
+    const { count, error } = await supabaseAdmin
+        .from('user_presence')
+        .select('*', { count: 'exact', head: true })
+        .gt('last_seen_at', fifteenMinutesAgo)
+
+    if (error) {
+        console.error('Error fetching live users:', error)
+        // Fallback or return 0
+        return NextResponse.json({ count: 0 })
+    }
+
+    // console.log(`[Admin] Live Users Count: ${count}`) // Optional debug
+    return NextResponse.json({ count: count || 0 })
 }
