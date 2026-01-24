@@ -145,7 +145,7 @@ export default function SupportSection({ userEmail }: { userEmail: string }) {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Oggetto</label>
                             <input
-                                className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                className="w-full border rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900 placeholder:text-gray-400"
                                 placeholder="Es. Problema col video Caldaie..."
                                 value={newSubject}
                                 onChange={e => setNewSubject(e.target.value)}
@@ -155,7 +155,7 @@ export default function SupportSection({ userEmail }: { userEmail: string }) {
                         <div>
                             <label className="block text-sm font-medium text-gray-700 mb-1">Messaggio</label>
                             <textarea
-                                className="w-full border rounded-lg p-2 h-32 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                className="w-full border rounded-lg p-2 h-32 focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900 placeholder:text-gray-400"
                                 placeholder="Descrivi il problema..."
                                 value={newMsg}
                                 onChange={e => setNewMsg(e.target.value)}
@@ -216,7 +216,7 @@ export default function SupportSection({ userEmail }: { userEmail: string }) {
                 <div className="p-4 border-t bg-white">
                     <form onSubmit={handleSendMessage} className="flex gap-2">
                         <input
-                            className="flex-1 border rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none"
+                            className="flex-1 border rounded-lg p-2 focus:ring-2 focus:ring-indigo-500 outline-none text-gray-900 placeholder:text-gray-400"
                             placeholder="Scrivi un messaggio..."
                             value={chatInput}
                             onChange={e => setChatInput(e.target.value)}

@@ -200,6 +200,7 @@ Simon Silver
 
                 {/* Form Card */}
                 <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 border border-gray-100">
+                    <div className="text-[10px] text-gray-300 font-mono text-center mb-4">Build: INPUT-FIX-01</div>
 
                     {/* Tipo cliente switch */}
                     <div className="flex p-1 bg-gray-100 rounded-xl mb-6">
@@ -252,7 +253,7 @@ Simon Silver
                                     required
                                     value={firstName}
                                     onChange={(e) => setFirstName(e.target.value)}
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-gray-900 placeholder:text-gray-400"
                                     placeholder="Mario"
                                 />
                             </div>
@@ -265,7 +266,7 @@ Simon Silver
                                     required
                                     value={lastName}
                                     onChange={(e) => setLastName(e.target.value)}
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-gray-900 placeholder:text-gray-400"
                                     placeholder="Rossi"
                                 />
                             </div>
@@ -287,7 +288,7 @@ Simon Silver
                                         required
                                         value={companyName}
                                         onChange={(e) => setCompanyName(e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white transition-all"
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white transition-all text-gray-900 placeholder:text-gray-400"
                                         placeholder="Termotecnica SRL"
                                     />
                                 </div>
@@ -301,7 +302,7 @@ Simon Silver
                                             required
                                             value={vatNumber}
                                             onChange={(e) => setVatNumber(e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white transition-all"
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white transition-all text-gray-900 placeholder:text-gray-400"
                                             placeholder="12345678901"
                                         />
                                     </div>
@@ -313,7 +314,7 @@ Simon Silver
                                             type="text"
                                             value={sdiCode}
                                             onChange={(e) => setSdiCode(e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white transition-all"
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white transition-all text-gray-900 placeholder:text-gray-400"
                                             placeholder="XXXXXXX o email@pec.it"
                                         />
                                     </div>
@@ -331,7 +332,7 @@ Simon Silver
                                     type="text"
                                     value={fiscalCode}
                                     onChange={(e) => setFiscalCode(e.target.value.toUpperCase())}
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none uppercase transition-all"
+                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none uppercase transition-all text-gray-900 placeholder:text-gray-400"
                                     placeholder="RSSMRA80A01H501U"
                                     maxLength={16}
                                 />
@@ -352,7 +353,7 @@ Simon Silver
                                         required
                                         value={address}
                                         onChange={(e) => setAddress(e.target.value)}
-                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-gray-900 placeholder:text-gray-400"
                                         placeholder="Via Roma 10"
                                     />
                                 </div>
@@ -367,7 +368,7 @@ Simon Silver
                                             required
                                             value={city}
                                             onChange={(e) => setCity(e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-gray-900 placeholder:text-gray-400"
                                             placeholder="Milano"
                                         />
                                     </div>
@@ -380,7 +381,7 @@ Simon Silver
                                             required
                                             value={postalCode}
                                             onChange={(e) => setPostalCode(e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-gray-900 placeholder:text-gray-400"
                                             placeholder="20100"
                                             maxLength={5}
                                         />
