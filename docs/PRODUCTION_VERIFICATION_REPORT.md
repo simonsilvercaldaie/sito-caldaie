@@ -30,7 +30,7 @@
 - **Whitelist**: La variabile `ADMIN_EMAILS` viene letta da `process.env`.
 - **Logica**: Se l'email dell'utente che chiama l'API NON è nella lista, ritorna `403 Forbidden`.
 - **UI**: La pagina `/admin` fa un controllo preliminare e nasconde il contenuto se non autorizzato.
-- **Test**: Prova ad accedere a `/admin` con un'email diversa da `simonsilver@tiscali.it`. Dovresti vedere "ACCESSO NEGATO".
+- **Test**: Prova ad accedere a `/admin` con un'email diversa da `simonsilvercaldaie@gmail.com`. Dovresti vedere "ACCESSO NEGATO".
 - **Esito**: ✅ **PASS** (Logica implementata correttamente).
 
 ## 4. Flusso Acquisto Completo (Personale & Team)

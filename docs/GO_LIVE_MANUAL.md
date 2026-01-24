@@ -42,7 +42,7 @@ Da eseguire prima del lancio ufficiale. Tempo stimato: 10 minuti.
         *   `PAYPAL_CLIENT_SECRET` (Live)
         *   `NEXT_PUBLIC_PAYMENTS_ENABLED=true`
         *   `INVOICE_NOTIFICATION_EMAIL=fatture@simonsilvercaldaie.it`
-        *   `ADMIN_EMAILS=simonsilver@tiscali.it` (Per pannello admin, vedi punto 4).
+        *   `ADMIN_EMAILS=simonsilvercaldaie@gmail.com` (Per pannello admin, vedi punto 4).
 
 2.  **Deploy**:
     *   Assicurati che l'ultimo commit sia deployato su **Production**.
