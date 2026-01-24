@@ -258,9 +258,17 @@ export default function DashboardPage() {
 
                 <div className="flex items-center justify-between">
                     <h1 className="text-3xl font-bold text-gray-900">Il Mio Account</h1>
-                    <Link href="/" className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 hover:text-primary transition-colors text-sm font-medium shadow-sm">
-                        → Home page
-                    </Link>
+                    <div className="flex gap-2">
+                        {user?.email === 'simonsilvercaldaie@gmail.com' && (
+                            <Link href="/admin" className="px-4 py-2 bg-slate-800 text-white border border-slate-700 rounded-xl hover:bg-slate-900 transition-colors text-sm font-bold shadow-sm flex items-center gap-2">
+                                <Shield className="w-4 h-4" />
+                                Pannello Admin
+                            </Link>
+                        )}
+                        <Link href="/" className="px-4 py-2 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 hover:text-primary transition-colors text-sm font-medium shadow-sm">
+                            → Home page
+                        </Link>
+                    </div>
                 </div>
 
                 <TeamDashboard />
