@@ -13,7 +13,7 @@ const supabaseAdmin = (supabaseUrl && supabaseKey)
     : null as any
 
 // Allowed Admins (Simple Env Var Check)
-const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'simonsilver@tiscali.it').split(',').map(e => e.trim())
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'simonsilver@tiscali.it,simonsilvercaldaie@gmail.com').split(',').map(e => e.trim())
 
 export async function POST(request: NextRequest) {
     try {
