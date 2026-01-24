@@ -43,10 +43,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
         // 2. Fetch messages
         const { data: messages } = await supabaseAdmin
             .from('ticket_messages')
-            .select(`
-                *,
-                sender:sender_id (email)
-            `)
+            .select('*')
             .eq('ticket_id', id)
             .order('created_at', { ascending: true })
 
