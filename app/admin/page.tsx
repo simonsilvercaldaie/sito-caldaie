@@ -60,7 +60,7 @@ export default function AdminPage() {
         })
         if (res.ok) {
             const data = await res.json()
-            setOrders(data.orders)
+            setOrders(data.orders || [])
         }
     }
 
