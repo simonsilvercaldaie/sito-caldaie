@@ -239,18 +239,10 @@ async function sendWarning(email: string, reason: string) {
 }
 
 async function getTickets() {
-    // Fetch tickets with user email
-    // We try to join with auth.users via user_id foreign key if allowed, 
-    // otherwise we just get user_id and client might need to fetch names, but let's try the join first as commonly configured.
-    // If auth schema is not exposed to PostgREST, this join might fail. 
-    // However, purchases query uses it, so it likely works.
-
+    // 1. Fetch tickets without join first (safer)
     const { data: tickets, error } = await supabaseAdmin
         .from('tickets')
-        .select(`
-            *,
-            user:user_id (email)
-        `)
+        .select('*')
         .order('updated_at', { ascending: false })
         .limit(50)
 
@@ -259,7 +251,30 @@ async function getTickets() {
         return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    return NextResponse.json({ tickets })
+    if (!tickets || tickets.length === 0) {
+        return NextResponse.json({ tickets: [] })
+    }
+
+    // 2. Fetch users manually to map emails
+    // We get all users for simplicity (or we could filter by specific IDs if listUsers supports it efficiently, but it doesn't really)
+    // For < 10k users, fetching all ids/emails is fast enough.
+    // Optimization: Collect unique user IDs from tickets? listUsers doesn't support "in" filter easily.
+    // We fall back to fetching latest 1000 users or so.
+    const { data: { users } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
+
+    // Create map
+    const userMap = new Map()
+    users.forEach((u: any) => userMap.set(u.id, u.email))
+
+    // 3. Attach email to tickets
+    const enrichedTickets = tickets.map((t: any) => ({
+        ...t,
+        user: {
+            email: userMap.get(t.user_id) || 'Utente sconosciuto'
+        }
+    }))
+
+    return NextResponse.json({ tickets: enrichedTickets })
 }
 
 async function getLiveUsers() {

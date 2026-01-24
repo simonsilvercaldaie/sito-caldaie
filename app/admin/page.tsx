@@ -172,7 +172,7 @@ export default function AdminPage() {
                             🏠 Home
                         </a>
                     </div>
-                    <p className="text-[10px] text-slate-400 font-mono mt-1">Build: LIVE-USERS-15M-01</p>
+                    <p className="text-[10px] text-slate-400 font-mono mt-1">Build: ADMIN-FIX-TICKETS-01</p>
                 </div>
                 <button onClick={() => window.location.reload()} className="p-2 bg-white rounded-lg shadow-sm hover:shadow">
                     <RefreshCw className="w-5 h-5 text-slate-600" />
