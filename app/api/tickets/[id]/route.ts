@@ -2,14 +2,16 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
-const supabaseAdmin = createClient(supabaseUrl, supabaseKey)
+function getAdminClient() {
+    return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
+}
+
 
 // Allowed Admins
 const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'simonsilvercaldaie@gmail.com').split(',').map(e => e.trim())
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const supabaseAdmin = getAdminClient()
     try {
         const { id } = await params
         const authHeader = request.headers.get('authorization')
@@ -56,6 +58,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 }
 
 export async function POST(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const supabaseAdmin = getAdminClient()
     try {
         const { id } = await params
         const authHeader = request.headers.get('authorization')
@@ -117,6 +120,7 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
 }
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+    const supabaseAdmin = getAdminClient()
     try {
         const { id } = await params
         const authHeader = request.headers.get('authorization')

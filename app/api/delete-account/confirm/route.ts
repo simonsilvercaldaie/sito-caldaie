@@ -3,13 +3,16 @@ import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 
 // Service Role Client
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-)
+// The global supabaseAdmin initialization is removed as per the instruction.
 
 export async function POST(request: NextRequest) {
+    // Initialize supabaseAdmin inside the POST handler
+    const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+    )
+
     try {
         const body = await request.json()
         const { token } = body

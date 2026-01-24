@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabaseClient'
 interface Ticket {
     id: string
     subject: string
-    status: 'open' | 'closed' | 'pending'
+    status: 'open' | 'closed' | 'pending' | 'replied_user' | 'replied_admin'
     created_at: string
     updated_at: string
 }

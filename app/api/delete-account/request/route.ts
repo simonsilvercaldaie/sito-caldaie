@@ -5,13 +5,17 @@ import { checkRateLimit } from '@/lib/rateLimit'
 import { sendEmail } from '@/lib/email'
 
 // Service Role Client
-const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-)
+// Service Role Client
+// Removed top level init
+
 
 export async function POST(request: NextRequest) {
+    const supabaseAdmin = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { autoRefreshToken: false, persistSession: false } }
+    )
+
     try {
         // 1. Auth Check
         const authHeader = request.headers.get('authorization')
