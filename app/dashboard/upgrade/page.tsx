@@ -11,12 +11,12 @@ import { LEGAL_TEXT_CHECKOUT } from '@/lib/legalTexts'
 // Upgrade pricing
 const UPGRADE_PRICES = {
     // From Individual (all 3) to Team
-    'individual_to_team_5': 600,
-    'individual_to_team_10': 1100,
-    'individual_to_team_25': 2100,
+    'individual_to_team_5': 800,
+    'individual_to_team_10': 1800,
+    'individual_to_team_25': 2800,
     // Team to Team
-    'team_5_to_team_10': 500,
-    'team_5_to_team_25': 1500,
+    'team_5_to_team_10': 1000,
+    'team_5_to_team_25': 2000,
     'team_10_to_team_25': 1000,
 }
 

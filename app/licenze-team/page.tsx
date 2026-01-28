@@ -221,23 +221,23 @@ export default function TeamLicensePage() {
                         <TeamCard
                             title="Team 5"
                             users={5}
-                            price="1.500"
+                            price="2.000"
                             code="team_5"
-                            amount={1500}
+                            amount={2000}
                         />
                         <TeamCard
                             title="Team 10"
                             users={10}
-                            price="2.000"
+                            price="3.000"
                             code="team_10"
-                            amount={2000}
+                            amount={3000}
                         />
                         <TeamCard
                             title="Team 25 / Formatore"
                             users={25}
-                            price="3.000"
+                            price="4.000"
                             code="team_25"
-                            amount={3000}
+                            amount={4000}
                         />
                     </div>
 

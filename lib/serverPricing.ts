@@ -3,15 +3,15 @@
 // VERITÀ UNICA PREZZI (Centesimi)
 export const PRODUCT_PRICES_CENTS = {
     // Individual
-    'base': 20000,       // 200 EUR
-    'intermediate': 30000, // 300 EUR
-    'advanced': 40000,   // 400 EUR
-    'complete': 90000,   // 900 EUR
+    'base': 30000,       // 300 EUR
+    'intermediate': 40000, // 400 EUR
+    'advanced': 50000,   // 500 EUR
+    'complete': 120000,  // 1200 EUR
 
     // Team (Complete)
-    'team_5': 150000,    // 1500 EUR
-    'team_10': 200000,   // 2000 EUR
-    'team_25': 300000    // 3000 EUR
+    'team_5': 200000,    // 2000 EUR
+    'team_10': 300000,   // 3000 EUR
+    'team_25': 400000    // 4000 EUR
 } as const
 
 export type ProductCode = keyof typeof PRODUCT_PRICES_CENTS

@@ -1,11 +1,11 @@
 // Logica di pricing per Pacchetti Livello
-// Prezzi: Base €200, Intermedio €300, Avanzato €400
+// Prezzi: Base €300, Intermedio €400, Avanzato €500
 // Non esistono acquisti singoli.
 
 export const PRICES = {
-    PACK_BASE: 200,
-    PACK_INTERMEDIO: 300,
-    PACK_AVANZATO: 400,
+    PACK_BASE: 300,
+    PACK_INTERMEDIO: 400,
+    PACK_AVANZATO: 500,
 } as const
 
 export interface LevelPricingResult {

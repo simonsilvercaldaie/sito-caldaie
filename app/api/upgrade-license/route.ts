@@ -14,11 +14,11 @@ const PAYPAL_API = process.env.PAYPAL_ENV === 'live'
 
 // Expected upgrade prices in cents
 const UPGRADE_PRICES: Record<string, number> = {
-    'individual_to_team_5': 60000,
-    'individual_to_team_10': 110000,
-    'individual_to_team_25': 210000,
-    'team_5_to_team_10': 50000,
-    'team_5_to_team_25': 150000,
+    'individual_to_team_5': 80000,
+    'individual_to_team_10': 180000,
+    'individual_to_team_25': 280000,
+    'team_5_to_team_10': 100000,
+    'team_5_to_team_25': 200000,
     'team_10_to_team_25': 100000,
 }
 
