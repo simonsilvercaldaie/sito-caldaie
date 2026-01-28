@@ -2,11 +2,13 @@
 // Prezzi: Base €300, Intermedio €400, Avanzato €500
 // Non esistono acquisti singoli.
 
+// CENSURA_PREZZI_START - Per ripristinare: Base 300, Intermedio 400, Avanzato 500
 export const PRICES = {
-    PACK_BASE: 300,
-    PACK_INTERMEDIO: 400,
-    PACK_AVANZATO: 500,
+    PACK_BASE: 0,        // CENSURATO (era 300)
+    PACK_INTERMEDIO: 0,  // CENSURATO (era 400)
+    PACK_AVANZATO: 0,    // CENSURATO (era 500)
 } as const
+// CENSURA_PREZZI_END
 
 export interface LevelPricingResult {
     amountToPay: number
