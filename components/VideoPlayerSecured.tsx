@@ -14,6 +14,7 @@ interface VideoPlayerSecuredProps {
  * - Posizione casuale che cambia ogni 20-40 secondi
  * - Opacità 10-15% per deterrenza senza disturbare la visione
  * - Blocco context menu per prevenire download facile
+ * - Opzione rallentamento 0.75x
  */
 export default function VideoPlayerSecured({
     videoUrl,
@@ -22,9 +23,20 @@ export default function VideoPlayerSecured({
     className = ''
 }: VideoPlayerSecuredProps) {
     const containerRef = useRef<HTMLDivElement>(null)
+    const videoRef = useRef<HTMLVideoElement>(null)
     const [watermarkPosition, setWatermarkPosition] = useState({ x: 20, y: 20 })
     const [watermarkOpacity, setWatermarkOpacity] = useState(0.12)
     const [secondaryPosition, setSecondaryPosition] = useState({ x: 70, y: 70 })
+    const [isSlowMode, setIsSlowMode] = useState(false)
+
+    // Gestione velocità playback
+    const toggleSpeed = () => {
+        if (videoRef.current) {
+            const newSpeed = isSlowMode ? 1 : 0.75
+            videoRef.current.playbackRate = newSpeed
+            setIsSlowMode(!isSlowMode)
+        }
+    }
 
     useEffect(() => {
         // Posizione iniziale casuale
@@ -83,6 +95,7 @@ export default function VideoPlayerSecured({
         >
             {/* Video Element */}
             <video
+                ref={videoRef}
                 className="w-full h-full object-cover"
                 controls
                 controlsList="nodownload noplaybackrate"
@@ -93,6 +106,18 @@ export default function VideoPlayerSecured({
             >
                 Il tuo browser non supporta il tag video.
             </video>
+
+            {/* Speed Toggle Button */}
+            <button
+                onClick={toggleSpeed}
+                className={`absolute top-4 left-4 z-20 px-3 py-1.5 rounded-lg font-medium text-sm transition-all duration-200 ${isSlowMode
+                        ? 'bg-amber-500 text-white shadow-lg'
+                        : 'bg-black/50 text-white/80 hover:bg-black/70'
+                    }`}
+                title={isSlowMode ? 'Velocità normale' : 'Rallenta 25%'}
+            >
+                {isSlowMode ? '🐢 0.75x' : '1x'}
+            </button>
 
             {/* Primary Watermark - Full info */}
             <div
