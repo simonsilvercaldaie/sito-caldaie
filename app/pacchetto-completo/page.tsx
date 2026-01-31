@@ -2,8 +2,7 @@
 import { useState, useEffect } from 'react'
 import Navbar from "@/components/Navbar"
 import Link from "next/link"
-import { Package, CheckCircle2, Sparkles, ArrowRight } from "lucide-react"
-import { PayPalBtn } from "@/components/PayPalBtn"
+import { Package, CheckCircle2, Sparkles, ArrowRight, ShieldCheck, Star } from "lucide-react"
 import { supabase } from "@/lib/supabaseClient"
 import { LEGAL_TEXT_CHECKOUT } from "@/lib/legalTexts"
 
@@ -106,201 +105,164 @@ export default function PacchettoCompletoPage() {
         }
     }
 
-    const handlePurchaseSuccess = async (orderId: string) => {
-        const { data: { session } } = await supabase.auth.getSession()
-        const accessToken = session?.access_token
-
-        if (!accessToken) return
-
-        try {
-            const res = await fetch('/api/complete-purchase', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`
-                },
-                body: JSON.stringify({
-                    orderId,
-                    product_code: 'complete_bundle',
-                    amount_cents: BUNDLE_PRICE * 100,
-                    plan_type: 'individual'
-                })
-            })
-
-            const data = await res.json()
-
-            if (res.ok) {
-                // Send confirmation email
-                if (data.email) {
-                    try {
-                        const emailData = {
-                            service_id: 'service_i4y7ewt',
-                            template_id: 'template_sotc25n',
-                            user_id: 'NcJg5-hiu3gVJiJZ-',
-                            template_params: {
-                                from_name: 'Simon Silver Caldaie',
-                                to_email: data.email,
-                                subject: '✅ Conferma Acquisto - Pacchetto Completo',
-                                message: `Ciao! Grazie per il tuo acquisto.\n\nHai sbloccato con successo:\nPACCHETTO COMPLETO (27 Video - Tutti i 3 Livelli)\n\nPuoi accedere subito ai tuoi corsi qui:\nhttps://simonsilvercaldaie.it/catalogo\n\nBuono studio!\nSimon Silver`
-                            }
-                        }
-                        await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(emailData)
-                        })
-                    } catch (emailErr) {
-                        console.error('Email error:', emailErr)
-                    }
-                }
-                window.location.href = `/ordine/${orderId}`
-            } else {
-                alert('Errore nel completamento dell\'ordine. Contatta l\'assistenza.')
-            }
-        } catch (err) {
-            console.error(err)
-            alert('Errore di rete.')
-        }
-    }
-
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 to-slate-800">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
                 <div className="w-12 h-12 border-4 border-amber-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
         )
     }
 
     return (
-        <div className="min-h-screen flex flex-col font-sans bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+        <div className="min-h-screen flex flex-col font-sans bg-gray-50">
             <Navbar />
 
-            <main className="flex-grow py-16 px-4">
-                <div className="max-w-3xl mx-auto">
+            <main className="flex-grow py-12 px-4">
+                <div className="max-w-4xl mx-auto">
                     {/* Header */}
-                    <div className="text-center mb-12">
-                        <div className="inline-flex items-center gap-2 bg-amber-500/20 text-amber-400 px-4 py-2 rounded-full text-sm font-bold mb-6">
+                    <div className="text-center mb-10">
+                        <div className="inline-flex items-center gap-2 bg-amber-100 text-amber-700 px-4 py-2 rounded-full text-sm font-bold mb-6 shadow-sm border border-amber-200">
                             <Sparkles className="w-4 h-4" />
                             OFFERTA SPECIALE
                         </div>
-                        <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4">
-                            Pacchetto <span className="text-amber-400">Completo</span>
+                        <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4 tracking-tight">
+                            Pacchetto <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-600">Completo</span>
                         </h1>
-                        <p className="text-xl text-slate-300">
-                            Tutti e 3 i livelli insieme. <strong className="text-amber-400">Risparmi €100!</strong>
+                        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                            Tutti e 3 i livelli insieme per una formazione completa. <br />
+                            <strong className="text-amber-600">Risparmi €100</strong> rispetto all'acquisto singolo.
                         </p>
                     </div>
 
                     {/* Main Card */}
-                    <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-3xl p-8 md:p-12 shadow-2xl border border-slate-600">
+                    <div className="bg-white rounded-3xl p-8 md:p-12 shadow-2xl border border-gray-100 relative overflow-hidden">
+                        {/* Decorative background blob */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-amber-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none"></div>
+
                         {hasPurchased ? (
-                            <div className="text-center py-8">
-                                <div className="p-4 bg-green-500/20 rounded-full inline-block mb-4">
-                                    <CheckCircle2 className="w-16 h-16 text-green-400" />
+                            <div className="text-center py-8 relative z-10">
+                                <div className="p-4 bg-green-100 text-green-600 rounded-full inline-block mb-4">
+                                    <CheckCircle2 className="w-16 h-16" />
                                 </div>
-                                <h2 className="text-2xl font-bold text-white mb-2">Hai già accesso completo!</h2>
-                                <p className="text-slate-300 mb-6">Tutti i 27 corsi sono già sbloccati nel tuo account.</p>
+                                <h2 className="text-3xl font-bold text-gray-900 mb-2">Hai già accesso completo!</h2>
+                                <p className="text-gray-600 mb-8 text-lg">Tutti i 27 corsi sono già sbloccati nel tuo account.</p>
                                 <Link
                                     href="/catalogo"
-                                    className="inline-flex items-center gap-2 bg-green-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-green-500 transition-colors"
+                                    className="inline-flex items-center gap-2 bg-green-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-green-700 transition-all hover:shadow-lg hover:-translate-y-0.5"
                                 >
                                     Vai ai Corsi <ArrowRight className="w-5 h-5" />
                                 </Link>
                             </div>
                         ) : (
-                            <>
-                                {/* Price Section */}
-                                <div className="text-center mb-8">
-                                    <div className="flex items-center justify-center gap-4 mb-2">
-                                        <span className="text-3xl text-slate-400 line-through">€{FULL_PRICE}</span>
-                                        <span className="text-6xl font-extrabold text-white">€{BUNDLE_PRICE}</span>
+                            <div className="grid md:grid-cols-2 gap-12 relative z-10">
+                                {/* Left Side: Value Proposition */}
+                                <div className="space-y-8">
+                                    <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
+                                        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
+                                            <Package className="w-5 h-5 text-amber-500" />
+                                            Cosa include il pacchetto:
+                                        </h3>
+                                        <ul className="space-y-4">
+                                            <li className="flex items-center gap-3 text-gray-700">
+                                                <div className="bg-green-100 p-1.5 rounded-lg text-green-600">
+                                                    <CheckCircle2 className="w-5 h-5" />
+                                                </div>
+                                                <span><strong className="text-green-700">Livello Base</strong> (9 video)</span>
+                                            </li>
+                                            <li className="flex items-center gap-3 text-gray-700">
+                                                <div className="bg-blue-100 p-1.5 rounded-lg text-blue-600">
+                                                    <CheckCircle2 className="w-5 h-5" />
+                                                </div>
+                                                <span><strong className="text-blue-700">Livello Intermedio</strong> (9 video)</span>
+                                            </li>
+                                            <li className="flex items-center gap-3 text-gray-700">
+                                                <div className="bg-purple-100 p-1.5 rounded-lg text-purple-600">
+                                                    <CheckCircle2 className="w-5 h-5" />
+                                                </div>
+                                                <span><strong className="text-purple-700">Livello Avanzato</strong> (9 video)</span>
+                                            </li>
+                                        </ul>
                                     </div>
-                                    <div className="inline-block bg-amber-500 text-slate-900 font-bold px-4 py-1 rounded-full text-sm">
-                                        RISPARMI €{FULL_PRICE - BUNDLE_PRICE}
-                                    </div>
-                                </div>
 
-                                {/* What's Included */}
-                                <div className="bg-slate-900/50 rounded-2xl p-6 mb-8">
-                                    <h3 className="font-bold text-white mb-4 flex items-center gap-2">
-                                        <Package className="w-5 h-5 text-amber-400" />
-                                        Cosa include:
-                                    </h3>
-                                    <ul className="space-y-3">
-                                        <li className="flex items-center gap-3 text-slate-200">
-                                            <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0" />
-                                            <span><strong className="text-green-400">Livello Base</strong> - 9 video corsi (valore €300)</span>
-                                        </li>
-                                        <li className="flex items-center gap-3 text-slate-200">
-                                            <CheckCircle2 className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                                            <span><strong className="text-blue-400">Livello Intermedio</strong> - 9 video corsi (valore €400)</span>
-                                        </li>
-                                        <li className="flex items-center gap-3 text-slate-200">
-                                            <CheckCircle2 className="w-5 h-5 text-purple-400 flex-shrink-0" />
-                                            <span><strong className="text-purple-400">Livello Avanzato</strong> - 9 video corsi (valore €500)</span>
-                                        </li>
-                                        <li className="flex items-center gap-3 text-slate-200 pt-2 border-t border-slate-600">
-                                            <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                                            <span><strong>27 video totali</strong> - Accesso a vita</span>
-                                        </li>
-                                    </ul>
-                                </div>
-
-                                {/* Purchase Section */}
-                                {user ? (
                                     <div className="space-y-4">
-                                        <label className={`flex items-start gap-3 text-sm text-slate-300 cursor-pointer p-4 bg-slate-900/50 rounded-xl border-2 ${tosAccepted ? 'border-amber-500/50' : 'border-slate-600'} transition-all ${tosLoading ? 'opacity-50 pointer-events-none' : ''}`}>
-                                            <input
-                                                type="checkbox"
-                                                checked={tosAccepted}
-                                                onChange={(e) => handleTosCheckbox(e.target.checked)}
-                                                disabled={tosLoading}
-                                                className="mt-1 w-5 h-5 accent-amber-500 flex-shrink-0"
-                                            />
-                                            <span>
-                                                Dichiaro di aver letto e accettato i{' '}
-                                                <Link href="/termini" target="_blank" className="text-amber-400 underline">Termini d'Uso</Link>
-                                                {' '}e le condizioni di vendita.
-                                            </span>
-                                        </label>
-
-                                        <div className="text-xs text-slate-500 bg-slate-900/30 p-3 rounded-lg">
-                                            {LEGAL_TEXT_CHECKOUT}
+                                        <div className="flex items-center gap-3">
+                                            <ShieldCheck className="w-6 h-6 text-gray-400" />
+                                            <span className="text-sm text-gray-500 font-medium">Garanzia Soddifatti o Rimborsati (30gg)</span>
                                         </div>
+                                        <div className="flex items-center gap-3">
+                                            <Star className="w-6 h-6 text-gray-400" />
+                                            <span className="text-sm text-gray-500 font-medium">Accesso a vita e aggiornamenti inclusi</span>
+                                        </div>
+                                    </div>
+                                </div>
 
-                                        {tosAccepted ? (
-                                            // DISABILITATO TEMPORANEAMENTE
-                                            <div className="text-center p-4 bg-slate-900/50 rounded-xl border-2 border-dashed border-slate-600">
-                                                <p className="font-bold text-slate-400 mb-1">Acquisti momentaneamente sospesi</p>
-                                                <p className="text-xs text-slate-500">In attesa del caricamento dei video definitivi.</p>
+                                {/* Right Side: Price & Action */}
+                                <div className="flex flex-col justify-center">
+                                    <div className="text-center mb-8 bg-amber-50 rounded-2xl p-6 border border-amber-100">
+                                        <p className="text-sm font-bold text-amber-800 uppercase tracking-wider mb-2">Prezzo Totale</p>
+                                        <div className="flex items-end justify-center gap-3 mb-2">
+                                            <span className="text-3xl text-gray-400 line-through font-medium translate-y-[-4px]">€{FULL_PRICE}</span>
+                                            <span className="text-6xl font-extrabold text-gray-900 tracking-tight">€{BUNDLE_PRICE}</span>
+                                        </div>
+                                        <div className="inline-block bg-white text-green-700 font-bold px-4 py-1.5 rounded-full text-sm shadow-sm border border-green-100">
+                                            Risparmi €{FULL_PRICE - BUNDLE_PRICE} subito
+                                        </div>
+                                    </div>
+
+                                    {user ? (
+                                        <div className="space-y-4">
+                                            <label className={`flex items-start gap-3 text-sm text-gray-600 cursor-pointer p-4 bg-gray-50 rounded-xl border-2 ${tosAccepted ? 'border-amber-500 bg-amber-50/50' : 'border-gray-200'} transition-all hover:border-amber-300 ${tosLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={tosAccepted}
+                                                    onChange={(e) => handleTosCheckbox(e.target.checked)}
+                                                    disabled={tosLoading}
+                                                    className="mt-1 w-5 h-5 accent-amber-500 flex-shrink-0"
+                                                />
+                                                <span className="leading-snug">
+                                                    Dichiaro di aver letto e accettato i{' '}
+                                                    <Link href="/termini" target="_blank" className="text-amber-600 underline hover:text-amber-700">Termini d'Uso</Link>
+                                                    {' '}e le condizioni di vendita.
+                                                </span>
+                                            </label>
+
+                                            <div className="text-xs text-gray-500 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                                                {LEGAL_TEXT_CHECKOUT.slice(0, 150)}...
                                             </div>
-                                        ) : (
-                                            <button disabled className="w-full py-4 bg-slate-600 text-slate-400 font-bold rounded-xl cursor-not-allowed">
-                                                Accetta i Termini per procedere
-                                            </button>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <div className="text-center">
-                                        <Link
-                                            href="/login"
-                                            className="inline-block w-full py-4 bg-amber-500 text-slate-900 font-bold rounded-xl hover:bg-amber-400 transition-colors text-lg"
-                                        >
-                                            Accedi per Acquistare
-                                        </Link>
-                                        <p className="text-sm text-slate-400 mt-3">
-                                            Hai già acquistato? <Link href="/login" className="text-amber-400 underline">Accedi</Link>
-                                        </p>
-                                    </div>
-                                )}
-                            </>
+
+                                            {tosAccepted ? (
+                                                <div className="text-center p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                                                    <p className="font-bold text-gray-500 mb-1">Acquisti momentaneamente sospesi</p>
+                                                    <p className="text-xs text-gray-400">In attesa del caricamento dei video definitivi.</p>
+                                                </div>
+                                            ) : (
+                                                <button disabled className="w-full py-4 bg-gray-200 text-gray-400 font-bold rounded-xl cursor-not-allowed">
+                                                    Accetta i Termini per procedere
+                                                </button>
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="text-center space-y-3">
+                                            <Link
+                                                href="/login"
+                                                className="block w-full py-4 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5 text-lg"
+                                            >
+                                                Accedi per Acquistare
+                                            </Link>
+                                            <p className="text-sm text-gray-500">
+                                                Hai già un account? <Link href="/login" className="text-amber-600 font-semibold hover:underline">Accedi qui</Link>
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         )}
                     </div>
 
                     {/* Back Link */}
-                    <div className="text-center mt-8">
-                        <Link href="/catalogo" className="text-slate-400 hover:text-white transition-colors">
-                            ← Torna al Catalogo
+                    <div className="text-center mt-12">
+                        <Link href="/catalogo" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors font-medium">
+                            <ArrowRight className="w-4 h-4 rotate-180" /> Torna al Catalogo
                         </Link>
                     </div>
                 </div>

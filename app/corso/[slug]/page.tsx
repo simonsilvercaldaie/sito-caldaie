@@ -549,23 +549,21 @@ export default function CorsoPage() {
                                         </Link>
 
                                         {/* Banner Promo Bundle Completo */}
+                                        {/* Banner Promo Bundle Completo */}
                                         <Link
                                             href="/pacchetto-completo"
-                                            className="block bg-gradient-to-r from-amber-50 to-orange-50 border-2 border-amber-300 rounded-2xl p-5 cursor-pointer hover:border-amber-500 hover:shadow-lg transition-all duration-300 group"
+                                            className="block bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 rounded-3xl p-8 cursor-pointer hover:border-amber-500 hover:shadow-lg transition-all duration-300 group text-center"
                                         >
-                                            <div className="flex items-center gap-4">
-                                                <div className="p-3 bg-amber-100 text-amber-600 rounded-xl group-hover:scale-110 transition-transform">
-                                                    <Package className="w-8 h-8" />
+                                            <div className="flex flex-col items-center gap-4">
+                                                <div className="p-4 bg-amber-100 text-amber-600 rounded-2xl group-hover:scale-110 transition-transform shadow-sm">
+                                                    <Package className="w-10 h-10" />
                                                 </div>
-                                                <div className="flex-1">
-                                                    <h4 className="font-bold text-amber-900 mb-1">Vuoi tutti e 3 i livelli?</h4>
-                                                    <p className="text-sm text-amber-700">
-                                                        Acquistali insieme e <strong>risparmi €100!</strong>
+                                                <div>
+                                                    <h4 className="font-bold text-2xl text-amber-900 mb-2">Vuoi tutti e 3 i livelli?</h4>
+                                                    <p className="text-amber-800 leading-relaxed">
+                                                        Acquistali insieme e<br />
+                                                        <span className="font-bold bg-amber-200/50 px-2 rounded-md">risparmi €100!</span>
                                                     </p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <div className="text-xs text-amber-600 line-through">€1200</div>
-                                                    <div className="text-xl font-extrabold text-amber-900">€1100</div>
                                                 </div>
                                             </div>
                                         </Link>
