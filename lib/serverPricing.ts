@@ -6,7 +6,8 @@ export const PRODUCT_PRICES_CENTS = {
     'intermediate': 40000, // 400 EUR
     'advanced': 50000,   // 500 EUR
     'complete': 120000,  // 1200 EUR (prezzo pieno)
-    'complete_bundle': 110000, // 1100 EUR (bundle scontato -100€)
+    'complete_bundle': 110000, // 1100 EUR (bundle scontato standard)
+    'complete_bundle_promo': 100000, // 1000 EUR (bundle con sconto TECNICI-FB)
 
     // Team (Complete)
     'team_5': 200000,    // 2000 EUR

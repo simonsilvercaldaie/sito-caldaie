@@ -2,12 +2,14 @@
 import { useState, useEffect } from 'react'
 import Navbar from "@/components/Navbar"
 import Link from "next/link"
-import { Package, CheckCircle2, Sparkles, ArrowRight, ShieldCheck, Star } from "lucide-react"
+import { Package, CheckCircle2, Sparkles, ArrowRight, ShieldCheck, Star, Tag } from "lucide-react"
 import { supabase } from "@/lib/supabaseClient"
 import { LEGAL_TEXT_CHECKOUT } from "@/lib/legalTexts"
 
-const BUNDLE_PRICE = 1100 // €1100 invece di €1200
+const BUNDLE_PRICE = 1100 // €1100
 const FULL_PRICE = 1200
+const PROMO_PRICE = 1000 // €1000 con sconto
+const PROMO_CODE_VALID = "TECNICI-FB"
 
 export default function PacchettoCompletoPage() {
     const [user, setUser] = useState<any>(null)
@@ -15,6 +17,11 @@ export default function PacchettoCompletoPage() {
     const [tosAccepted, setTosAccepted] = useState(false)
     const [tosLoading, setTosLoading] = useState(false)
     const [hasPurchased, setHasPurchased] = useState(false)
+
+    // Promo Code State
+    const [promoCodeInput, setPromoCodeInput] = useState("")
+    const [isPromoApplied, setIsPromoApplied] = useState(false)
+    const [promoError, setPromoError] = useState("")
 
     useEffect(() => {
         const checkUser = async () => {
@@ -64,6 +71,16 @@ export default function PacchettoCompletoPage() {
         return () => subscription.unsubscribe()
     }, [])
 
+    const handleApplyPromo = () => {
+        if (promoCodeInput.trim().toUpperCase() === PROMO_CODE_VALID) {
+            setIsPromoApplied(true)
+            setPromoError("")
+        } else {
+            setIsPromoApplied(false)
+            setPromoError("Codice non valido")
+        }
+    }
+
     const handleTosCheckbox = async (checked: boolean) => {
         if (!checked) {
             setTosAccepted(false)
@@ -105,6 +122,14 @@ export default function PacchettoCompletoPage() {
         }
     }
 
+    // Logic for Purchase (Disabled currently, but prepared for future)
+    const handlePurchase = async (orderId: string) => {
+        // ... Logic adapted to send correct product code
+        const productCode = isPromoApplied ? 'complete_bundle_promo' : 'complete_bundle'
+        const amountCents = isPromoApplied ? PROMO_PRICE * 100 : BUNDLE_PRICE * 100
+        // ... rest of logic
+    }
+
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -112,6 +137,9 @@ export default function PacchettoCompletoPage() {
             </div>
         )
     }
+
+    const currentPrice = isPromoApplied ? PROMO_PRICE : BUNDLE_PRICE
+    const savings = FULL_PRICE - currentPrice
 
     return (
         <div className="min-h-screen flex flex-col font-sans bg-gray-50">
@@ -129,8 +157,7 @@ export default function PacchettoCompletoPage() {
                             Pacchetto <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-orange-600">Completo</span>
                         </h1>
                         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                            Tutti e 3 i livelli insieme per una formazione completa. <br />
-                            <strong className="text-amber-600">Risparmi €100</strong> rispetto all'acquisto singolo.
+                            Tutti e 3 i livelli insieme per una formazione completa.
                         </p>
                     </div>
 
@@ -198,15 +225,52 @@ export default function PacchettoCompletoPage() {
 
                                 {/* Right Side: Price & Action */}
                                 <div className="flex flex-col justify-center">
-                                    <div className="text-center mb-8 bg-amber-50 rounded-2xl p-6 border border-amber-100">
+                                    <div className="text-center mb-6 bg-amber-50 rounded-2xl p-6 border border-amber-100">
                                         <p className="text-sm font-bold text-amber-800 uppercase tracking-wider mb-2">Prezzo Totale</p>
                                         <div className="flex items-end justify-center gap-3 mb-2">
                                             <span className="text-3xl text-gray-400 line-through font-medium translate-y-[-4px]">€{FULL_PRICE}</span>
-                                            <span className="text-6xl font-extrabold text-gray-900 tracking-tight">€{BUNDLE_PRICE}</span>
+                                            <span className="text-6xl font-extrabold text-gray-900 tracking-tight">€{currentPrice}</span>
                                         </div>
                                         <div className="inline-block bg-white text-green-700 font-bold px-4 py-1.5 rounded-full text-sm shadow-sm border border-green-100">
-                                            Risparmi €{FULL_PRICE - BUNDLE_PRICE} subito
+                                            Risparmi €{savings} subito
                                         </div>
+                                    </div>
+
+                                    {/* Promo Code Input */}
+                                    <div className="mb-6">
+                                        {!isPromoApplied ? (
+                                            <div className="flex gap-2">
+                                                <input
+                                                    type="text"
+                                                    placeholder="Codice Promozionale"
+                                                    value={promoCodeInput}
+                                                    onChange={(e) => setPromoCodeInput(e.target.value)}
+                                                    className="flex-1 px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-amber-500 uppercase text-sm"
+                                                />
+                                                <button
+                                                    onClick={handleApplyPromo}
+                                                    className="bg-gray-800 text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-gray-700 transition-colors"
+                                                >
+                                                    Applica
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center justify-between bg-green-50 px-4 py-3 rounded-xl border border-green-200">
+                                                <div className="flex items-center gap-2 text-green-700 font-bold text-sm">
+                                                    <Tag className="w-4 h-4" />
+                                                    Sconto TECNICI-FB applicato!
+                                                </div>
+                                                <button
+                                                    onClick={() => { setIsPromoApplied(false); setPromoCodeInput("") }}
+                                                    className="text-xs text-gray-500 hover:text-red-500 underline"
+                                                >
+                                                    Rimuovi
+                                                </button>
+                                            </div>
+                                        )}
+                                        {promoError && (
+                                            <p className="text-red-500 text-xs mt-2 ml-1">{promoError}</p>
+                                        )}
                                     </div>
 
                                     {user ? (
