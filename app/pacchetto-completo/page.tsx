@@ -183,35 +183,33 @@ export default function PacchettoCompletoPage() {
                         ) : (
                             <div className="grid md:grid-cols-2 gap-12 relative z-10">
                                 {/* Left Side: Value Proposition */}
-                                <div className="space-y-8">
-                                    <div className="bg-gray-50 rounded-2xl p-6 border border-gray-200">
-                                        <h3 className="font-bold text-gray-900 mb-4 flex items-center gap-2 text-lg">
-                                            <Package className="w-5 h-5 text-amber-500" />
+                                <div className="space-y-8 flex flex-col justify-center">
+                                    <div className="bg-gray-50 rounded-2xl p-8 border border-gray-200 h-full flex flex-col justify-center">
+                                        <h3 className="font-bold text-gray-900 mb-6 flex items-center gap-2 text-xl">
+                                            <Package className="w-6 h-6 text-amber-500" />
                                             Cosa include il pacchetto:
                                         </h3>
-                                        <ul className="space-y-4">
-                                            <li className="flex items-center gap-3 text-gray-700">
-                                                <div className="bg-blue-100 p-1.5 rounded-lg text-blue-600">
-                                                    <CheckCircle2 className="w-5 h-5" />
+                                        <ul className="space-y-8">
+                                            <li className="flex items-center gap-4 text-gray-700">
+                                                <div className="bg-blue-100 p-2 rounded-xl text-blue-600 shadow-sm">
+                                                    <CheckCircle2 className="w-6 h-6" />
                                                 </div>
-                                                <span><strong className="text-blue-700">Livello Base</strong> (9 video)</span>
+                                                <span className="text-lg"><strong className="text-blue-700">Livello Base</strong> (9 video)</span>
                                             </li>
-                                            <li className="flex items-center gap-3 text-gray-700">
-                                                <div className="bg-green-100 p-1.5 rounded-lg text-green-600">
-                                                    <CheckCircle2 className="w-5 h-5" />
+                                            <li className="flex items-center gap-4 text-gray-700">
+                                                <div className="bg-green-100 p-2 rounded-xl text-green-600 shadow-sm">
+                                                    <CheckCircle2 className="w-6 h-6" />
                                                 </div>
-                                                <span><strong className="text-green-700">Livello Intermedio</strong> (9 video)</span>
+                                                <span className="text-lg"><strong className="text-green-700">Livello Intermedio</strong> (9 video)</span>
                                             </li>
-                                            <li className="flex items-center gap-3 text-gray-700">
-                                                <div className="bg-red-100 p-1.5 rounded-lg text-red-600">
-                                                    <CheckCircle2 className="w-5 h-5" />
+                                            <li className="flex items-center gap-4 text-gray-700">
+                                                <div className="bg-red-100 p-2 rounded-xl text-red-600 shadow-sm">
+                                                    <CheckCircle2 className="w-6 h-6" />
                                                 </div>
-                                                <span><strong className="text-red-700">Livello Avanzato</strong> (9 video)</span>
+                                                <span className="text-lg"><strong className="text-red-700">Livello Avanzato</strong> (9 video)</span>
                                             </li>
                                         </ul>
                                     </div>
-
-                                    {/* Testo Garanzia Rimosso */}
                                 </div>
 
                                 {/* Right Side: Price & Action */}
