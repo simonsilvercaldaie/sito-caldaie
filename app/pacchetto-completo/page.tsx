@@ -191,36 +191,27 @@ export default function PacchettoCompletoPage() {
                                         </h3>
                                         <ul className="space-y-4">
                                             <li className="flex items-center gap-3 text-gray-700">
-                                                <div className="bg-green-100 p-1.5 rounded-lg text-green-600">
-                                                    <CheckCircle2 className="w-5 h-5" />
-                                                </div>
-                                                <span><strong className="text-green-700">Livello Base</strong> (9 video)</span>
-                                            </li>
-                                            <li className="flex items-center gap-3 text-gray-700">
                                                 <div className="bg-blue-100 p-1.5 rounded-lg text-blue-600">
                                                     <CheckCircle2 className="w-5 h-5" />
                                                 </div>
-                                                <span><strong className="text-blue-700">Livello Intermedio</strong> (9 video)</span>
+                                                <span><strong className="text-blue-700">Livello Base</strong> (9 video)</span>
                                             </li>
                                             <li className="flex items-center gap-3 text-gray-700">
-                                                <div className="bg-purple-100 p-1.5 rounded-lg text-purple-600">
+                                                <div className="bg-green-100 p-1.5 rounded-lg text-green-600">
                                                     <CheckCircle2 className="w-5 h-5" />
                                                 </div>
-                                                <span><strong className="text-purple-700">Livello Avanzato</strong> (9 video)</span>
+                                                <span><strong className="text-green-700">Livello Intermedio</strong> (9 video)</span>
+                                            </li>
+                                            <li className="flex items-center gap-3 text-gray-700">
+                                                <div className="bg-red-100 p-1.5 rounded-lg text-red-600">
+                                                    <CheckCircle2 className="w-5 h-5" />
+                                                </div>
+                                                <span><strong className="text-red-700">Livello Avanzato</strong> (9 video)</span>
                                             </li>
                                         </ul>
                                     </div>
 
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-3">
-                                            <ShieldCheck className="w-6 h-6 text-gray-400" />
-                                            <span className="text-sm text-gray-500 font-medium">Garanzia Soddifatti o Rimborsati (30gg)</span>
-                                        </div>
-                                        <div className="flex items-center gap-3">
-                                            <Star className="w-6 h-6 text-gray-400" />
-                                            <span className="text-sm text-gray-500 font-medium">Accesso a vita e aggiornamenti inclusi</span>
-                                        </div>
-                                    </div>
+                                    {/* Testo Garanzia Rimosso */}
                                 </div>
 
                                 {/* Right Side: Price & Action */}
