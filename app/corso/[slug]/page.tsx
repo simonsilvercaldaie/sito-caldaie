@@ -562,7 +562,7 @@ export default function CorsoPage() {
                                                     <h4 className="font-bold text-2xl text-amber-900 mb-2">Vuoi tutti e 3 i livelli?</h4>
                                                     <p className="text-amber-800 leading-relaxed">
                                                         Acquistali insieme e<br />
-                                                        <span className="font-bold bg-amber-200/50 px-2 rounded-md">risparmi €100!</span>
+                                                        <span className="font-bold bg-amber-200/50 px-2 rounded-md">risparmi €200!</span>
                                                     </p>
                                                 </div>
                                             </div>
