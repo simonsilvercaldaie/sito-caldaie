@@ -182,8 +182,15 @@ export default function TeamLicensePage() {
         <div className="min-h-screen flex flex-col font-sans bg-slate-50">
             <Navbar />
 
-            <main className="flex-grow py-20 px-4">
+            <main className="flex-grow py-12 px-4">
                 <div className="max-w-6xl mx-auto">
+                    {/* Back Link */}
+                    <div className="mb-8">
+                        <Link href="/catalogo" className="inline-flex items-center gap-2 text-gray-500 hover:text-indigo-600 transition-colors font-medium">
+                            <ArrowRight className="w-4 h-4 rotate-180" /> Torna al Catalogo
+                        </Link>
+                    </div>
+
                     <div className="text-center mb-16">
                         <span className="text-indigo-600 font-bold tracking-wider uppercase text-sm bg-indigo-50 px-4 py-2 rounded-full mb-4 inline-block">
                             Per Aziende e Centri Assistenza
@@ -239,13 +246,6 @@ export default function TeamLicensePage() {
                             code="team_25"
                             amount={5000}
                         />
-                    </div>
-
-                    {/* Back Link */}
-                    <div className="text-center mt-12">
-                        <Link href="/catalogo" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors font-medium">
-                            <ArrowRight className="w-4 h-4 rotate-180" /> Torna al Catalogo
-                        </Link>
                     </div>
                 </div>
             </main>
