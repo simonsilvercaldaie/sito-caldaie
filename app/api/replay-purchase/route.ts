@@ -260,7 +260,10 @@ export async function POST(request: NextRequest) {
 
         if (isTeam) {
             // --- LOGICA TEAM (Copiata da complete-purchase per coerenza) ---
-            const seats = parseInt(productCode.split('_')[1])
+            // Il numero nel product_code (es. team_5) indica i posti invitabili
+            // +1 per includere anche l'admin come membro
+            const seatsFromCode = parseInt(productCode.split('_')[1])
+            const seats = seatsFromCode + 1
 
             // 1. Crea Licenza
             // Nota: in replay non abbiamo i dati di fatturazione freschi del body, usiamo quelli nel profilo billing se ci sono.

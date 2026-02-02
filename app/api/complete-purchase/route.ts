@@ -210,7 +210,10 @@ export async function POST(request: NextRequest) {
 
         if (isTeam) {
             // --- RAMO TEAM ---
-            const seats = parseInt(product_code.split('_')[1])
+            // Il numero nel product_code (es. team_5) indica i posti invitabili
+            // +1 per includere anche l'admin come membro
+            const seatsFromCode = parseInt(product_code.split('_')[1])
+            const seats = seatsFromCode + 1
 
             const { data: lic, error: licErr } = await supabaseAdmin.from('team_licenses').insert({
                 owner_user_id: user.id,

@@ -147,6 +147,8 @@ export async function POST(request: NextRequest) {
         // 7. Perform upgrade based on from_status
         if (from_status === 'full_individual') {
             // Create new team license
+            // target_team_size indica i posti invitabili (+1 per l'admin)
+            const maxMembers = target_team_size + 1
             const validUntil = new Date()
             validUntil.setFullYear(validUntil.getFullYear() + 100) // Lifetime
 
@@ -154,7 +156,7 @@ export async function POST(request: NextRequest) {
                 .from('team_licenses')
                 .insert({
                     owner_id: user.id,
-                    max_members: target_team_size,
+                    max_members: maxMembers,
                     status: 'active',
                     valid_until: validUntil.toISOString()
                 })
@@ -183,9 +185,11 @@ export async function POST(request: NextRequest) {
 
         } else {
             // Upgrade existing team license
+            // target_team_size indica i posti invitabili (+1 per l'admin)
+            const maxMembers = target_team_size + 1
             const { error: updateError } = await supabaseAdmin
                 .from('team_licenses')
-                .update({ max_members: target_team_size })
+                .update({ max_members: maxMembers })
                 .eq('owner_id', user.id)
                 .eq('status', 'active')
 
