@@ -136,7 +136,7 @@ export default function TeamLicensePage() {
             </div>
 
             <div className="mb-8">
-                <div className="text-4xl font-extrabold text-slate-800">€ {price}</div>
+                <div className="text-4xl font-extrabold text-slate-800">€ ---</div>
                 <div className="text-sm text-slate-500 mt-1">Pagamento unico · Accesso a vita</div>
             </div>
 

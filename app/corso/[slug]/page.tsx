@@ -608,7 +608,7 @@ export default function CorsoPage() {
                                                     <h3 className={`font-bold text-2xl lg:text-3xl ${colors.title} mb-4`}>Licenza Singola</h3>
 
                                                     <div className="text-4xl lg:text-5xl font-extrabold text-primary mb-2">
-                                                        € {user?.email === 'simonsilvercaldaie@gmail.com' ? "1.00" : `${pricingInfo?.amountToPay}.00`}
+                                                        € ---
                                                     </div>
 
                                                     <p className="text-base lg:text-lg text-gray-700 font-medium mb-1">
@@ -650,7 +650,7 @@ export default function CorsoPage() {
                                             </h3>
 
                                             <div className="text-4xl font-extrabold text-primary mb-2">
-                                                € {pricingInfo?.amountToPay}.00
+                                                € ---
                                             </div>
                                             <p className="text-gray-500 text-sm">Include tutti i 9 corsi del livello</p>
                                         </div>

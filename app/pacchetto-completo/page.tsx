@@ -226,7 +226,7 @@ export default function PacchettoCompletoPage() {
                         </h1>
                         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
                             Tutti e 3 i livelli insieme per una formazione completa. <br />
-                            <strong className="text-amber-600">Risparmi €{savings}</strong> rispetto all'acquisto singolo.
+                            <strong className="text-amber-600">Risparmio speciale</strong> rispetto all'acquisto singolo.
                         </p>
                     </div>
 
@@ -286,11 +286,10 @@ export default function PacchettoCompletoPage() {
                                     <div className="text-center mb-8 bg-amber-50 rounded-2xl p-6 border border-amber-100">
                                         <p className="text-sm font-bold text-amber-800 uppercase tracking-wider mb-2">Prezzo Totale</p>
                                         <div className="flex items-end justify-center gap-3 mb-2">
-                                            <span className="text-3xl text-gray-400 line-through font-medium translate-y-[-4px]">€{FULL_PRICE}</span>
-                                            <span className="text-6xl font-extrabold text-gray-900 tracking-tight">€{currentPrice}</span>
+                                            <span className="text-6xl font-extrabold text-gray-900 tracking-tight">€ ---</span>
                                         </div>
                                         <div className="inline-block bg-white text-green-700 font-bold px-4 py-1.5 rounded-full text-sm shadow-sm border border-green-100">
-                                            Risparmi €{savings} subito
+                                            Prezzo speciale!
                                         </div>
                                     </div>
 
