@@ -316,11 +316,11 @@ export default function PacchettoCompletoPage() {
                                             </div>
 
                                             {tosAccepted ? (
-                                                <PayPalBtn
-                                                    amount={BUNDLE_PRICE.toString()}
-                                                    courseTitle="Pacchetto Completo (27 video)"
-                                                    onSuccess={handlePurchaseSuccess}
-                                                />
+                                                // ACQUISTI TEMPORANEAMENTE SOSPESI
+                                                <div className="text-center p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
+                                                    <p className="font-bold text-gray-500 mb-1">Acquisti momentaneamente sospesi</p>
+                                                    <p className="text-xs text-gray-400">In attesa del caricamento dei video definitivi.</p>
+                                                </div>
                                             ) : (
                                                 <button disabled className="w-full py-4 bg-gray-200 text-gray-400 font-bold rounded-xl cursor-not-allowed">
                                                     Accetta i Termini per procedere

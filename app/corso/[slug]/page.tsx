@@ -707,11 +707,11 @@ export default function CorsoPage() {
 
                                                 {viewMode === 'individual' && pricingInfo && (
                                                     tosAccepted ? (
-                                                        <PayPalBtn
-                                                            amount={pricingInfo.amountToPay.toString()}
-                                                            courseTitle={`Pacchetto ${course.level}`}
-                                                            onSuccess={(orderId) => handlePurchaseSuccess(orderId, { plan_type: 'individual' })}
-                                                        />
+                                                        // ACQUISTI TEMPORANEAMENTE SOSPESI
+                                                        <div className="text-center p-4 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300">
+                                                            <p className="font-bold text-gray-500 mb-1">Acquisti momentaneamente sospesi</p>
+                                                            <p className="text-xs text-gray-400">In attesa del caricamento dei video definitivi.</p>
+                                                        </div>
                                                     ) : (
                                                         !user ? (
                                                             <p className="text-xs text-gray-400 text-center mt-2">

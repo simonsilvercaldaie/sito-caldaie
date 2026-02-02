@@ -159,11 +159,10 @@ export default function TeamLicensePage() {
             <div className="mt-auto">
                 {user ? (
                     tosAccepted ? (
-                        <PayPalBtn
-                            amount={amount.toString()}
-                            courseTitle={`Licenza ${title}`}
-                            onSuccess={(orderId) => handlePurchaseSuccess(orderId, { product_code: code, amount_cents: amount * 100 })}
-                        />
+                        // ACQUISTI TEMPORANEAMENTE SOSPESI
+                        <div className="text-center p-3 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300">
+                            <p className="font-bold text-gray-500 text-sm">Acquisti Sospesi</p>
+                        </div>
                     ) : (
                         <button disabled className="w-full py-4 bg-slate-100 text-slate-400 font-bold rounded-xl cursor-not-allowed">
                             Accetta i termini sopra per acquistare
