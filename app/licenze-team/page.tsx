@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react"
 import Navbar from "@/components/Navbar"
 import Link from "next/link"
-import { Users, CheckCircle2 } from "lucide-react"
+import { Users, CheckCircle2, ArrowRight } from "lucide-react"
 import { PayPalBtn } from "@/components/PayPalBtn"
 import { supabase } from "@/lib/supabaseClient"
 import { LEGAL_TEXT_CHECKOUT } from "@/lib/legalTexts"
@@ -241,7 +241,12 @@ export default function TeamLicensePage() {
                         />
                     </div>
 
-
+                    {/* Back Link */}
+                    <div className="text-center mt-12">
+                        <Link href="/catalogo" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors font-medium">
+                            <ArrowRight className="w-4 h-4 rotate-180" /> Torna al Catalogo
+                        </Link>
+                    </div>
                 </div>
             </main>
         </div>
