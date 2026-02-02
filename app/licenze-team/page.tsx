@@ -187,7 +187,7 @@ export default function TeamLicensePage() {
                 <div className="max-w-6xl mx-auto">
                     {/* Back Link */}
                     <div className="mb-8">
-                        <button onClick={() => router.back()} className="inline-flex items-center gap-2 text-gray-500 hover:text-indigo-600 transition-colors font-medium">
+                        <button onClick={() => router.back()} className="inline-flex items-center gap-2 text-gray-500 hover:text-indigo-600 transition-colors font-medium cursor-pointer">
                             <ArrowRight className="w-4 h-4 rotate-180" /> Torna Indietro
                         </button>
                     </div>
