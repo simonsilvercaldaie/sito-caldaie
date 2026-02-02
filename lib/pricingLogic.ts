@@ -1,14 +1,11 @@
 // Logica di pricing per Pacchetti Livello
-// Prezzi: Base €300, Intermedio €400, Avanzato €500
-// Non esistono acquisti singoli.
+// Prezzi: Base €200, Intermedio €400, Avanzato €600
 
-// CENSURA_PREZZI_START - Per ripristinare: Base 300, Intermedio 400, Avanzato 500
 export const PRICES = {
-    PACK_BASE: 0,        // CENSURATO (era 300)
-    PACK_INTERMEDIO: 0,  // CENSURATO (era 400)
-    PACK_AVANZATO: 0,    // CENSURATO (era 500)
+    PACK_BASE: 200,
+    PACK_INTERMEDIO: 400,
+    PACK_AVANZATO: 600,
 } as const
-// CENSURA_PREZZI_END
 
 export interface LevelPricingResult {
     amountToPay: number

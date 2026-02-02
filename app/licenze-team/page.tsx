@@ -218,29 +218,27 @@ export default function TeamLicensePage() {
                     )}
 
                     <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-                        {/* CENSURA_PREZZI_START - Team5: 2.000/2000, Team10: 3.000/3000, Team25: 4.000/4000 */}
                         <TeamCard
                             title="Team 5"
                             users={5}
-                            price="---"
+                            price="3.000"
                             code="team_5"
-                            amount={0}
+                            amount={3000}
                         />
                         <TeamCard
                             title="Team 10"
                             users={10}
-                            price="---"
+                            price="4.000"
                             code="team_10"
-                            amount={0}
+                            amount={4000}
                         />
                         <TeamCard
                             title="Team 25 / Formatore"
                             users={25}
-                            price="---"
+                            price="5.000"
                             code="team_25"
-                            amount={0}
+                            amount={5000}
                         />
-                        {/* CENSURA_PREZZI_END */}
                     </div>
 
 

@@ -8,19 +8,18 @@ import { Loader2, ArrowLeft, Users, CheckCircle2, ArrowUpCircle, AlertCircle } f
 import { PayPalBtn } from '@/components/PayPalBtn'
 import { LEGAL_TEXT_CHECKOUT } from '@/lib/legalTexts'
 
-// Upgrade pricing
-// CENSURA_PREZZI_START - Valori originali: i2t5=800, i2t10=1800, i2t25=2800, t5t10=1000, t5t25=2000, t10t25=1000
+// Upgrade pricing (differenziale)
+// Individual complete = 1200€, Team5 = 3000€, Team10 = 4000€, Team25 = 5000€
 const UPGRADE_PRICES = {
     // From Individual (all 3) to Team
-    'individual_to_team_5': 0,    // CENSURATO (era 800)
-    'individual_to_team_10': 0,   // CENSURATO (era 1800)
-    'individual_to_team_25': 0,   // CENSURATO (era 2800)
+    'individual_to_team_5': 1800,    // 3000 - 1200
+    'individual_to_team_10': 2800,   // 4000 - 1200
+    'individual_to_team_25': 3800,   // 5000 - 1200
     // Team to Team
-    'team_5_to_team_10': 0,       // CENSURATO (era 1000)
-    'team_5_to_team_25': 0,       // CENSURATO (era 2000)
-    'team_10_to_team_25': 0,      // CENSURATO (era 1000)
+    'team_5_to_team_10': 1000,       // 4000 - 3000
+    'team_5_to_team_25': 2000,       // 5000 - 3000
+    'team_10_to_team_25': 1000,      // 5000 - 4000
 }
-// CENSURA_PREZZI_END
 
 type LicenseStatus =
     | 'none'

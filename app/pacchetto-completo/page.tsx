@@ -5,6 +5,7 @@ import Link from "next/link"
 import { Package, CheckCircle2, Sparkles, ArrowRight } from "lucide-react"
 import { supabase } from "@/lib/supabaseClient"
 import { LEGAL_TEXT_CHECKOUT } from "@/lib/legalTexts"
+import { PayPalBtn } from "@/components/PayPalBtn"
 
 const BUNDLE_PRICE = 1000 // €1000 (Sconto €200 da €1200)
 const FULL_PRICE = 1200
@@ -105,12 +106,96 @@ export default function PacchettoCompletoPage() {
         }
     }
 
-    // Logic for Purchase (Disabled currently, but prepared for future)
-    const handlePurchase = async (orderId: string) => {
-        // Updated to use the standard bundle code which is now priced at 100000 cents
-        const productCode = 'complete_bundle'
-        const amountCents = BUNDLE_PRICE * 100
-        // ... rest of logic would go here
+    const handlePurchaseSuccess = async (orderId: string) => {
+        if (!user) return
+
+        const { data: { session } } = await supabase.auth.getSession()
+        const accessToken = session?.access_token
+
+        if (!accessToken) {
+            alert('Sessione scaduta. Effettua di nuovo l\'accesso e riprova.')
+            return
+        }
+
+        const product_code = 'complete_bundle'
+        const amount_cents = BUNDLE_PRICE * 100
+
+        const attemptSave = async (attempt: number = 1): Promise<boolean> => {
+            try {
+                const body = {
+                    orderId: orderId,
+                    product_code: product_code,
+                    amount_cents: amount_cents,
+                    plan_type: 'individual'
+                }
+
+                const res = await fetch('/api/complete-purchase', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${accessToken}`
+                    },
+                    body: JSON.stringify(body)
+                })
+
+                const data = await res.json()
+
+                if (res.ok && data.ok) {
+                    // Send confirmation email
+                    try {
+                        if (data.email) {
+                            const emailData = {
+                                service_id: 'service_fwvybtr',
+                                template_id: 'template_b8p58ci',
+                                user_id: 'NcJg5-hiu3gVJiJZ-',
+                                template_params: {
+                                    from_name: 'Simon Silver Caldaie',
+                                    to_email: data.email,
+                                    subject: '✅ Conferma Acquisto - Pacchetto Completo',
+                                    message: `Grazie per il tuo acquisto!\n\nHai sbloccato il Pacchetto Completo (tutti i 27 video).\n\nAccedi al catalogo per iniziare: https://www.simonsilvercaldaie.it/catalogo\n\nBuono studio!`
+                                }
+                            }
+                            await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify(emailData)
+                            })
+                        }
+                    } catch (emailErr) {
+                        console.error('Email error:', emailErr)
+                    }
+                    return true
+                }
+
+                if (data.error === 'tos_not_accepted') {
+                    alert('Accetta i Termini per procedere.')
+                    setTosAccepted(false)
+                    return false
+                }
+
+                if (res.status >= 500 && attempt < 3) {
+                    await new Promise(r => setTimeout(r, 2000))
+                    return attemptSave(attempt + 1)
+                }
+                return false
+
+            } catch (err) {
+                if (attempt < 3) {
+                    await new Promise(r => setTimeout(r, 2000))
+                    return attemptSave(attempt + 1)
+                }
+                return false
+            }
+        }
+
+        const success = await attemptSave()
+
+        if (success) {
+            window.location.href = `/ordine/${orderId}`
+        } else {
+            localStorage.setItem('pendingOrderId', orderId)
+            window.location.href = `/ordine/${orderId}`
+        }
     }
 
     if (loading) {
@@ -209,8 +294,6 @@ export default function PacchettoCompletoPage() {
                                         </div>
                                     </div>
 
-                                    {/* Promo Code Logic Removed */}
-
                                     {user ? (
                                         <div className="space-y-4">
                                             <label className={`flex items-start gap-3 text-sm text-gray-600 cursor-pointer p-4 bg-gray-50 rounded-xl border-2 ${tosAccepted ? 'border-amber-500 bg-amber-50/50' : 'border-gray-200'} transition-all hover:border-amber-300 ${tosLoading ? 'opacity-50 pointer-events-none' : ''}`}>
@@ -233,10 +316,11 @@ export default function PacchettoCompletoPage() {
                                             </div>
 
                                             {tosAccepted ? (
-                                                <div className="text-center p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-                                                    <p className="font-bold text-gray-500 mb-1">Acquisti momentaneamente sospesi</p>
-                                                    <p className="text-xs text-gray-400">In attesa del caricamento dei video definitivi.</p>
-                                                </div>
+                                                <PayPalBtn
+                                                    amount={BUNDLE_PRICE.toString()}
+                                                    courseTitle="Pacchetto Completo (27 video)"
+                                                    onSuccess={handlePurchaseSuccess}
+                                                />
                                             ) : (
                                                 <button disabled className="w-full py-4 bg-gray-200 text-gray-400 font-bold rounded-xl cursor-not-allowed">
                                                     Accetta i Termini per procedere
