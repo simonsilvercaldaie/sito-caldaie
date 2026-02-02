@@ -2,12 +2,14 @@
 import { useState, useEffect } from "react"
 import Navbar from "@/components/Navbar"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { Users, CheckCircle2, ArrowRight } from "lucide-react"
 import { PayPalBtn } from "@/components/PayPalBtn"
 import { supabase } from "@/lib/supabaseClient"
 import { LEGAL_TEXT_CHECKOUT } from "@/lib/legalTexts"
 
 export default function TeamLicensePage() {
+    const router = useRouter()
     const [user, setUser] = useState<any>(null)
     const [loading, setLoading] = useState(true)
     const [tosAccepted, setTosAccepted] = useState(false)
@@ -185,9 +187,9 @@ export default function TeamLicensePage() {
                 <div className="max-w-6xl mx-auto">
                     {/* Back Link */}
                     <div className="mb-8">
-                        <Link href="/catalogo" className="inline-flex items-center gap-2 text-gray-500 hover:text-indigo-600 transition-colors font-medium">
-                            <ArrowRight className="w-4 h-4 rotate-180" /> Torna al Catalogo
-                        </Link>
+                        <button onClick={() => router.back()} className="inline-flex items-center gap-2 text-gray-500 hover:text-indigo-600 transition-colors font-medium">
+                            <ArrowRight className="w-4 h-4 rotate-180" /> Torna Indietro
+                        </button>
                     </div>
 
                     <div className="text-center mb-16">
