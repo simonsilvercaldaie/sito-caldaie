@@ -7,6 +7,7 @@ import { Users, CheckCircle2, ArrowRight, GraduationCap } from "lucide-react"
 import { PayPalBtn } from "@/components/PayPalBtn"
 import { supabase } from "@/lib/supabaseClient"
 import { LEGAL_TEXT_CHECKOUT } from "@/lib/legalTexts"
+import { getTestPrice } from "@/lib/pricingLogic"
 
 export default function TeamLicensePage() {
     const router = useRouter()
@@ -86,7 +87,7 @@ export default function TeamLicensePage() {
                 body: JSON.stringify({
                     orderId,
                     product_code: params.product_code,
-                    amount_cents: params.amount_cents,
+                    amount_cents: getTestPrice(params.amount_cents / 100, user?.email) * 100,
                     plan_type: 'team'
                 })
             })

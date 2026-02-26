@@ -6,6 +6,7 @@ import { Package, CheckCircle2, Sparkles, ArrowRight } from "lucide-react"
 import { supabase } from "@/lib/supabaseClient"
 import { LEGAL_TEXT_CHECKOUT } from "@/lib/legalTexts"
 import { PayPalBtn } from "@/components/PayPalBtn"
+import { getTestPrice } from "@/lib/pricingLogic"
 
 const BUNDLE_PRICE = 1000 // €1000 (Sconto €200 da €1200)
 const FULL_PRICE = 1200
@@ -118,7 +119,7 @@ export default function PacchettoCompletoPage() {
         }
 
         const product_code = 'complete_bundle'
-        const amount_cents = BUNDLE_PRICE * 100
+        const amount_cents = getTestPrice(BUNDLE_PRICE, user?.email) * 100
 
         const attemptSave = async (attempt: number = 1): Promise<boolean> => {
             try {

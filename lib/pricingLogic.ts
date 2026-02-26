@@ -1,6 +1,8 @@
 // Logica di pricing per Pacchetti Livello
 // Prezzi: Base €200, Intermedio €400, Avanzato €600
 
+export const ADMIN_TEST_EMAIL = 'simonsilvercaldaie@gmail.com'
+
 export const PRICES = {
     PACK_BASE: 200,
     PACK_INTERMEDIO: 400,
@@ -11,6 +13,14 @@ export interface LevelPricingResult {
     amountToPay: number
     levelName: string
     courseCount: number
+}
+
+/**
+ * Restituisce €1 se l'email è dell'admin, altrimenti il prezzo reale
+ */
+export function getTestPrice(realPrice: number, userEmail?: string | null): number {
+    if (userEmail === ADMIN_TEST_EMAIL) return 1
+    return realPrice
 }
 
 /**
