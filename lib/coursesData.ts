@@ -415,6 +415,44 @@ export const courses: Course[] = [
     }
 ]
 
+// --- PERCORSI TEMATICI ---
+export interface PercorsoTematico {
+    id: string
+    number: number
+    title: string
+    description: string
+    courseIds: string[]
+}
+
+export const percorsiTematici: PercorsoTematico[] = [
+    {
+        id: "percorso-1",
+        number: 1,
+        title: "Smetti di Cambiare Pezzi",
+        description: "Impara a ragionare prima di smontare. Dalla logica della caldaia alla diagnosi senza ricambi inutili.",
+        courseIds: ["01-caldaia-decisioni", "04-acs-riscaldamento", "06-falsi-colpevoli", "13-valvola-tre-vie", "15-scheda-elettronica"]
+    },
+    {
+        id: "percorso-2",
+        number: 2,
+        title: "Il Tecnico che Fidelizza",
+        description: "Gestisci il cliente, previeni i problemi e costruisci fiducia. Il lato professionale che nessuno insegna.",
+        courseIds: ["19-combustione-falsa", "12-scambiatori-colpevoli", "16-calcare-magnetite", "17-errori-installazione", "26-gestire-cliente"]
+    },
+    {
+        id: "percorso-3",
+        number: 3,
+        title: "Proteggi Te Stesso",
+        description: "Responsabilità, decisioni difficili e quando dire di no. Il mindset del tecnico maturo.",
+        courseIds: ["09-quando-non-intervenire", "19-combustione-falsa", "21-cinque-domande", "25-decisione-finale"]
+    }
+]
+
+export const getPercorsoById = (id: string) => percorsiTematici.find(p => p.id === id)
+
+export const getCoursesForPercorso = (percorso: PercorsoTematico): Course[] =>
+    percorso.courseIds.map(id => courses.find(c => c.id === id)).filter((c): c is Course => c !== undefined)
+
 // Corsi in evidenza per la homepage (uno per livello)
 export const getFeaturedCourses = () => [
     courses.find(c => c.id === "01-caldaia-decisioni")!,

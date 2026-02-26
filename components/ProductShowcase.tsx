@@ -1,7 +1,8 @@
 'use client'
-import { Lock, MonitorPlay, ShieldCheck, Users } from "lucide-react"
+import { Lock, MonitorPlay, ShieldCheck, Users, Wrench, Heart, Shield } from "lucide-react"
 import Link from "next/link"
 import { LEGAL_TEXT_HOMEPAGE } from "@/lib/legalTexts"
+import { percorsiTematici } from "@/lib/coursesData"
 
 export default function ProductShowcase() {
 
@@ -34,6 +35,12 @@ export default function ProductShowcase() {
             </div>
         </Link>
     )
+
+    const percorsoIcons = [
+        <Wrench className="w-6 h-6 text-yellow-600" />,
+        <Heart className="w-6 h-6 text-yellow-600" />,
+        <Shield className="w-6 h-6 text-yellow-600" />
+    ]
 
     return (
         <section className="py-20 px-4 md:px-8 bg-slate-50">
@@ -83,28 +90,45 @@ export default function ProductShowcase() {
 
                 <div className="text-center mb-16 space-y-4">
                     <h2 className="text-3xl md:text-5xl font-extrabold text-primary">
-                        Vai <span className="text-accent">Oltre</span>
+                        Percorso <span className="text-accent">Tematico</span>
                     </h2>
                     <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-                        Contenuti fuori schema per tecnici curiosi.
+                        3 percorsi trasversali per approfondire i temi che contano davvero.
                     </p>
                 </div>
 
-                <div className="max-w-2xl mx-auto mb-20">
-                    <LevelCard
-                        title="LABORATORIO"
-                        description="Casi studio reali, video extra e approfondimenti. Contenuti fuori schema per tecnici curiosi."
-                        level="Extra"
-                        link="/catalogo/laboratorio"
-                        colorClass="border-yellow-200 hover:border-yellow-400"
-                        badgeClass="bg-yellow-100 text-yellow-800 border-yellow-200"
-                        icon={<MonitorPlay className="w-6 h-6 text-yellow-600" />}
-                        footerText="Esplora il Laboratorio"
-                    />
+                <div className="grid md:grid-cols-3 gap-8 mb-20">
+                    {percorsiTematici.map((percorso, index) => (
+                        <Link key={percorso.id} href={`/catalogo/laboratorio#${percorso.id}`} className="block group">
+                            <div className="rounded-3xl p-8 border-2 border-yellow-200 hover:border-yellow-400 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 h-full flex flex-col bg-white hover:bg-gray-50">
+                                <div className="flex items-center justify-between mb-6">
+                                    <span className="px-4 py-2 rounded-full font-bold text-sm uppercase tracking-wider border shadow-sm bg-yellow-100 text-yellow-800 border-yellow-200">
+                                        Percorso {percorso.number}
+                                    </span>
+                                    <div className="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                                        {percorsoIcons[index]}
+                                    </div>
+                                </div>
+
+                                <h2 className="text-2xl font-extrabold text-gray-900 mb-4 group-hover:text-primary transition-colors">
+                                    {percorso.title}
+                                </h2>
+                                <p className="text-gray-600 text-base mb-8 leading-relaxed flex-grow">
+                                    {percorso.description}
+                                </p>
+
+                                <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
+                                    <span className="font-bold text-gray-900 flex items-center gap-2">
+                                        {percorso.courseIds.length} Video Inclusi
+                                    </span>
+                                    <span className="text-xl group-hover:translate-x-2 transition-transform">→</span>
+                                </div>
+                            </div>
+                        </Link>
+                    ))}
                 </div>
 
                 {/* SEZIONE TEAM REMOVED */}
-
 
 
 
