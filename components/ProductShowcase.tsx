@@ -40,10 +40,10 @@ export default function ProductShowcase() {
             <div className="max-w-6xl mx-auto">
                 <div className="text-center mb-16 space-y-4">
                     <h2 className="text-3xl md:text-5xl font-extrabold text-primary">
-                        Scegli il tuo <span className="text-accent">Livello</span>
+                        Un Percorso <span className="text-accent">Unico</span> nel Settore
                     </h2>
                     <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-                        Un percorso strutturato step-by-step per portarti da principiante a esperto.
+                        Il primo metodo completo per caldaisti. 27 video che cambieranno il tuo modo di lavorare.
                     </p>
                 </div>
 
