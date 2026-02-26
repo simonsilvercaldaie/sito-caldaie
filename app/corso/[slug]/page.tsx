@@ -21,8 +21,11 @@ import {
     Package,
     Users,
     User,
+    AlertTriangle,
+    Monitor,
 } from "lucide-react"
 import { CourseJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd"
+import { useSessionGuard } from "@/hooks/useSessionGuard"
 
 export default function CorsoPage() {
     const params = useParams()
@@ -48,6 +51,11 @@ export default function CorsoPage() {
     // Team UI State
     const [viewMode, setViewMode] = useState<'individual' | 'team' | null>(null)
     const [teamAccess, setTeamAccess] = useState(false)
+
+    // Session Guard — activates when user has purchased access
+    const { status: sessionStatus, errorMessage: sessionError } = useSessionGuard({
+        enabled: hasPurchased && !loading
+    })
 
     useEffect(() => {
         const checkUser = async () => {
@@ -463,6 +471,43 @@ export default function CorsoPage() {
                                     </div>
                                 </div>
                             </div>
+
+                            {/* Session Guard Overlay */}
+                            {hasPurchased && (sessionStatus === 'kicked' || sessionStatus === 'device_limit') && (
+                                <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-6 text-center">
+                                    <div className="p-4 bg-red-100 rounded-2xl inline-block mb-4">
+                                        {sessionStatus === 'kicked'
+                                            ? <AlertTriangle className="w-10 h-10 text-red-600" />
+                                            : <Monitor className="w-10 h-10 text-red-600" />
+                                        }
+                                    </div>
+                                    <h3 className="text-xl font-bold text-red-900 mb-2">
+                                        {sessionStatus === 'kicked'
+                                            ? 'Sessione Chiusa'
+                                            : 'Limite Dispositivi Raggiunto'
+                                        }
+                                    </h3>
+                                    <p className="text-red-700 mb-4">
+                                        {sessionError}
+                                    </p>
+                                    {sessionStatus === 'device_limit' && (
+                                        <Link
+                                            href="/dashboard"
+                                            className="inline-block px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors"
+                                        >
+                                            Vai alla Dashboard per resettare
+                                        </Link>
+                                    )}
+                                    {sessionStatus === 'kicked' && (
+                                        <button
+                                            onClick={() => window.location.reload()}
+                                            className="inline-block px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors"
+                                        >
+                                            Riprova accesso
+                                        </button>
+                                    )}
+                                </div>
+                            )}
 
                             <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
                                 <h2 className="text-2xl font-bold text-primary mb-4">Descrizione del Corso</h2>
