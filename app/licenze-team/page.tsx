@@ -283,7 +283,7 @@ export default function TeamLicensePage() {
                         <p className="text-amber-900 text-sm leading-relaxed">
                             <strong>ℹ️ Riassegnamento slot:</strong> Ogni licenza include un numero di riassegnamenti gratuiti pari ai posti acquistati.
                             Hai licenziato un dipendente e ne hai assunto uno nuovo? Puoi rimuovere il vecchio account e invitare il nuovo gratuitamente.
-                            Superati i riassegnamenti inclusi, ogni ulteriore sostituzione costa <strong>€200</strong>.
+                            Superati i riassegnamenti inclusi, ogni ulteriore sostituzione costa <strong>€400</strong>.
                         </p>
                     </div>
                 </div>

@@ -153,7 +153,7 @@ export default function TeamDashboard() {
 
             if (!res.ok) {
                 if (data.needsPayment) {
-                    alert('Hai esaurito i riassegnamenti gratuiti. Contatta simonsilvercaldaie@gmail.com per acquistare nuovi riassegnamenti (€200 cad.)')
+                    alert('Hai esaurito i riassegnamenti gratuiti. Contatta simonsilvercaldaie@gmail.com per acquistare nuovi riassegnamenti (€400 cad.)')
                 } else {
                     throw new Error(data.error || 'Errore nella rimozione')
                 }
@@ -215,7 +215,7 @@ export default function TeamDashboard() {
                         {team.freeReassignmentsUsed >= team.freeReassignmentsTotal && (
                             <div className="p-3 bg-amber-50 text-amber-800 text-sm rounded-lg border border-amber-200 flex items-center gap-2">
                                 <RefreshCw className="w-4 h-4 flex-shrink-0" />
-                                <span>Riassegnamenti gratuiti esauriti. Per rimuovere e sostituire un membro contatta <strong>simonsilvercaldaie@gmail.com</strong> (€200/riassegnamento).</span>
+                                <span>Riassegnamenti gratuiti esauriti. Per rimuovere e sostituire un membro contatta <strong>simonsilvercaldaie@gmail.com</strong> (€400/riassegnamento).</span>
                             </div>
                         )}
 

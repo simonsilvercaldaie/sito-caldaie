@@ -83,9 +83,9 @@ export async function POST(request: NextRequest) {
         if (freeRemaining <= 0) {
             return NextResponse.json({
                 success: false,
-                error: 'Hai esaurito i riassegnamenti gratuiti. Contatta simonsilvercaldaie@gmail.com per acquistare nuovi riassegnamenti (€200 cad.)',
+                error: 'Hai esaurito i riassegnamenti gratuiti. Contatta simonsilvercaldaie@gmail.com per acquistare nuovi riassegnamenti (€400 cad.)',
                 needsPayment: true,
-                cost: 200,
+                cost: 400,
                 freeTotal,
                 freeUsed
             }, { status: 402 }) // 402 Payment Required
