@@ -97,6 +97,7 @@ export default function TerminiPage() {
                                 <li><strong>Licenza Formazione</strong>: per istituti scolastici, centri di formazione professionale e laboratori tecnici. Fino a 25 utenti nominativi, accesso a vita a tutti i livelli. Consente la proiezione in aula e l'uso didattico dei contenuti.</li>
                             </ul>
                             <p className="mt-4"><strong>7.2.</strong> Ogni licenza Team prevede esclusivamente account nominativi. Ogni account è associato a una singola persona fisica e non può essere condiviso.</p>
+                            <p className="mt-4"><strong>7.3.</strong> <strong>Riassegnamento slot.</strong> Ogni licenza Team include un numero di riassegnamenti gratuiti pari ai posti acquistati (es. la Team 5 include 5 riassegnamenti gratuiti). Ogni riassegnamento consiste nella rimozione di un membro esistente e nella successiva aggiunta di un nuovo membro. Esauriti i riassegnamenti gratuiti, ogni ulteriore sostituzione comporta un costo di <strong>€200</strong>.</p>
                             <p className="mt-4">
                                 Per i dettagli completi sui tipi di licenza, consulta la pagina{' '}
                                 <Link href="/licenze-team" className="text-accent hover:underline font-semibold">Licenze Team</Link>.

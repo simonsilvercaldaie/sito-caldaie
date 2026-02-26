@@ -162,6 +162,10 @@ export default function TeamLicensePage() {
                             <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
                             <span><strong>Admin + {users} tecnici</strong> invitabili</span>
                         </li>
+                        <li className="flex items-start gap-3 text-slate-600">
+                            <CheckCircle2 className="w-5 h-5 text-amber-500 flex-shrink-0" />
+                            <span><strong>{users} riassegnamenti</strong> gratuiti inclusi</span>
+                        </li>
                     </>
                 )}
             </ul>
@@ -268,9 +272,19 @@ export default function TeamLicensePage() {
                                 'Uso <strong>didattico e formativo</strong> consentito',
                                 'Fino a <strong>25 account</strong> per studenti/partecipanti',
                                 'Accesso completo a <strong>tutti i 3 Livelli</strong>',
+                                '<strong>25 riassegnamenti</strong> gratuiti inclusi',
                                 'Ideale per <strong>istituti tecnici, CFP, laboratori</strong>'
                             ]}
                         />
+                    </div>
+
+                    {/* Reassignment Info Box */}
+                    <div className="max-w-3xl mx-auto mt-8 p-5 bg-amber-50 rounded-2xl border border-amber-200">
+                        <p className="text-amber-900 text-sm leading-relaxed">
+                            <strong>ℹ️ Riassegnamento slot:</strong> Ogni licenza include un numero di riassegnamenti gratuiti pari ai posti acquistati.
+                            Hai licenziato un dipendente e ne hai assunto uno nuovo? Puoi rimuovere il vecchio account e invitare il nuovo gratuitamente.
+                            Superati i riassegnamenti inclusi, ogni ulteriore sostituzione costa <strong>€200</strong>.
+                        </p>
                     </div>
                 </div>
             </main>

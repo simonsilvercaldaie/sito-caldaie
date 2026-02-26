@@ -1,9 +1,10 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import { Users, UserPlus, X, Copy, Check, Loader2, Shield } from 'lucide-react'
+import { Users, UserPlus, X, Copy, Check, Loader2, Shield, UserMinus, RefreshCw } from 'lucide-react'
 
 interface TeamMember {
+    id: string
     user_id: string
     added_at: string
     email: string
@@ -23,6 +24,8 @@ interface TeamStats {
     seatsUsed: number
     members: TeamMember[]
     invites: TeamInvite[]
+    freeReassignmentsTotal: number
+    freeReassignmentsUsed: number
 }
 
 export default function TeamDashboard() {
@@ -32,6 +35,7 @@ export default function TeamDashboard() {
     const [inviting, setInviting] = useState(false)
     const [inviteResult, setInviteResult] = useState<{ url: string, message: string } | null>(null)
     const [error, setError] = useState('')
+    const [removingMember, setRemovingMember] = useState<string | null>(null)
 
     const fetchTeams = async () => {
         try {
@@ -128,6 +132,43 @@ export default function TeamDashboard() {
         }
     }
 
+    const handleRemoveMember = async (memberId: string, memberEmail: string, licenseId: string) => {
+        if (!confirm(`Sei sicuro di voler rimuovere ${memberEmail} dal team? Questo utilizzerà un riassegnamento.`)) return
+
+        setRemovingMember(memberId)
+        try {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (!session) throw new Error("No session")
+
+            const res = await fetch('/api/team/remove-member', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({ teamLicenseId: licenseId, memberId })
+            })
+
+            const data = await res.json()
+
+            if (!res.ok) {
+                if (data.needsPayment) {
+                    alert('Hai esaurito i riassegnamenti gratuiti. Contatta simonsilvercaldaie@gmail.com per acquistare nuovi riassegnamenti (€200 cad.)')
+                } else {
+                    throw new Error(data.error || 'Errore nella rimozione')
+                }
+                return
+            }
+
+            alert(`${memberEmail} rimosso dal team. Riassegnamenti gratuiti rimasti: ${data.freeRemaining}`)
+            fetchTeams() // Refresh
+        } catch (e: any) {
+            alert('Errore: ' + e.message)
+        } finally {
+            setRemovingMember(null)
+        }
+    }
+
     if (loading) return null // Or simple loader
     if (!teams || teams.length === 0) return null // Don't show if not an owner
 
@@ -161,8 +202,22 @@ export default function TeamDashboard() {
                                     <div className="text-2xl font-bold text-indigo-600">{team.seatsUsed} / {team.seats}</div>
                                     <div className="text-xs font-medium text-indigo-400 uppercase tracking-wider">Posti Utilizzati</div>
                                 </div>
+                                <div className="text-center border-l border-indigo-200 pl-6">
+                                    <div className="text-2xl font-bold text-amber-600">
+                                        {Math.max(0, team.freeReassignmentsTotal - team.freeReassignmentsUsed)}
+                                    </div>
+                                    <div className="text-xs font-medium text-amber-500 uppercase tracking-wider">Riassegnamenti Gratis</div>
+                                </div>
                             </div>
                         </div>
+
+                        {/* Reassignment warning if exhausted */}
+                        {team.freeReassignmentsUsed >= team.freeReassignmentsTotal && (
+                            <div className="p-3 bg-amber-50 text-amber-800 text-sm rounded-lg border border-amber-200 flex items-center gap-2">
+                                <RefreshCw className="w-4 h-4 flex-shrink-0" />
+                                <span>Riassegnamenti gratuiti esauriti. Per rimuovere e sostituire un membro contatta <strong>simonsilvercaldaie@gmail.com</strong> (€200/riassegnamento).</span>
+                            </div>
+                        )}
 
                         <div className="grid md:grid-cols-2 gap-8">
                             {/* Invite Form */}
@@ -234,6 +289,17 @@ export default function TeamDashboard() {
                                                     <div className="text-xs text-gray-500">Membro attivo</div>
                                                 </div>
                                             </div>
+                                            <button
+                                                onClick={() => handleRemoveMember(m.id, m.email, team.licenseId)}
+                                                disabled={removingMember === m.id}
+                                                className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
+                                                title="Rimuovi membro"
+                                            >
+                                                {removingMember === m.id
+                                                    ? <Loader2 className="w-4 h-4 animate-spin" />
+                                                    : <UserMinus className="w-4 h-4" />
+                                                }
+                                            </button>
                                         </div>
                                     ))}
 

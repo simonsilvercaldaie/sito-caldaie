@@ -14,7 +14,7 @@ L'accesso alla piattaforma avviene esclusivamente tramite account Google. Non so
 Ogni licenza personale è valida per un singolo utilizzatore. Non è cedibile né condivisibile con terzi.
 
 **Licenza Team**
-Le licenze Team (5, 10 o 25 posti) assegnano uno slot individuale a ciascun collaboratore. Ogni membro accede con il proprio account Google personale. Le licenze Team non consentono la proiezione in aula né l'uso didattico.
+Le licenze Team (5, 10 o 25 posti) assegnano uno slot individuale a ciascun collaboratore. Ogni membro accede con il proprio account Google personale. Le licenze Team non consentono la proiezione in aula né l'uso didattico. Ogni licenza include un numero di riassegnamenti gratuiti pari ai posti (es. Team 5 = 5 riassegnamenti gratis). Oltre la soglia, €200 per riassegnamento.
 
 **Licenza Formazione**
 La Licenza Formazione è riservata a istituti scolastici, centri di formazione professionale e laboratori tecnici. È l'unica licenza che autorizza la proiezione in aula e l'uso didattico dei contenuti.

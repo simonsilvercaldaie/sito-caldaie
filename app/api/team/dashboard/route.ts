@@ -29,12 +29,9 @@ export async function GET(request: NextRequest) {
         // 1. Get Team Licenses owned by user
         const { data: licenses, error: licError } = await supabase
             .from('team_licenses')
-            .select('id, seats, product_code, created_at, company_name') // product_code might not be there? Check schema. It's in purchases usually, but maybe helpful here. 
-            // Correct, team_licenses has: id, owner_user_id, seats, created_at. 
-            // Wait, implementation_plan says team_licenses has NO product_code.
-            // We can fetch seats.
+            .select('id, seats, created_at, company_name, free_reassignments_total, free_reassignments_used')
             .eq('owner_user_id', user.id)
-            .eq('status', 'active') // Assuming valid only
+            .eq('status', 'active')
 
         if (licError) throw licError
         if (!licenses || licenses.length === 0) {
@@ -57,7 +54,7 @@ export async function GET(request: NextRequest) {
             // Fetch Recent Members (for list)
             const { data: members, error: memListErr } = await supabase
                 .from('team_members')
-                .select('user_id, added_at, auth_users:user_id(email)') // Select email via Join if possible? 
+                .select('id, user_id, added_at') // Select email via Join if possible? 
                 // auth.users is not usually joinable via standard client unless FK exists and permissions allow.
                 // Admin client CAN join if we define relationship or just manual fetch.
                 // Since 'team_members.user_id' refs 'auth.users', supabase-js might allow it if we are admin.
@@ -98,7 +95,9 @@ export async function GET(request: NextRequest) {
                 seats: lic.seats,
                 seatsUsed: memberCount || 0,
                 members: enrichedMembers,
-                invites: invites || []
+                invites: invites || [],
+                freeReassignmentsTotal: lic.free_reassignments_total || lic.seats,
+                freeReassignmentsUsed: lic.free_reassignments_used || 0
             })
         }
 
