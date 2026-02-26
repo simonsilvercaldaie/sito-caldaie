@@ -539,9 +539,9 @@ export default function CorsoPage() {
                                                     <Users className="w-10 h-10" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="font-bold text-xl text-indigo-900 mb-2">Sei un team di tecnici?</h4>
+                                                    <h4 className="font-bold text-xl text-indigo-900 mb-2">Sei un team o una scuola?</h4>
                                                     <p className="text-slate-600 leading-relaxed">
-                                                        Scopri le licenze aziendali.<br />
+                                                        Licenze per aziende e istituti di formazione.<br />
                                                         <span className="text-sm font-semibold text-indigo-600/80">Risparmia fino al 40%</span>
                                                     </p>
                                                 </div>
