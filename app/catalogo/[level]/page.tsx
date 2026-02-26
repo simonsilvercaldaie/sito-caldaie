@@ -33,8 +33,8 @@ function CourseCard({ course }: { course: Course }) {
                         <MonitorPlay className="w-3 h-3" /> {course.freeDuration}
                     </span>
                     <span className={`px-2 py-1 rounded text-xs font-medium border ${course.level === "Base" ? "bg-blue-500/80 text-white border-blue-400/30" :
-                            course.level === "Intermedio" ? "bg-green-500/80 text-white border-green-400/30" :
-                                "bg-red-500/80 text-white border-red-400/30"
+                        course.level === "Intermedio" ? "bg-green-500/80 text-white border-green-400/30" :
+                            "bg-red-500/80 text-white border-red-400/30"
                         }`}>
                         {course.level}
                     </span>
@@ -93,84 +93,12 @@ export default function LivelloPage() {
         <Shield key="shield" className="w-8 h-8 text-yellow-600" />
     ]
 
-    // --- PAGINA LABORATORIO (Percorsi Tematici) ---
+    // Laboratorio ora ha pagine dedicate per percorso (/percorso/[id])
     if (levelSlug.toLowerCase() === "laboratorio") {
-        return (
-            <div className="min-h-screen flex flex-col font-sans bg-gray-50">
-                <Navbar />
-
-                <BreadcrumbJsonLd items={[
-                    { name: "Home", url: "/" },
-                    { name: "Catalogo", url: "/catalogo" },
-                    { name: "Percorsi Tematici", url: "/catalogo/laboratorio" }
-                ]} />
-
-                <main className="flex-grow py-12 px-4 md:px-8">
-                    <div className="max-w-7xl mx-auto">
-
-                        <Link href="/" className="inline-flex items-center gap-2 text-gray-500 hover:text-primary mb-8 transition-colors">
-                            <ArrowLeft className="w-4 h-4" />
-                            Torna alla Home
-                        </Link>
-
-                        <div className="text-center mb-16">
-                            <span className="inline-block py-1 px-3 font-bold rounded-full text-sm uppercase tracking-wider border mb-4 bg-yellow-100 text-yellow-800 border-yellow-200">
-                                Percorsi Tematici
-                            </span>
-                            <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-6">
-                                Percorso <span className="text-accent">Tematico</span>
-                            </h1>
-                            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                                3 percorsi trasversali che raggruppano video da livelli diversi per tema. Scegli il tuo focus.
-                            </p>
-                        </div>
-
-                        <div className="space-y-20">
-                            {percorsiTematici.map((percorso, index) => {
-                                const courses = getCoursesForPercorso(percorso)
-                                return (
-                                    <section key={percorso.id} id={percorso.id} className="scroll-mt-24">
-                                        <div className="flex items-center gap-4 mb-8">
-                                            <div className="w-14 h-14 rounded-2xl bg-yellow-100 border-2 border-yellow-200 flex items-center justify-center flex-shrink-0">
-                                                {percorsoIcons[index]}
-                                            </div>
-                                            <div>
-                                                <span className="text-sm font-bold text-yellow-700 uppercase tracking-wider">
-                                                    Percorso {percorso.number}
-                                                </span>
-                                                <h2 className="text-2xl md:text-3xl font-extrabold text-gray-900">
-                                                    {percorso.title}
-                                                </h2>
-                                            </div>
-                                        </div>
-                                        <p className="text-gray-600 text-lg mb-8 max-w-2xl">
-                                            {percorso.description}
-                                        </p>
-                                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                                            {courses.map((course) => (
-                                                <CourseCard key={course.id} course={course} />
-                                            ))}
-                                        </div>
-                                    </section>
-                                )
-                            })}
-                        </div>
-
-                    </div>
-                </main>
-
-                <footer className="bg-slate-900 text-slate-400 py-12 px-4 border-t border-slate-800">
-                    <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
-                        <div className="flex items-center gap-2">
-                            <span className="font-semibold text-slate-200">Simon Silver Caldaie</span>
-                        </div>
-                        <div className="text-sm">
-                            &copy; {new Date().getFullYear()} Simon Silver. P.IVA 03235620121
-                        </div>
-                    </div>
-                </footer>
-            </div>
-        )
+        if (typeof window !== 'undefined') {
+            window.location.href = "/"
+        }
+        return null
     }
 
     // --- PAGINE LIVELLI NORMALI (base, intermedio, avanzato) ---

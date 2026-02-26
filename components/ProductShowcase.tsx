@@ -99,7 +99,7 @@ export default function ProductShowcase() {
 
                 <div className="grid md:grid-cols-3 gap-8 mb-20">
                     {percorsiTematici.map((percorso, index) => (
-                        <Link key={percorso.id} href={`/catalogo/laboratorio#${percorso.id}`} className="block group">
+                        <Link key={percorso.id} href={`/percorso/${percorso.id}`} className="block group">
                             <div className="rounded-3xl p-8 border-2 border-yellow-200 hover:border-yellow-400 transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 h-full flex flex-col bg-white hover:bg-gray-50">
                                 <div className="flex items-center justify-between mb-6">
                                     <span className="px-4 py-2 rounded-full font-bold text-sm uppercase tracking-wider border shadow-sm bg-yellow-100 text-yellow-800 border-yellow-200">

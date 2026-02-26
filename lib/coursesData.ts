@@ -437,7 +437,7 @@ export const percorsiTematici: PercorsoTematico[] = [
         number: 2,
         title: "Il Tecnico che Fidelizza",
         description: "Gestisci il cliente, previeni i problemi e costruisci fiducia. Il lato professionale che nessuno insegna.",
-        courseIds: ["19-combustione-falsa", "12-scambiatori-colpevoli", "16-calcare-magnetite", "17-errori-installazione", "26-gestire-cliente"]
+        courseIds: ["10-blocchi-prevedibili", "12-scambiatori-colpevoli", "16-calcare-magnetite", "17-errori-installazione", "26-gestire-cliente"]
     },
     {
         id: "percorso-3",
