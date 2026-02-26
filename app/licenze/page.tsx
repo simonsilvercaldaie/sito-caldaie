@@ -1,7 +1,7 @@
 'use client'
 import Navbar from '@/components/Navbar'
 import Link from 'next/link'
-import { CheckCircle2, Users, Building2, GraduationCap, User, Mail } from 'lucide-react'
+import { CheckCircle2, Users, GraduationCap, User } from 'lucide-react'
 
 export default function LicenzePage() {
     return (
@@ -61,13 +61,13 @@ export default function LicenzePage() {
                                     <Users className="w-6 h-6" />
                                 </div>
                                 <h2 className="text-xl font-bold text-primary">Licenza Team</h2>
-                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">2-5 persone</span>
+                                <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full font-semibold">5, 10 o 25 persone</span>
                             </div>
-                            <p className="text-gray-600 mb-4">Per piccoli gruppi di lavoro.</p>
+                            <p className="text-gray-600 mb-4">Per ditte e aziende con più tecnici.</p>
                             <ul className="space-y-2 text-sm text-gray-700 mb-6">
                                 <li className="flex items-center gap-2">
                                     <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                    Fino a 5 account nominativi
+                                    Account nominativi (5, 10 o 25 posti)
                                 </li>
                                 <li className="flex items-center gap-2">
                                     <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
@@ -79,54 +79,22 @@ export default function LicenzePage() {
                                 </li>
                             </ul>
                             <div className="bg-gray-50 p-3 rounded-lg text-xs text-gray-500">
-                                <strong>Non consente:</strong> uso di un singolo account da parte di più persone.
+                                <strong>Non consente:</strong> proiezione in aula, uso didattico o formativo.
                             </div>
                             <p className="text-sm text-gray-500 mt-4">
-                                <strong>Indicata per:</strong> ditte con pochi collaboratori.
+                                <strong>Indicata per:</strong> ditte con collaboratori, centri assistenza, aziende.
                             </p>
                         </div>
 
-                        {/* Licenza Azienda */}
-                        <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-gray-100 hover:border-accent/30 transition-colors">
+                        {/* Licenza Formazione */}
+                        <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl shadow-lg p-6 border-2 border-amber-200">
                             <div className="flex items-center gap-3 mb-4">
-                                <div className="p-3 bg-purple-100 text-purple-600 rounded-xl">
-                                    <Building2 className="w-6 h-6" />
-                                </div>
-                                <h2 className="text-xl font-bold text-primary">Licenza Azienda</h2>
-                                <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full font-semibold">6-20 persone</span>
-                            </div>
-                            <p className="text-gray-600 mb-4">Per squadre tecniche strutturate.</p>
-                            <ul className="space-y-2 text-sm text-gray-700 mb-6">
-                                <li className="flex items-center gap-2">
-                                    <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                    Fino a 20 account nominativi
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                    Pannello di gestione dedicato
-                                </li>
-                                <li className="flex items-center gap-2">
-                                    <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                    Possibilità di aggiungere o rimuovere utenti
-                                </li>
-                            </ul>
-                            <div className="bg-gray-50 p-3 rounded-lg text-xs text-gray-500">
-                                <strong>Non consente:</strong> proiezione collettiva, formazione in aula.
-                            </div>
-                            <p className="text-sm text-gray-500 mt-4">
-                                <strong>Indicata per:</strong> aziende con più tecnici operativi.
-                            </p>
-                        </div>
-
-                        {/* Licenza Formatore */}
-                        <div className="bg-gradient-to-br from-accent/10 to-orange-50 rounded-2xl shadow-lg p-6 border-2 border-accent/20">
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="p-3 bg-accent/20 text-accent rounded-xl">
+                                <div className="p-3 bg-amber-100 text-amber-600 rounded-xl">
                                     <GraduationCap className="w-6 h-6" />
                                 </div>
-                                <h2 className="text-xl font-bold text-primary">Licenza Formatore</h2>
+                                <h2 className="text-xl font-bold text-primary">Licenza Formazione</h2>
                             </div>
-                            <p className="text-gray-600 mb-4">Per centri di formazione, scuole tecniche, enti accreditati.</p>
+                            <p className="text-gray-600 mb-4">Per istituti scolastici, centri di formazione professionale e laboratori tecnici.</p>
                             <ul className="space-y-2 text-sm text-gray-700 mb-6">
                                 <li className="flex items-center gap-2">
                                     <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
@@ -134,20 +102,22 @@ export default function LicenzePage() {
                                 </li>
                                 <li className="flex items-center gap-2">
                                     <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                    Uso didattico consentito
+                                    Uso didattico e formativo consentito
                                 </li>
                                 <li className="flex items-center gap-2">
                                     <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                                    Preventivo personalizzato
+                                    Fino a 25 account per studenti/partecipanti
                                 </li>
                             </ul>
-                            <a
-                                href="mailto:simonsilvercaldaie@gmail.com?subject=Richiesta%20Licenza%20Formatore"
-                                className="w-full py-3 bg-accent text-white font-bold rounded-xl hover:bg-accent/90 transition-colors flex items-center justify-center gap-2"
+                            <Link
+                                href="/licenze-team"
+                                className="w-full py-3 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-2"
                             >
-                                <Mail className="w-4 h-4" />
-                                Richiedi Preventivo
-                            </a>
+                                Acquista Licenza Formazione
+                            </Link>
+                            <p className="text-sm text-gray-500 mt-4">
+                                <strong>Indicata per:</strong> istituti tecnici, CFP, enti accreditati, laboratori che formano tecnici.
+                            </p>
                         </div>
                     </div>
 
@@ -168,16 +138,12 @@ export default function LicenzePage() {
                                         <td className="py-3 px-4 font-semibold text-blue-600">Personale</td>
                                     </tr>
                                     <tr className="border-b border-gray-100">
-                                        <td className="py-3 px-4">2-5 colleghi, ognuno studia per sé</td>
-                                        <td className="py-3 px-4 font-semibold text-green-600">Team</td>
-                                    </tr>
-                                    <tr className="border-b border-gray-100">
-                                        <td className="py-3 px-4">6-20 tecnici in azienda</td>
-                                        <td className="py-3 px-4 font-semibold text-purple-600">Azienda</td>
+                                        <td className="py-3 px-4">Ditta con collaboratori, centro assistenza</td>
+                                        <td className="py-3 px-4 font-semibold text-green-600">Team (5, 10 o 25)</td>
                                     </tr>
                                     <tr>
-                                        <td className="py-3 px-4">Formazione in aula, corsi a terzi</td>
-                                        <td className="py-3 px-4 font-semibold text-accent">Formatore</td>
+                                        <td className="py-3 px-4">Formazione in aula, scuola, CFP, laboratorio</td>
+                                        <td className="py-3 px-4 font-semibold text-amber-600">Formazione</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -211,13 +177,13 @@ export default function LicenzePage() {
                     <div className="bg-gradient-to-br from-primary to-slate-800 rounded-2xl shadow-lg p-8 text-center text-white">
                         <h2 className="text-2xl font-bold mb-4">Hai bisogno di una licenza per più persone?</h2>
                         <p className="text-white/80 mb-6 max-w-xl mx-auto">
-                            Contattaci per ricevere un preventivo personalizzato per le licenze Team, Azienda o Formatore.
+                            Contattaci per ricevere informazioni sulle licenze Team e Formazione.
                         </p>
                         <a
                             href="mailto:simonsilvercaldaie@gmail.com?subject=Richiesta%20Licenza%20Aziendale"
                             className="inline-flex items-center gap-2 bg-white text-primary font-bold px-6 py-3 rounded-xl hover:bg-gray-100 transition-colors"
                         >
-                            <Mail className="w-5 h-5" />
+                            ✉
                             Contattaci
                         </a>
                     </div>

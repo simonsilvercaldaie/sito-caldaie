@@ -14,7 +14,10 @@ L'accesso alla piattaforma avviene esclusivamente tramite account Google. Non so
 Ogni licenza personale è valida per un singolo utilizzatore. Non è cedibile né condivisibile con terzi.
 
 **Licenza Team**
-Le licenze Team (5, 10 o 25 posti) assegnano uno slot individuale a ciascun collaboratore. Ogni membro accede con il proprio account Google personale.
+Le licenze Team (5, 10 o 25 posti) assegnano uno slot individuale a ciascun collaboratore. Ogni membro accede con il proprio account Google personale. Le licenze Team non consentono la proiezione in aula né l'uso didattico.
+
+**Licenza Formazione**
+La Licenza Formazione è riservata a istituti scolastici, centri di formazione professionale e laboratori tecnici. È l'unica licenza che autorizza la proiezione in aula e l'uso didattico dei contenuti.
 
 **Sessioni e Dispositivi**
 È consentita una sola sessione attiva per account: l'accesso da un nuovo dispositivo disconnette automaticamente quello precedente. Ogni account può registrare al massimo 2 dispositivi, con possibilità di reset una volta ogni 30 giorni. È richiesto un login periodico per mantenere attiva la sessione.

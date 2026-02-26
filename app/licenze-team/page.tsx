@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 import Navbar from "@/components/Navbar"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Users, CheckCircle2, ArrowRight } from "lucide-react"
+import { Users, CheckCircle2, ArrowRight, GraduationCap } from "lucide-react"
 import { PayPalBtn } from "@/components/PayPalBtn"
 import { supabase } from "@/lib/supabaseClient"
 import { LEGAL_TEXT_CHECKOUT } from "@/lib/legalTexts"
@@ -127,13 +127,13 @@ export default function TeamLicensePage() {
         }
     }
 
-    const TeamCard = ({ title, users, price, code, amount }: { title: string, users: number, price: string, code: string, amount: number }) => (
-        <div className="bg-white border-2 border-indigo-100 rounded-3xl p-8 shadow-xl hover:border-indigo-300 transition-all duration-300 flex flex-col">
+    const TeamCard = ({ title, users, price, code, amount, icon, features, highlighted = false }: { title: string, users: number, price: string, code: string, amount: number, icon?: any, features?: string[], highlighted?: boolean }) => (
+        <div className={`rounded-3xl p-8 shadow-xl transition-all duration-300 flex flex-col ${highlighted ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 hover:border-amber-400' : 'bg-white border-2 border-indigo-100 hover:border-indigo-300'}`}>
             <div className="mb-6">
-                <h3 className="text-2xl font-bold text-indigo-900 mb-2">{title}</h3>
-                <div className="flex items-center gap-2 text-indigo-600 font-medium bg-indigo-50 px-3 py-1 rounded-full inline-block">
-                    <Users className="w-4 h-4" />
-                    <span>Fino a {users} Tecnici</span>
+                <h3 className={`text-2xl font-bold mb-2 ${highlighted ? 'text-amber-900' : 'text-indigo-900'}`}>{title}</h3>
+                <div className={`flex items-center gap-2 font-medium px-3 py-1 rounded-full inline-block ${highlighted ? 'text-amber-700 bg-amber-100' : 'text-indigo-600 bg-indigo-50'}`}>
+                    {icon || <Users className="w-4 h-4" />}
+                    <span>Fino a {users} {highlighted ? 'Partecipanti' : 'Tecnici'}</span>
                 </div>
             </div>
 
@@ -143,19 +143,27 @@ export default function TeamLicensePage() {
             </div>
 
             <ul className="space-y-3 mb-8 flex-grow">
-                <li className="flex items-start gap-3 text-slate-600">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                    <span>Accesso completo a <strong>tutti i 3 Livelli</strong></span>
-                </li>
-
-                <li className="flex items-start gap-3 text-slate-600">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                    <span>Gestione utenti centralizzata</span>
-                </li>
-                <li className="flex items-start gap-3 text-slate-600">
-                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
-                    <span><strong>Admin + {users} tecnici</strong> invitabili</span>
-                </li>
+                {features ? features.map((f, i) => (
+                    <li key={i} className="flex items-start gap-3 text-slate-600">
+                        <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <span dangerouslySetInnerHTML={{ __html: f }} />
+                    </li>
+                )) : (
+                    <>
+                        <li className="flex items-start gap-3 text-slate-600">
+                            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                            <span>Accesso completo a <strong>tutti i 3 Livelli</strong></span>
+                        </li>
+                        <li className="flex items-start gap-3 text-slate-600">
+                            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                            <span>Gestione utenti centralizzata</span>
+                        </li>
+                        <li className="flex items-start gap-3 text-slate-600">
+                            <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0" />
+                            <span><strong>Admin + {users} tecnici</strong> invitabili</span>
+                        </li>
+                    </>
+                )}
             </ul>
 
             <div className="mt-auto">
@@ -171,7 +179,7 @@ export default function TeamLicensePage() {
                         </button>
                     )
                 ) : (
-                    <Link href="/login" className="block w-full py-4 bg-indigo-600 text-white font-bold rounded-xl text-center hover:bg-indigo-700 transition-colors">
+                    <Link href="/login" className={`block w-full py-4 font-bold rounded-xl text-center transition-colors ${highlighted ? 'bg-amber-600 text-white hover:bg-amber-700' : 'bg-indigo-600 text-white hover:bg-indigo-700'}`}>
                         Accedi per Acquistare
                     </Link>
                 )}
@@ -194,13 +202,13 @@ export default function TeamLicensePage() {
 
                     <div className="text-center mb-16">
                         <span className="text-indigo-600 font-bold tracking-wider uppercase text-sm bg-indigo-50 px-4 py-2 rounded-full mb-4 inline-block">
-                            Per Aziende e Centri Assistenza
+                            Per Aziende, Centri Assistenza e Istituti di Formazione
                         </span>
                         <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6">
                             Licenze <span className="text-indigo-600">Team</span>
                         </h1>
                         <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-                            Soluzione aziendale completa. Risparmia fino al 40% rispetto alle licenze singole e gestisci la formazione dei tuoi tecnici in un unico posto.
+                            Soluzione completa per aziende e formatori. Risparmia fino al 40% rispetto alle licenze singole e gestisci la formazione in un unico posto.
                         </p>
                     </div>
 
@@ -225,7 +233,7 @@ export default function TeamLicensePage() {
                         </div>
                     )}
 
-                    <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                    <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                         <TeamCard
                             title="Team 5"
                             users={5}
@@ -241,11 +249,27 @@ export default function TeamLicensePage() {
                             amount={4000}
                         />
                         <TeamCard
-                            title="Team 25 / Formatore"
+                            title="Team 25"
                             users={25}
                             price="5.000"
                             code="team_25"
                             amount={5000}
+                        />
+                        <TeamCard
+                            title="🎓 Formazione"
+                            users={25}
+                            price="5.000"
+                            code="team_25"
+                            amount={5000}
+                            highlighted={true}
+                            icon={<GraduationCap className="w-4 h-4" />}
+                            features={[
+                                '<strong>Proiezione in aula</strong> autorizzata',
+                                'Uso <strong>didattico e formativo</strong> consentito',
+                                'Fino a <strong>25 account</strong> per studenti/partecipanti',
+                                'Accesso completo a <strong>tutti i 3 Livelli</strong>',
+                                'Ideale per <strong>istituti tecnici, CFP, laboratori</strong>'
+                            ]}
                         />
                     </div>
                 </div>

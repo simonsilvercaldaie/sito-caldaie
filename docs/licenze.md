@@ -19,43 +19,30 @@ Per un singolo professionista.
 
 ---
 
-## Licenza Team (2-5 persone)
+## Licenza Team (5, 10 o 25 posti)
 
-Per piccoli gruppi di lavoro.
+Per ditte e aziende con più tecnici.
 
-- Fino a 5 account nominativi (uno per persona)
+- Account nominativi (5, 10 o 25 posti)
 - Ogni utente accede con le proprie credenziali
 - Visione individuale, non in proiezione condivisa
 
-**Non consente:** uso di un singolo account da parte di più persone.
+**Non consente:** proiezione in aula, uso didattico o formativo, uso di un singolo account da parte di più persone.
 
-**Indicata per:** ditte con pochi collaboratori.
-
----
-
-## Licenza Azienda (6-20 persone)
-
-Per squadre tecniche strutturate.
-
-- Fino a 20 account nominativi
-- Pannello di gestione dedicato
-- Possibilità di aggiungere o rimuovere utenti
-
-**Non consente:** proiezione collettiva, formazione in aula.
-
-**Indicata per:** aziende con più tecnici operativi.
+**Indicata per:** ditte con collaboratori, centri assistenza, aziende.
 
 ---
 
-## Licenza Formatore
+## Licenza Formazione
 
-Per centri di formazione, scuole tecniche, enti accreditati.
+Per istituti scolastici, centri di formazione professionale e laboratori tecnici.
 
 - Proiezione in aula autorizzata
-- Uso didattico consentito
-- Preventivo personalizzato in base al numero di partecipanti
+- Uso didattico e formativo consentito
+- Fino a 25 account per studenti/partecipanti
+- Accesso completo a tutti i 3 Livelli
 
-**Richiedi preventivo:** simonsilvercaldaie@gmail.com
+**Indicata per:** istituti tecnici, CFP, enti accreditati, laboratori che formano tecnici caldaisti.
 
 ---
 
@@ -64,9 +51,8 @@ Per centri di formazione, scuole tecniche, enti accreditati.
 | Situazione | Licenza consigliata |
 |------------|---------------------|
 | Studio personale, aggiornamento individuale | Personale |
-| 2-5 colleghi, ognuno studia per sé | Team |
-| 6-20 tecnici in azienda | Azienda |
-| Formazione in aula, corsi a terzi | Formatore |
+| Ditta con collaboratori, centro assistenza | Team (5, 10 o 25) |
+| Formazione in aula, scuola, CFP, laboratorio | Formazione |
 
 ---
 
@@ -79,7 +65,10 @@ Sì, puoi accedere da qualsiasi dispositivo. L'unico vincolo è che la visione p
 Nessun problema. Non c'è limite al numero di dispositivi su cui puoi accedere, solo alla visione simultanea.
 
 **Posso far vedere i video a un collega?**  
-Con la licenza personale, no. Se hai bisogno di formare più persone, scegli la licenza Team o Azienda.
+Con la licenza personale, no. Se hai bisogno di formare più persone, scegli la licenza Team.
+
+**Posso proiettare i video in aula o in un corso?**  
+Solo con la Licenza Formazione. Le licenze Team non autorizzano la proiezione collettiva né l'uso didattico.
 
 **I video scadono?**  
 No. L'accesso è illimitato nel tempo.
