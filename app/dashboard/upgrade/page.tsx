@@ -9,12 +9,12 @@ import { PayPalBtn } from '@/components/PayPalBtn'
 import { LEGAL_TEXT_CHECKOUT } from '@/lib/legalTexts'
 
 // Upgrade pricing (differenziale)
-// Individual complete = 1200€, Team5 = 3000€, Team10 = 4000€, Team25 = 5000€
+// Individual complete = 1000€ (bundle), Team5 = 3000€, Team10 = 4000€, Team25 = 5000€
 const UPGRADE_PRICES = {
     // From Individual (all 3) to Team
-    'individual_to_team_5': 1800,    // 3000 - 1200
-    'individual_to_team_10': 2800,   // 4000 - 1200
-    'individual_to_team_25': 3800,   // 5000 - 1200
+    'individual_to_team_5': 2000,    // 3000 - 1000
+    'individual_to_team_10': 3000,   // 4000 - 1000
+    'individual_to_team_25': 4000,   // 5000 - 1000
 }
 
 type LicenseStatus =
