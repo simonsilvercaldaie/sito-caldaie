@@ -15,10 +15,6 @@ const UPGRADE_PRICES = {
     'individual_to_team_5': 1800,    // 3000 - 1200
     'individual_to_team_10': 2800,   // 4000 - 1200
     'individual_to_team_25': 3800,   // 5000 - 1200
-    // Team to Team
-    'team_5_to_team_10': 1000,       // 4000 - 3000
-    'team_5_to_team_25': 2000,       // 5000 - 3000
-    'team_10_to_team_25': 1000,      // 5000 - 4000
 }
 
 type LicenseStatus =
@@ -263,7 +259,7 @@ export default function UpgradePage() {
                         <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
                             <Users className="w-5 h-5 text-indigo-600 flex-shrink-0" />
                             <p className="text-indigo-800">
-                                <strong>Team 5</strong> - Puoi espandere a Team 10 o Team 25.
+                                <strong>Team 5</strong> - Hai già una licenza Team attiva. Gestisci i tuoi membri dalla <Link href="/dashboard" className="underline font-bold">Dashboard</Link>.
                             </p>
                         </div>
                     )}
@@ -271,7 +267,7 @@ export default function UpgradePage() {
                         <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
                             <Users className="w-5 h-5 text-indigo-600 flex-shrink-0" />
                             <p className="text-indigo-800">
-                                <strong>Team 10</strong> - Puoi espandere a Team 25.
+                                <strong>Team 10</strong> - Hai già una licenza Team attiva. Gestisci i tuoi membri dalla <Link href="/dashboard" className="underline font-bold">Dashboard</Link>.
                             </p>
                         </div>
                     )}
@@ -286,7 +282,7 @@ export default function UpgradePage() {
                 </div>
 
                 {/* TOS CHECKBOX */}
-                {(licenseStatus === 'full_individual' || licenseStatus === 'team_5' || licenseStatus === 'team_10') && (
+                {licenseStatus === 'full_individual' && (
                     <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
                         <label className={`flex items-start gap-3 cursor-pointer p-4 rounded-xl border-2 ${tosAccepted ? 'border-indigo-300 bg-indigo-50/50' : 'border-gray-200'} transition-all ${tosLoading ? 'opacity-50 pointer-events-none' : ''}`}>
                             <input
@@ -308,54 +304,38 @@ export default function UpgradePage() {
                 )}
 
                 {/* UPGRADE OPTIONS */}
-                {(licenseStatus === 'full_individual' || licenseStatus === 'team_5' || licenseStatus === 'team_10') && (
+                {licenseStatus === 'full_individual' && (
                     <div className="space-y-4">
                         <h2 className="text-xl font-bold text-gray-800">Opzioni di Upgrade</h2>
 
                         <div className="grid md:grid-cols-3 gap-6">
                             {/* Team 5 */}
-                            {licenseStatus === 'full_individual' && (
-                                <UpgradeCard
-                                    title="Team 5"
-                                    users={5}
-                                    price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_5}
-                                    enabled={tosAccepted}
-                                    onSuccess={(id) => handleUpgradeSuccess(id, 5, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_5)}
-                                />
-                            )}
+                            <UpgradeCard
+                                title="Team 5"
+                                users={5}
+                                price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_5}
+                                enabled={tosAccepted}
+                                onSuccess={(id) => handleUpgradeSuccess(id, 5, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_5)}
+                            />
 
                             {/* Team 10 */}
-                            {(licenseStatus === 'full_individual' || licenseStatus === 'team_5') && (
-                                <UpgradeCard
-                                    title="Team 10"
-                                    users={10}
-                                    price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : (licenseStatus === 'full_individual' ? UPGRADE_PRICES.individual_to_team_10 : UPGRADE_PRICES.team_5_to_team_10)}
-                                    enabled={tosAccepted}
-                                    onSuccess={(id) => handleUpgradeSuccess(id, 10, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : (licenseStatus === 'full_individual' ? UPGRADE_PRICES.individual_to_team_10 : UPGRADE_PRICES.team_5_to_team_10))}
-                                />
-                            )}
+                            <UpgradeCard
+                                title="Team 10"
+                                users={10}
+                                price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_10}
+                                enabled={tosAccepted}
+                                onSuccess={(id) => handleUpgradeSuccess(id, 10, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_10)}
+                            />
 
                             {/* Team 25 */}
-                            {(licenseStatus === 'full_individual' || licenseStatus === 'team_5' || licenseStatus === 'team_10') && (
-                                <UpgradeCard
-                                    title="Team 25"
-                                    users={25}
-                                    price={
-                                        user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : (
-                                            licenseStatus === 'full_individual' ? UPGRADE_PRICES.individual_to_team_25 :
-                                                licenseStatus === 'team_5' ? UPGRADE_PRICES.team_5_to_team_25 :
-                                                    UPGRADE_PRICES.team_10_to_team_25
-                                        )}
-                                    enabled={tosAccepted}
-                                    onSuccess={(id) => handleUpgradeSuccess(id, 25,
-                                        user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : (
-                                            licenseStatus === 'full_individual' ? UPGRADE_PRICES.individual_to_team_25 :
-                                                licenseStatus === 'team_5' ? UPGRADE_PRICES.team_5_to_team_25 :
-                                                    UPGRADE_PRICES.team_10_to_team_25
-                                        ))}
-                                    highlight
-                                />
-                            )}
+                            <UpgradeCard
+                                title="Team 25"
+                                users={25}
+                                price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_25}
+                                enabled={tosAccepted}
+                                onSuccess={(id) => handleUpgradeSuccess(id, 25, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_25)}
+                                highlight
+                            />
                         </div>
                     </div>
                 )}

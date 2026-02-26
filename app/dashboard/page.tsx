@@ -105,21 +105,18 @@ export default function DashboardPage() {
                 setLoadingDevices(false)
             }
 
-            // 3. Check upgrade eligibility (has all 3 levels OR has team < 25)
+            // 3. Check upgrade eligibility (has all 3 levels individually)
             try {
-
-                // Check if user is team owner with < 25 members
+                // Check if user already has a team license (no upgrade needed)
                 const { data: teamLicense } = await supabase
                     .from('team_licenses')
-                    .select('max_members')
-                    .eq('owner_id', session.user.id)
+                    .select('seats')
+                    .eq('owner_user_id', session.user.id)
                     .eq('status', 'active')
                     .maybeSingle()
 
-                if (teamLicense && teamLicense.max_members < 25) {
-                    setCanUpgrade(true)
-                } else if (!teamLicense) {
-                    // Check individual purchases
+                if (!teamLicense) {
+                    // No team license — check individual purchases
                     const { data: purchases } = await supabase
                         .from('purchases')
                         .select('product_code')
