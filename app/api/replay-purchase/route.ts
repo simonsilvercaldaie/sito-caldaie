@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL } from '@/lib/constants'
 import { getExpectedPriceCents, PRODUCT_PRICES_CENTS, ProductCode } from '@/lib/serverPricing'
 import { checkRateLimit } from '@/lib/rateLimit'
+import { grantAccessForProduct } from '@/lib/accessControl'
 
 function getSupabaseAdmin() {
     return createClient(
@@ -158,7 +159,7 @@ export async function POST(request: NextRequest) {
         // Check Legacy Order ID Check (Ottimizzazione rapida)
         const { data: existingPurchase } = await supabaseAdmin
             .from('purchases')
-            .select('id, course_id')
+            .select('id')
             .eq('paypal_order_id', orderId)
             .maybeSingle()
 
@@ -287,7 +288,7 @@ export async function POST(request: NextRequest) {
             if (memErr) throw memErr
 
             // 3. Registra Acquisto
-            const { error: purErr } = await supabaseAdmin.from('purchases').insert({
+            const { data: purchaseRow, error: purErr } = await supabaseAdmin.from('purchases').insert({
                 user_id: user.id,
                 plan_type: 'team',
                 product_code: productCode,
@@ -295,9 +296,8 @@ export async function POST(request: NextRequest) {
                 paypal_order_id: orderId,
                 paypal_capture_id: captureId,
                 team_license_id: lic.id,
-                course_id: null,
                 validated_at: new Date().toISOString()
-            })
+            }).select('id').single()
             if (purErr) {
                 if (purErr.code === '23505') { // Unique constraint violation (race condition)
                     return NextResponse.json({ ok: true, status: 'activated', message: 'Ordine già attivato' })
@@ -305,9 +305,12 @@ export async function POST(request: NextRequest) {
                 throw purErr
             }
 
+            // Grant access levels for team owner
+            await grantAccessForProduct(user.id, productCode, 'team', purchaseRow.id, lic.id)
+
         } else {
             // --- LOGICA INDIVIDUAL ---
-            const { error: insertError } = await supabaseAdmin
+            const { data: purchaseRow, error: insertError } = await supabaseAdmin
                 .from('purchases')
                 .insert({
                     user_id: user.id,
@@ -316,9 +319,8 @@ export async function POST(request: NextRequest) {
                     amount_cents: amountCents,
                     paypal_order_id: orderId,
                     paypal_capture_id: captureId,
-                    course_id: null,
                     validated_at: new Date().toISOString()
-                })
+                }).select('id').single()
 
             if (insertError) {
                 if (insertError.code === '23505') {
@@ -326,6 +328,9 @@ export async function POST(request: NextRequest) {
                 }
                 throw insertError
             }
+
+            // Grant access levels for individual purchase
+            await grantAccessForProduct(user.id, productCode, 'purchase', purchaseRow.id)
         }
 
         console.log(`[replay-purchase] Successo attivazione ${productCode}`)

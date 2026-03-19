@@ -314,7 +314,7 @@ export default function AdminPage() {
                                             </td>
                                             <td className="p-4">
                                                 <span className="px-2 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">
-                                                    {order.product_code || order.course_id}
+                                                    {order.product_code || 'N/A'}
                                                 </span>
                                             </td>
                                             <td className="p-4 font-mono">€{(order.amount / 100).toFixed(2)}</td>

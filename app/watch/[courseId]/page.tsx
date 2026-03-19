@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter, useParams } from 'next/navigation'
-import { Loader2, Lock, ArrowLeft } from 'lucide-react'
+import { Loader2, Lock, ArrowLeft, ShoppingCart } from 'lucide-react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import VideoPlayerSecured from '@/components/VideoPlayerSecured'
@@ -14,16 +14,15 @@ export default function WatchPage() {
     const [videoUrl, setVideoUrl] = useState("")
     const [userEmail, setUserEmail] = useState("")
     const [orderId, setOrderId] = useState("")
+    const [requiredLevel, setRequiredLevel] = useState<string | null>(null)
 
     const params = useParams()
     const router = useRouter()
 
     useEffect(() => {
         const checkAccess = async () => {
-            // Decode URI component to handle spaces correctly
             const rawId = params.courseId as string
             const courseId = decodeURIComponent(rawId)
-            setCourseTitle(courseId)
 
             // 1. Check Auth
             const { data: { session } } = await supabase.auth.getSession()
@@ -33,47 +32,36 @@ export default function WatchPage() {
             }
             setUserEmail(session.user.email || '')
 
-            // 2. Check Purchase per questo specifico corso
-            // Cerchiamo sia acquisti individuali che tramite team license (se applicabile)
-            // Per ora manteniamo la logica semplice su 'purchases'
-            const { data, error } = await supabase
-                .from('purchases')
-                .select('*')
-                .eq('user_id', session.user.id)
-                .eq('course_id', courseId)
-                .single()
+            // 2. Call server-side access check API
+            try {
+                const res = await fetch('/api/video-access', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({ courseId })
+                })
 
-            if (data) {
-                setAuthorized(true)
-                // Use paypal_capture_id if available, otherwise purchase ID
-                setOrderId(data.paypal_capture_id || data.id)
+                const data = await res.json()
 
-                // Logica per determinare quale file caricare in base al Product Name
-                // In produzione, avremmo una colonna 'video_filename' nella tabella 'courses' o 'products'.
-                // Per ora facciamo un mapping manuale semplice.
-                let videoFilename = "default_placeholder.mp4"
-
-                if (courseId.includes("Sostituzione Scambiatore")) {
-                    videoFilename = "scambiatore.mp4"
-                }
-                // Aggiungere altri casi qui...
-
-                // Genera Signed URL valido per 1 ora (3600 secondi)
-                const { data: fileData, error: fileError } = await supabase
-                    .storage
-                    .from('videos')
-                    .createSignedUrl(videoFilename, 3600)
-
-                if (fileError) {
-                    console.error("Errore caricamento video:", fileError)
-                    // Fallback se il file non esiste ancora (per evitare errore critico in UI)
-                    setVideoUrl("https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4")
+                if (res.ok && data.authorized) {
+                    setAuthorized(true)
+                    setCourseTitle(data.courseTitle || courseId)
+                    setVideoUrl(data.videoUrl)
+                    // Use a stable identifier for the watermark
+                    setOrderId(session.user.id.slice(-12))
                 } else {
-                    setVideoUrl(fileData.signedUrl)
+                    setAuthorized(false)
+                    setCourseTitle(data.courseTitle || courseId)
+                    setRequiredLevel(data.requiredLevel || null)
                 }
-            } else {
+            } catch (err) {
+                console.error('Error checking video access:', err)
                 setAuthorized(false)
+                setCourseTitle(courseId)
             }
+
             setLoading(false)
         }
         checkAccess()
@@ -90,11 +78,22 @@ export default function WatchPage() {
             <Lock className="w-16 h-16 text-red-500 mb-4" />
             <h1 className="text-2xl font-bold text-gray-800 mb-2">Accesso Negato</h1>
             <p className="text-gray-600 max-w-md mb-6">
-                Non risulti aver acquistato il corso: <strong>{courseTitle}</strong>.
+                Non hai accesso al corso: <strong>{courseTitle}</strong>.
+                {requiredLevel && (
+                    <span className="block mt-2 text-sm">
+                        Serve il pacchetto <strong className="capitalize">{requiredLevel}</strong>.
+                    </span>
+                )}
             </p>
-            <Link href="/" className="px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors">
-                Torna al Catalogo
-            </Link>
+            <div className="flex gap-4">
+                <Link href="/catalogo" className="flex items-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors">
+                    <ShoppingCart className="w-4 h-4" />
+                    Vai al Catalogo
+                </Link>
+                <Link href="/" className="px-6 py-3 bg-white border border-gray-200 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-colors">
+                    Torna alla Home
+                </Link>
+            </div>
         </div>
     )
 
@@ -110,7 +109,6 @@ export default function WatchPage() {
                     </Link>
                     <div>
                         <h1 className="text-xl md:text-2xl font-bold">{courseTitle}</h1>
-                        <p className="text-gray-400 text-sm">Capitolo 1: Introduzione e Diagnosi</p>
                     </div>
                 </div>
 

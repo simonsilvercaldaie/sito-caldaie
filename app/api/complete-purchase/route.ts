@@ -4,6 +4,7 @@ import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL, INVOICE_NOTIFICAT
 import { getExpectedPriceCents } from '@/lib/serverPricing'
 import { checkRateLimit } from '@/lib/rateLimit'
 import { sendEmail } from '@/lib/email'
+import { grantAccessForProduct } from '@/lib/accessControl'
 
 // Type for billing profile
 interface BillingProfile {
@@ -229,31 +230,35 @@ export async function POST(request: NextRequest) {
             })
             if (memErr) throw memErr
 
-            const { error: purErr } = await supabaseAdmin.from('purchases').insert({
+            const { data: purchaseRow, error: purErr } = await supabaseAdmin.from('purchases').insert({
                 user_id: user.id,
                 plan_type: 'team',
                 product_code: product_code,
                 amount_cents: truthPrice,
                 paypal_capture_id: captureId,
                 team_license_id: lic.id,
-                course_id: null,
                 ...snapshotData
-            })
+            }).select('id').single()
             if (purErr) throw purErr
+
+            // Grant access levels for team owner
+            await grantAccessForProduct(user.id, product_code, 'team', purchaseRow.id, lic.id)
 
         } else {
             // --- RAMO INDIVIDUAL ---
-            const { error: purErr } = await supabaseAdmin.from('purchases').insert({
+            const { data: purchaseRow, error: purErr } = await supabaseAdmin.from('purchases').insert({
                 user_id: user.id,
                 plan_type: 'individual',
                 product_code: product_code,
                 amount_cents: truthPrice,
                 paypal_capture_id: captureId,
                 team_license_id: null,
-                course_id: null, // DEPRECATED
                 ...snapshotData
-            })
+            }).select('id').single()
             if (purErr) throw purErr
+
+            // Grant access levels for individual purchase
+            await grantAccessForProduct(user.id, product_code, 'purchase', purchaseRow.id)
         }
 
         // 8.1 Determine Email Type for client-side sending
