@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { sendEmail } from '@/lib/email'
+import { validateCodiceFiscale, validatePartitaIVA } from '@/lib/italianFiscalValidation'
 
 function getSupabaseAdmin() {
     return createClient(
@@ -64,9 +65,13 @@ export async function POST(request: NextRequest) {
 
         // Validazioni per PRIVATO
         if (customer_type === 'private') {
-            const cf = fiscal_code?.trim()?.toUpperCase() || ''
-            if (!/^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$/.test(cf)) {
-                return NextResponse.json({ error: 'Codice Fiscale non valido (formato: RSSMRA80A01H501U)' }, { status: 400 })
+            const cfResult = validateCodiceFiscale(
+                fiscal_code?.trim() || '',
+                first_name.trim(),
+                last_name.trim()
+            )
+            if (!cfResult.valid) {
+                return NextResponse.json({ error: cfResult.error }, { status: 400 })
             }
         }
 
@@ -75,8 +80,9 @@ export async function POST(request: NextRequest) {
             if (!company_name?.trim() || company_name.trim().length < 3) {
                 return NextResponse.json({ error: 'Ragione Sociale non valida (minimo 3 caratteri)' }, { status: 400 })
             }
-            if (!/^\d{11}$/.test(vat_number?.trim() || '')) {
-                return NextResponse.json({ error: 'Partita IVA non valida (11 cifre)' }, { status: 400 })
+            const pivaResult = validatePartitaIVA(vat_number?.trim() || '')
+            if (!pivaResult.valid) {
+                return NextResponse.json({ error: pivaResult.error }, { status: 400 })
             }
             const sdi = sdi_code?.trim() || ''
             const isSdi = /^[A-Za-z0-9]{7}$/.test(sdi)

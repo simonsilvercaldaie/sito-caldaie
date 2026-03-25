@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2, User, Building2, CheckCircle, AlertCircle } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { validateCodiceFiscale, validatePartitaIVA } from '@/lib/italianFiscalValidation'
 
 export default function CompletaProfiloPage() {
     return (
@@ -105,15 +106,15 @@ function CompletaProfiloContent() {
 
         // --- PRIVATO ---
         if (customerType === 'private') {
-            // Codice Fiscale: OBBLIGATORIO, 16 caratteri alfanumerici
             const cfClean = fiscalCode.trim().toUpperCase()
             if (!cfClean) {
                 setError('Il Codice Fiscale è obbligatorio per la fatturazione')
                 setSaving(false)
                 return
             }
-            if (!/^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$/.test(cfClean)) {
-                setError('Il Codice Fiscale non è nel formato corretto (16 caratteri, es. "RSSMRA80A01H501U")')
+            const cfResult = validateCodiceFiscale(cfClean, firstName.trim(), lastName.trim())
+            if (!cfResult.valid) {
+                setError(cfResult.error!)
                 setSaving(false)
                 return
             }
@@ -127,10 +128,10 @@ function CompletaProfiloContent() {
                 return
             }
 
-            // Partita IVA: esattamente 11 cifre
-            const pivaClean = vatNumber.trim()
-            if (!/^\d{11}$/.test(pivaClean)) {
-                setError('La Partita IVA deve essere di 11 cifre (es. "12345678901")')
+            // Partita IVA con check digit
+            const pivaResult = validatePartitaIVA(vatNumber.trim())
+            if (!pivaResult.valid) {
+                setError(pivaResult.error!)
                 setSaving(false)
                 return
             }
@@ -142,7 +143,6 @@ function CompletaProfiloContent() {
                 setSaving(false)
                 return
             }
-            // SDI: 7 caratteri alfanumerici, oppure PEC: deve contenere @
             const isSdi = /^[A-Za-z0-9]{7}$/.test(sdiClean)
             const isPec = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sdiClean)
             if (!isSdi && !isPec) {

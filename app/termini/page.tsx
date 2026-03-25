@@ -42,10 +42,13 @@ export default function TerminiPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-bold text-primary">3. Pagamenti</h2>
+                            <h2 className="text-xl font-bold text-primary">3. Pagamenti e Fatturazione</h2>
                             <p>
                                 I pagamenti sono gestiti tramite PayPal. L'accesso al corso viene sbloccato
                                 automaticamente dopo la conferma del pagamento.
+                            </p>
+                            <p className="mt-4">
+                                <strong>Dati di fatturazione:</strong> L'utente è l'unico responsabile della correttezza e della veridicità dei dati fiscali forniti al momento dell'acquisto (Nome, Cognome, Codice Fiscale, Partita IVA, Codice SDI, PEC, indirizzo). L'Azienda emetterà fattura sulla base esclusiva dei dati dichiarati dall'utente. Qualsiasi errore, invalidità o scarto da parte del Sistema di Interscambio (SDI) dovuto a dati errati, falsi o compiacenti non sarà imputabile all'Azienda e non costituirà motivo legittimo di storno o rimborso.
                             </p>
                         </section>
 
