@@ -17,6 +17,7 @@ export default function PacchettoCompletoPage() {
     const [tosAccepted, setTosAccepted] = useState(false)
     const [tosLoading, setTosLoading] = useState(false)
     const [hasPurchased, setHasPurchased] = useState(false)
+    const [profileCompleted, setProfileCompleted] = useState(false)
 
     useEffect(() => {
         const checkUser = async () => {
@@ -25,6 +26,13 @@ export default function PacchettoCompletoPage() {
             setUser(currentUser)
 
             if (currentUser) {
+                // Check profile completion
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('profile_completed')
+                    .eq('id', currentUser.id)
+                    .maybeSingle()
+                setProfileCompleted(profile?.profile_completed ?? false)
                 // Check if already has complete access
                 const { data: purchases } = await supabase
                     .from('purchases')
@@ -294,7 +302,16 @@ export default function PacchettoCompletoPage() {
                                         </div>
                                     </div>
 
-                                    {user ? (
+                                    {user && !profileCompleted ? (
+                                        <div className="text-center">
+                                            <Link
+                                                href="/completa-profilo?returnTo=/pacchetto-completo"
+                                                className="block w-full py-4 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition-all shadow-lg text-lg"
+                                            >
+                                                ✏️ Completa il profilo per acquistare
+                                            </Link>
+                                        </div>
+                                    ) : user && profileCompleted ? (
                                         <div className="space-y-4">
                                             <label className={`flex items-start gap-3 text-sm text-gray-600 cursor-pointer p-4 bg-gray-50 rounded-xl border-2 ${tosAccepted ? 'border-amber-500 bg-amber-50/50' : 'border-gray-200'} transition-all hover:border-amber-300 ${tosLoading ? 'opacity-50 pointer-events-none' : ''}`}>
                                                 <input
@@ -306,7 +323,7 @@ export default function PacchettoCompletoPage() {
                                                 />
                                                 <span className="leading-snug">
                                                     Dichiaro di aver letto e accettato i{' '}
-                                                    <Link href="/termini" target="_blank" className="text-amber-600 underline hover:text-amber-700">Termini d'Uso</Link>
+                                                    <Link href="/termini" target="_blank" className="text-amber-600 underline hover:text-amber-700">Termini d&apos;Uso</Link>
                                                     {' '}e le condizioni di vendita.
                                                 </span>
                                             </label>

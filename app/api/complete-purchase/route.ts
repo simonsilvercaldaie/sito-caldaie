@@ -178,6 +178,12 @@ export async function POST(request: NextRequest) {
         const { data: tos } = await supabaseAdmin.from('tos_acceptances').select('id').eq('user_id', user.id).eq('tos_version', TOS_VERSION).maybeSingle()
         if (!tos) return NextResponse.json({ ok: false, error: 'tos_required' }, { status: 403 })
 
+        // 5b. Profile Completion Check (billing data required for invoice)
+        const { data: profileData } = await supabaseAdmin.from('profiles').select('profile_completed').eq('id', user.id).maybeSingle()
+        if (!profileData?.profile_completed) {
+            return NextResponse.json({ ok: false, error: 'profile_incomplete' }, { status: 403 })
+        }
+
         // 6. Verify PayPal
         const ver = await verifyPayPalOrder(orderId, truthPrice, user.id)
         if (!ver.valid || !ver.captureId) return NextResponse.json({ ok: false, error: ver.error }, { status: 402 })

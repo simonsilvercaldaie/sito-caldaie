@@ -47,6 +47,7 @@ export default function CorsoPage() {
     const [pricingInfo, setPricingInfo] = useState<ReturnType<typeof getLevelPricing> | null>(null)
     const [tosAccepted, setTosAccepted] = useState(false)
     const [tosLoading, setTosLoading] = useState(false)
+    const [profileCompleted, setProfileCompleted] = useState(false)
 
     // Team UI State
     const [viewMode, setViewMode] = useState<'individual' | 'team' | null>(null)
@@ -69,6 +70,13 @@ export default function CorsoPage() {
             }
 
             if (currentUser) {
+                // Check profile completion
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('profile_completed')
+                    .eq('id', currentUser.id)
+                    .maybeSingle()
+                setProfileCompleted(profile?.profile_completed ?? false)
                 // 1. Carica acquisti Individuali
                 const { data: purchases } = await supabase
                     .from('purchases')
@@ -715,8 +723,17 @@ export default function CorsoPage() {
                                             </div>
                                         ) : (
                                             <div className="space-y-4">
-                                                {user && (
-                                                    <div className="space-y-4">
+                                                {user && !profileCompleted && (
+                                                    <Link
+                                                        href={`/completa-profilo?returnTo=/corso/${slug}`}
+                                                        className="w-full py-4 bg-amber-500 text-white font-bold text-lg rounded-2xl hover:bg-amber-600 transition-all shadow-lg flex items-center justify-center gap-2"
+                                                    >
+                                                        ✏️ Completa il profilo per acquistare
+                                                    </Link>
+                                                )}
+
+                                                {user && profileCompleted && (
+                                                    <>
                                                         <label className={`flex items-start gap-3 text-sm text-gray-700 font-medium cursor-pointer p-4 bg-gray-50 rounded-xl border-2 ${tosAccepted ? 'border-accent/50 bg-accent/5' : 'border-gray-200'} transition-all hover:border-accent/30 ${tosLoading ? 'opacity-50 pointer-events-none' : ''}`}>
                                                             <input
                                                                 type="checkbox"
@@ -730,11 +747,11 @@ export default function CorsoPage() {
                                                                     <>
                                                                         Dichiaro di aver letto e accettato i{' '}
                                                                         <Link href="/termini" target="_blank" className="text-accent underline font-bold hover:text-accent/80">
-                                                                            Termini d’Uso
+                                                                            Termini d&apos;Uso
                                                                         </Link>
                                                                         {' '}e le regole di{' '}
                                                                         <Link href="/licenze" target="_blank" className="text-accent underline font-bold hover:text-accent/80">
-                                                                            Accesso & Licenze
+                                                                            Accesso &amp; Licenze
                                                                         </Link>
                                                                         {' '}della piattaforma SimonSilverCaldaie.it.
                                                                     </>
@@ -747,7 +764,7 @@ export default function CorsoPage() {
                                                                 {LEGAL_TEXT_CHECKOUT}
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    </>
                                                 )}
 
                                                 {viewMode === 'individual' && pricingInfo && (

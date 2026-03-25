@@ -89,18 +89,9 @@ export async function GET(request: NextRequest) {
 
             // Send welcome email (async, don't block)
             sendWelcomeEmail(user.email!).catch(console.error)
-
-            // Redirect to complete profile
-            return NextResponse.redirect(`${requestUrl.origin}/completa-profilo`)
         }
 
-        // Profile exists - check if complete
-        if (!existingProfile.profile_completed) {
-            console.log(`[auth/callback] Redirecting to profile completion: ${user.email}`)
-            return NextResponse.redirect(`${requestUrl.origin}/completa-profilo`)
-        }
-
-        // Profile complete - redirect to home
+        // All users go to home - profile completion is now required before purchase, not at login
         console.log(`[auth/callback] Login successful: ${user.email}`)
         return NextResponse.redirect(`${requestUrl.origin}/`)
 

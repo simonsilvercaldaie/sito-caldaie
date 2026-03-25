@@ -1,12 +1,15 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2, User, Building2, CheckCircle, AlertCircle } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 export default function CompletaProfiloPage() {
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const returnTo = searchParams.get('returnTo')
     const supabase = createClient()
 
     const [loading, setLoading] = useState(true)
@@ -147,8 +150,9 @@ Simon Silver
                 }
             }
 
-            // Success - redirect to home
-            router.push('/')
+            // Success - redirect to returnTo or home
+            const destination = returnTo || '/'
+            router.push(destination)
             router.refresh()
 
         } catch (err: any) {
@@ -185,7 +189,10 @@ Simon Silver
                     </div>
                     <h1 className="text-2xl font-bold text-primary">Completa il tuo Profilo</h1>
                     <p className="text-gray-600 mt-2">
-                        Per continuare, inserisci i tuoi dati per la fatturazione
+                        {returnTo
+                            ? 'Per procedere con l\'acquisto, compila i tuoi dati di fatturazione'
+                            : 'Inserisci i tuoi dati per la fatturazione dei futuri acquisti'
+                        }
                     </p>
                 </div>
 
@@ -418,6 +425,15 @@ Simon Silver
                 <p className="text-center text-xs text-gray-400 mt-6">
                     I tuoi dati sono al sicuro e verranno utilizzati solo per la fatturazione.
                 </p>
+
+                {/* Skip link - only if user is NOT coming from a purchase flow */}
+                {!returnTo && (
+                    <div className="text-center mt-4">
+                        <Link href="/" className="text-sm text-gray-400 hover:text-gray-600 transition-colors underline">
+                            Salta per ora → Esplora i corsi
+                        </Link>
+                    </div>
+                )}
 
             </div>
         </div>

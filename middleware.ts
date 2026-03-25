@@ -67,21 +67,8 @@ export async function middleware(request: NextRequest) {
         pathname.startsWith('/corso/')
     )
 
-    // If user is logged in and NOT on a public path or profile completion
-    if (user && !isPublicPath && pathname !== PROFILE_COMPLETION_PATH) {
-        // Check if profile is completed
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('profile_completed')
-            .eq('id', user.id)
-            .maybeSingle()
-
-        // If profile exists but not completed, redirect to completion
-        if (profile && profile.profile_completed === false) {
-            const redirectUrl = new URL(PROFILE_COMPLETION_PATH, request.url)
-            return NextResponse.redirect(redirectUrl)
-        }
-    }
+    // Profile completion is no longer enforced by middleware.
+    // It is checked at purchase time in the purchase pages and API.
 
     // If user is on profile completion page but already completed, redirect home
     if (user && pathname === PROFILE_COMPLETION_PATH) {

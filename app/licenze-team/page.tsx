@@ -15,11 +15,20 @@ export default function TeamLicensePage() {
     const [loading, setLoading] = useState(true)
     const [tosAccepted, setTosAccepted] = useState(false)
     const [tosLoading, setTosLoading] = useState(false)
+    const [profileCompleted, setProfileCompleted] = useState(false)
 
     useEffect(() => {
         const checkUser = async () => {
             const { data: { session } } = await supabase.auth.getSession()
             setUser(session?.user || null)
+            if (session?.user) {
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('profile_completed')
+                    .eq('id', session.user.id)
+                    .maybeSingle()
+                setProfileCompleted(profile?.profile_completed ?? false)
+            }
             setLoading(false)
         }
         checkUser()
@@ -172,7 +181,14 @@ export default function TeamLicensePage() {
             </ul>
 
             <div className="mt-auto">
-                {user ? (
+                {user && !profileCompleted ? (
+                    <Link
+                        href="/completa-profilo?returnTo=/licenze-team"
+                        className="block w-full py-4 bg-amber-500 text-white font-bold rounded-xl text-center hover:bg-amber-600 transition-all shadow-lg"
+                    >
+                        ✏️ Completa il profilo per acquistare
+                    </Link>
+                ) : user && profileCompleted ? (
                     tosAccepted ? (
                         <PayPalBtn
                             amount={String(getTestPrice(amount, user?.email))}
