@@ -286,10 +286,10 @@ export default function TeamLicensePage() {
                         <TeamCard
                             title="🎓 Formazione"
                             bigNumber="Scuola"
-                            users={1} // Internally, it grants 1 owner account
+                            users={10} 
                             badgeText="Allievi Illimitati"
                             price="5.000"
-                            code="multi_25"
+                            code="scuola_10"
                             amount={5000}
                             highlighted={true}
                             icon={<GraduationCap className="w-4 h-4" />}
@@ -298,7 +298,8 @@ export default function TeamLicensePage() {
                                 'Uso <strong>didattico e formativo</strong> consentito',
                                 'Nessun limite di partecipanti in presenza',
                                 'Accesso completo a <strong>tutti i 3 Livelli</strong>',
-                                '<strong>1 Account Istituto</strong> per la proiezione',
+                                'Fino a <strong>10 Account</strong> per i Docenti',
+                                '<strong>10 riassegnamenti</strong> gratuiti (turnover del corpo docenti)',
                                 'Ideale per <strong>istituti tecnici, CFP, laboratori</strong>'
                             ]}
                         />

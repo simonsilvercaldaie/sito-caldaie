@@ -257,7 +257,7 @@ export async function POST(request: NextRequest) {
         console.log(`[replay-purchase] Match prodotto: ${productCode} per €${amountCents / 100}`)
 
         // Logica Differenziata (Team vs Individual)
-        const isTeam = productCode.startsWith('team_')
+        const isTeam = productCode.startsWith('multi_') || productCode.startsWith('scuola_')
 
         if (isTeam) {
             // --- LOGICA TEAM (Copiata da complete-purchase per coerenza) ---

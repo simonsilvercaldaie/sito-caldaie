@@ -30,6 +30,8 @@ const PRODUCT_TO_LEVELS: Record<string, AccessLevel[]> = {
     'multi_5':           ['base', 'intermedio', 'avanzato'],
     'multi_10':          ['base', 'intermedio', 'avanzato'],
     'multi_25':          ['base', 'intermedio', 'avanzato'],
+    // Scuola
+    'scuola_10':         ['base', 'intermedio', 'avanzato'],
 }
 
 // Course level → access_level mapping

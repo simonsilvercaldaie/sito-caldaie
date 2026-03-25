@@ -202,7 +202,7 @@ export async function POST(request: NextRequest) {
             .maybeSingle()
 
         const billing = billingData as BillingProfile | null
-        const isTeam = product_code.startsWith('multi_')
+        const isTeam = product_code.startsWith('multi_') || product_code.startsWith('scuola_')
 
         // Common snapshot data
         const snapshotData = {

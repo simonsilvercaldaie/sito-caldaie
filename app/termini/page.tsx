@@ -97,7 +97,7 @@ export default function TerminiPage() {
                                 <li><strong>Licenza Multidipendente 5</strong>: per fino a 5 utenti nominativi, accesso a vita a tutti i livelli. Visione individuale.</li>
                                 <li><strong>Licenza Multidipendente 10</strong>: per fino a 10 utenti nominativi, accesso a vita a tutti i livelli. Visione individuale.</li>
                                 <li><strong>Licenza Multidipendente 25</strong>: per fino a 25 utenti nominativi, accesso a vita a tutti i livelli. Visione individuale.</li>
-                                <li><strong>Licenza Formazione</strong>: per istituti scolastici, centri di formazione professionale e laboratori tecnici. Fino a 25 utenti nominativi, accesso a vita a tutti i livelli. Consente la proiezione in aula e l'uso didattico dei contenuti.</li>
+                                <li><strong>Licenza Formazione (Scuola)</strong>: per istituti scolastici, centri di formazione professionale e laboratori tecnici. Consente l'assegnazione di 10 account nominativi per il corpo docente e autorizza legalmente la proiezione in aula agli studenti senza limiti di partecipanti. Accesso a vita a tutti i livelli. Include 10 riassegnamenti gratuiti per la gestione del turnover dei docenti.</li>
                             </ul>
                             <p className="mt-4"><strong>7.2.</strong> Ogni licenza Multidipendente prevede esclusivamente account nominativi. Ogni account è associato a una singola persona fisica e non può essere condiviso.</p>
                             <p className="mt-4"><strong>7.3.</strong> <strong>Riassegnamento slot.</strong> Ogni licenza Multidipendente include un numero di riassegnamenti gratuiti pari ai posti acquistati (es. la Multidipendente 5 include 5 riassegnamenti gratuiti). Ogni riassegnamento consiste nella rimozione di un membro esistente e nella successiva aggiunta di un nuovo membro. Esauriti i riassegnamenti gratuiti, ogni ulteriore sostituzione comporta un costo di <strong>€400</strong>.</p>
@@ -119,7 +119,7 @@ export default function TerminiPage() {
                                 <li>registrare, scaricare, duplicare o redistribuire i Contenuti in qualsiasi forma.</li>
                             </ul>
                             <p className="mt-4"><strong>8.3.</strong> Per usi aziendali o collettivi è obbligatorio acquistare una licenza Multidipendente appropriata (Multidipendente 5, 10 o 25).</p>
-                            <p className="mt-4"><strong>8.4.</strong> Per l'uso didattico, la proiezione in aula, la formazione scolastica o professionale, è obbligatorio acquistare la <strong>Licenza Formazione</strong>. Le licenze Multidipendente (5, 10 o 25) <strong>non</strong> autorizzano la proiezione collettiva né l'uso formativo.</p>
+                            <p className="mt-4"><strong>8.4.</strong> Per l'uso didattico, la proiezione in aula, la formazione scolastica o professionale, è obbligatorio acquistare la <strong>Licenza Formazione (Scuola)</strong>. Le licenze Multidipendente (5, 10 o 25) destinate alle aziende termoidrauliche <strong>non</strong> autorizzano la proiezione collettiva né l'uso formativo di gruppo.</p>
                         </section>
 
                         <section>
