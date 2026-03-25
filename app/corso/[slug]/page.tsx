@@ -767,7 +767,7 @@ export default function CorsoPage() {
                                                     </>
                                                 )}
 
-                                                {viewMode === 'individual' && pricingInfo && (
+                                                {viewMode === 'individual' && pricingInfo && profileCompleted && (
                                                     tosAccepted ? (
                                                         <PayPalBtn
                                                             amount={String(getTestPrice(pricingInfo.amountToPay, user?.email))}
