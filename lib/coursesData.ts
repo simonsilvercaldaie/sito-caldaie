@@ -25,7 +25,7 @@ export const courses: Course[] = [
         title: "1. La caldaia non è stupida: come prende decisioni",
         shortDescription: "Come ragiona una caldaia moderna. Catena dei consensi, logica prima dei componenti.",
         fullDescription: "Come ragiona una caldaia moderna. Catena dei consensi, logica prima dei componenti. Qui il tecnico capisce che non deve “cercare il guasto”, ma capire perché la macchina dice no.",
-        youtubeId: "PLACEHOLDER",
+        youtubeId: "e4D4N63lMp8",
         freeDuration: "15 min",
         premiumDuration: "30 min",
         level: "Base",
