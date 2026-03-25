@@ -137,7 +137,7 @@ export default function TeamLicensePage() {
         }
     }
 
-    const TeamCard = ({ title, bigNumber, users, price, code, amount, icon, features, highlighted = false }: { title: string, bigNumber: string, users: number, price: string, code: string, amount: number, icon?: any, features?: string[], highlighted?: boolean }) => (
+    const TeamCard = ({ title, bigNumber, users, badgeText, price, code, amount, icon, features, highlighted = false }: { title: string, bigNumber: string, users: number, badgeText?: string, price: string, code: string, amount: number, icon?: any, features?: string[], highlighted?: boolean }) => (
         <div className={`rounded-3xl p-8 shadow-xl transition-all duration-300 flex flex-col ${highlighted ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 hover:border-amber-400' : 'bg-white border-2 border-indigo-100 hover:border-indigo-300'}`}>
             <div className="mb-6 flex flex-col items-center text-center">
                 <h3 className={`text-xl font-bold mb-1 ${highlighted ? 'text-amber-900' : 'text-indigo-900'}`}>{title}</h3>
@@ -146,7 +146,7 @@ export default function TeamLicensePage() {
                 </div>
                 <div className={`flex items-center gap-2 font-medium px-3 py-1 rounded-full ${highlighted ? 'text-amber-700 bg-amber-100' : 'text-indigo-600 bg-indigo-50'}`}>
                     {icon || <Users className="w-4 h-4" />}
-                    <span>Fino a {users} {highlighted ? 'Partecipanti' : 'Tecnici'}</span>
+                    <span>{badgeText || `Fino a ${users} Tecnici`}</span>
                 </div>
             </div>
 
@@ -286,7 +286,8 @@ export default function TeamLicensePage() {
                         <TeamCard
                             title="🎓 Formazione"
                             bigNumber="Scuola"
-                            users={25}
+                            users={1} // Internally, it grants 1 owner account
+                            badgeText="Allievi Illimitati"
                             price="5.000"
                             code="multi_25"
                             amount={5000}
@@ -295,9 +296,9 @@ export default function TeamLicensePage() {
                             features={[
                                 '<strong>Proiezione in aula</strong> autorizzata',
                                 'Uso <strong>didattico e formativo</strong> consentito',
-                                'Fino a <strong>25 account</strong> per studenti/partecipanti',
+                                'Nessun limite di partecipanti in presenza',
                                 'Accesso completo a <strong>tutti i 3 Livelli</strong>',
-                                '<strong>25 riassegnamenti</strong> gratuiti inclusi',
+                                '<strong>1 Account Istituto</strong> per la proiezione',
                                 'Ideale per <strong>istituti tecnici, CFP, laboratori</strong>'
                             ]}
                         />
