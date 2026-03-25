@@ -182,7 +182,7 @@ export default function UpgradePage() {
                                 from_name: 'Simon Silver Caldaie',
                                 to_email: data.email,
                                 subject: '✅ Upgrade Licenza Completato',
-                                message: `Ciao!\n\nIl tuo upgrade a Team ${targetTeam} è stato completato con successo!\n\nOra puoi gestire i membri del tuo team dalla Dashboard.\n\nAccedi qui:\nhttps://simonsilvercaldaie.it/dashboard\n\nGrazie!\nSimon Silver`
+                                message: `Ciao!\n\nIl tuo upgrade a Multidipendente ${targetTeam} è stato completato con successo!\n\nOra puoi gestire i membri del tuo team dalla Dashboard.\n\nAccedi qui:\nhttps://simonsilvercaldaie.it/dashboard\n\nGrazie!\nSimon Silver`
                             }
                         }
                         await fetch('https://api.emailjs.com/api/v1.0/email/send', {
@@ -239,7 +239,7 @@ export default function UpgradePage() {
                             <div>
                                 <p className="text-amber-800 font-medium">Hai acquistato: {ownedLevels.map(l => l.charAt(0).toUpperCase() + l.slice(1)).join(', ')}</p>
                                 <p className="text-amber-700 text-sm mt-1">
-                                    Per passare a una licenza Team, devi prima acquistare <strong>tutti e 3 i livelli</strong> (Base, Intermedio, Avanzato).
+                                    Per passare a una licenza Multidipendente, devi prima acquistare <strong>tutti e 3 i livelli</strong> (Base, Intermedio, Avanzato).
                                 </p>
                                 <Link href="/catalogo" className="inline-block mt-3 text-amber-800 font-bold underline hover:text-amber-900">
                                     Vai al Catalogo per completare gli acquisti
@@ -251,7 +251,7 @@ export default function UpgradePage() {
                         <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-100">
                             <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
                             <p className="text-green-800">
-                                <strong>Licenza Singola Completa</strong> - Hai tutti e 3 i livelli. Puoi fare l'upgrade a Team!
+                                <strong>Licenza Singola Completa</strong> - Hai tutti e 3 i livelli. Puoi fare l'upgrade a Multidipendente!
                             </p>
                         </div>
                     )}
@@ -259,7 +259,7 @@ export default function UpgradePage() {
                         <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
                             <Users className="w-5 h-5 text-indigo-600 flex-shrink-0" />
                             <p className="text-indigo-800">
-                                <strong>Team 5</strong> - Hai già una licenza Team attiva. Gestisci i tuoi membri dalla <Link href="/dashboard" className="underline font-bold">Dashboard</Link>.
+                                <strong>Multidipendente 5</strong> - Hai già una licenza Multi-utente attiva. Gestisci i tuoi membri dalla <Link href="/dashboard" className="underline font-bold">Dashboard</Link>.
                             </p>
                         </div>
                     )}
@@ -267,7 +267,7 @@ export default function UpgradePage() {
                         <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
                             <Users className="w-5 h-5 text-indigo-600 flex-shrink-0" />
                             <p className="text-indigo-800">
-                                <strong>Team 10</strong> - Hai già una licenza Team attiva. Gestisci i tuoi membri dalla <Link href="/dashboard" className="underline font-bold">Dashboard</Link>.
+                                <strong>Multidipendente 10</strong> - Hai già una licenza Multi-utente attiva. Gestisci i tuoi membri dalla <Link href="/dashboard" className="underline font-bold">Dashboard</Link>.
                             </p>
                         </div>
                     )}
@@ -275,7 +275,7 @@ export default function UpgradePage() {
                         <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg border border-purple-100">
                             <CheckCircle2 className="w-5 h-5 text-purple-600 flex-shrink-0" />
                             <p className="text-purple-800">
-                                <strong>Team 25</strong> - Hai già la licenza massima disponibile! 🎉
+                                <strong>Multidipendente 25</strong> - Hai già la licenza massima disponibile! 🎉
                             </p>
                         </div>
                     )}
@@ -311,7 +311,7 @@ export default function UpgradePage() {
                         <div className="grid md:grid-cols-3 gap-6">
                             {/* Team 5 */}
                             <UpgradeCard
-                                title="Team 5"
+                                title="Multidipendente 5"
                                 users={5}
                                 price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_5}
                                 enabled={tosAccepted}
@@ -320,7 +320,7 @@ export default function UpgradePage() {
 
                             {/* Team 10 */}
                             <UpgradeCard
-                                title="Team 10"
+                                title="Multidipendente 10"
                                 users={10}
                                 price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_10}
                                 enabled={tosAccepted}
@@ -329,7 +329,7 @@ export default function UpgradePage() {
 
                             {/* Team 25 */}
                             <UpgradeCard
-                                title="Team 25"
+                                title="Multidipendente 25"
                                 users={25}
                                 price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_25}
                                 enabled={tosAccepted}

@@ -133,7 +133,7 @@ export default function TeamDashboard() {
     }
 
     const handleRemoveMember = async (memberId: string, memberEmail: string, licenseId: string) => {
-        if (!confirm(`Sei sicuro di voler rimuovere ${memberEmail} dal team? Questo utilizzerà un riassegnamento.`)) return
+        if (!confirm(`Sei sicuro di voler rimuovere ${memberEmail} dalla licenza aziendale? Questo utilizzerà un riassegnamento.`)) return
 
         setRemovingMember(memberId)
         try {
@@ -160,7 +160,7 @@ export default function TeamDashboard() {
                 return
             }
 
-            alert(`${memberEmail} rimosso dal team. Riassegnamenti gratuiti rimasti: ${data.freeRemaining}`)
+            alert(`${memberEmail} rimosso dalla licenza. Riassegnamenti gratuiti rimasti: ${data.freeRemaining}`)
             fetchTeams() // Refresh
         } catch (e: any) {
             alert('Errore: ' + e.message)
@@ -183,8 +183,8 @@ export default function TeamDashboard() {
                     <Shield className="w-5 h-5" />
                 </div>
                 <div>
-                    <h2 className="text-xl font-bold text-gray-900">Gestione Team</h2>
-                    <p className="text-sm text-gray-600">Gestisci i membri e le licenze della tua azienda</p>
+                    <h2 className="text-xl font-bold text-gray-900">Gestione Licenza Aziendale (Multidipendente)</h2>
+                    <p className="text-sm text-gray-600">Gestisci i membri e gli accessi della tua azienda</p>
                 </div>
             </div>
 
@@ -273,7 +273,7 @@ export default function TeamDashboard() {
                             {/* Members & Pending List */}
                             <div className="space-y-4">
                                 <h4 className="font-bold text-gray-800 flex items-center gap-2">
-                                    <Users className="w-4 h-4" /> Membri del Team
+                                    <Users className="w-4 h-4" /> Membri Autorizzati
                                 </h4>
 
                                 <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">

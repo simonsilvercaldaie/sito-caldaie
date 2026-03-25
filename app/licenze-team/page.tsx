@@ -227,7 +227,7 @@ export default function TeamLicensePage() {
                             Per Aziende, Centri Assistenza e Istituti di Formazione
                         </span>
                         <h1 className="text-4xl md:text-6xl font-extrabold text-slate-900 mb-6">
-                            Licenze <span className="text-indigo-600">Team</span>
+                            Licenze <span className="text-indigo-600">Multidipendente</span>
                         </h1>
                         <p className="text-xl text-slate-600 max-w-3xl mx-auto">
                             Soluzione completa per aziende e formatori. Risparmia fino al 40% rispetto alle licenze singole e gestisci la formazione in un unico posto.
@@ -257,21 +257,21 @@ export default function TeamLicensePage() {
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                         <TeamCard
-                            title="Team 5"
+                            title="Multidipendente 5"
                             users={5}
                             price="3.000"
                             code="team_5"
                             amount={3000}
                         />
                         <TeamCard
-                            title="Team 10"
+                            title="Multidipendente 10"
                             users={10}
                             price="4.000"
                             code="team_10"
                             amount={4000}
                         />
                         <TeamCard
-                            title="Team 25"
+                            title="Multidipendente 25"
                             users={25}
                             price="5.000"
                             code="team_25"

@@ -520,8 +520,8 @@ export default function DashboardPage() {
                             </div>
                             <h2 className="text-2xl font-bold text-indigo-900 mb-2">Vuoi fare un Upgrade?</h2>
                             <p className="text-indigo-700 mb-6 max-w-md mx-auto">
-                                Hai già una licenza singola e vuoi passare a Team?<br />
-                                O hai già un Team e vuoi espanderlo?
+                                Hai già una licenza singola e vuoi passare a Multidipendente?<br />
+                                O hai già una licenza e vuoi espanderla?
                             </p>
                             <Link
                                 href="/dashboard/upgrade"

@@ -94,16 +94,16 @@ export default function TerminiPage() {
                             <p><strong>7.1.</strong> La piattaforma offre le seguenti tipologie di licenza:</p>
                             <ul className="list-disc pl-6 mt-2 space-y-1">
                                 <li><strong>Licenza Singola</strong>: per un singolo utente, accesso a vita al livello acquistato</li>
-                                <li><strong>Licenza Team 5</strong>: per fino a 5 utenti nominativi, accesso a vita a tutti i livelli. Visione individuale.</li>
-                                <li><strong>Licenza Team 10</strong>: per fino a 10 utenti nominativi, accesso a vita a tutti i livelli. Visione individuale.</li>
-                                <li><strong>Licenza Team 25</strong>: per fino a 25 utenti nominativi, accesso a vita a tutti i livelli. Visione individuale.</li>
+                                <li><strong>Licenza Multidipendente 5</strong>: per fino a 5 utenti nominativi, accesso a vita a tutti i livelli. Visione individuale.</li>
+                                <li><strong>Licenza Multidipendente 10</strong>: per fino a 10 utenti nominativi, accesso a vita a tutti i livelli. Visione individuale.</li>
+                                <li><strong>Licenza Multidipendente 25</strong>: per fino a 25 utenti nominativi, accesso a vita a tutti i livelli. Visione individuale.</li>
                                 <li><strong>Licenza Formazione</strong>: per istituti scolastici, centri di formazione professionale e laboratori tecnici. Fino a 25 utenti nominativi, accesso a vita a tutti i livelli. Consente la proiezione in aula e l'uso didattico dei contenuti.</li>
                             </ul>
-                            <p className="mt-4"><strong>7.2.</strong> Ogni licenza Team prevede esclusivamente account nominativi. Ogni account è associato a una singola persona fisica e non può essere condiviso.</p>
-                            <p className="mt-4"><strong>7.3.</strong> <strong>Riassegnamento slot.</strong> Ogni licenza Team include un numero di riassegnamenti gratuiti pari ai posti acquistati (es. la Team 5 include 5 riassegnamenti gratuiti). Ogni riassegnamento consiste nella rimozione di un membro esistente e nella successiva aggiunta di un nuovo membro. Esauriti i riassegnamenti gratuiti, ogni ulteriore sostituzione comporta un costo di <strong>€400</strong>.</p>
+                            <p className="mt-4"><strong>7.2.</strong> Ogni licenza Multidipendente prevede esclusivamente account nominativi. Ogni account è associato a una singola persona fisica e non può essere condiviso.</p>
+                            <p className="mt-4"><strong>7.3.</strong> <strong>Riassegnamento slot.</strong> Ogni licenza Multidipendente include un numero di riassegnamenti gratuiti pari ai posti acquistati (es. la Multidipendente 5 include 5 riassegnamenti gratuiti). Ogni riassegnamento consiste nella rimozione di un membro esistente e nella successiva aggiunta di un nuovo membro. Esauriti i riassegnamenti gratuiti, ogni ulteriore sostituzione comporta un costo di <strong>€400</strong>.</p>
                             <p className="mt-4">
                                 Per i dettagli completi sui tipi di licenza, consulta la pagina{' '}
-                                <Link href="/licenze-team" className="text-accent hover:underline font-semibold">Licenze Team</Link>.
+                                <Link href="/licenze-team" className="text-accent hover:underline font-semibold">Licenze Multidipendente</Link>.
                             </p>
                         </section>
 
@@ -118,8 +118,8 @@ export default function TerminiPage() {
                                 <li>utilizzare i Contenuti per attività di formazione aziendale, interna o esterna;</li>
                                 <li>registrare, scaricare, duplicare o redistribuire i Contenuti in qualsiasi forma.</li>
                             </ul>
-                            <p className="mt-4"><strong>8.3.</strong> Per usi aziendali o collettivi è obbligatorio acquistare una licenza Team appropriata (Team 5, Team 10 o Team 25).</p>
-                            <p className="mt-4"><strong>8.4.</strong> Per l'uso didattico, la proiezione in aula, la formazione scolastica o professionale, è obbligatorio acquistare la <strong>Licenza Formazione</strong>. Le licenze Team 5, Team 10 e Team 25 <strong>non</strong> autorizzano la proiezione collettiva né l'uso formativo.</p>
+                            <p className="mt-4"><strong>8.3.</strong> Per usi aziendali o collettivi è obbligatorio acquistare una licenza Multidipendente appropriata (Multidipendente 5, 10 o 25).</p>
+                            <p className="mt-4"><strong>8.4.</strong> Per l'uso didattico, la proiezione in aula, la formazione scolastica o professionale, è obbligatorio acquistare la <strong>Licenza Formazione</strong>. Le licenze Multidipendente (5, 10 o 25) <strong>non</strong> autorizzano la proiezione collettiva né l'uso formativo.</p>
                         </section>
 
                         <section>
