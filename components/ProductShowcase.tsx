@@ -88,6 +88,7 @@ export default function ProductShowcase() {
 
 
 
+                {/* === PERCORSO TEMATICO — NASCOSTO PER IL LANCIO (riattivare in futuro) ===
                 <div className="text-center mb-16 space-y-4">
                     <h2 className="text-3xl md:text-5xl font-extrabold text-primary">
                         Percorso <span className="text-accent">Tematico</span>
@@ -127,6 +128,7 @@ export default function ProductShowcase() {
                         </Link>
                     ))}
                 </div>
+                === FINE PERCORSO TEMATICO NASCOSTO === */}
 
                 {/* SEZIONE TEAM REMOVED */}
 
