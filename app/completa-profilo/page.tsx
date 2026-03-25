@@ -67,29 +67,89 @@ function CompletaProfiloContent() {
         setError(null)
         setSaving(true)
 
-        // Validazioni
-        if (!firstName.trim() || !lastName.trim()) {
-            setError('Nome e cognome sono obbligatori')
+        // ===== VALIDAZIONI RIGOROSE PER FATTURAZIONE =====
+
+        // Nome e Cognome: obbligatori, almeno 2 caratteri
+        if (!firstName.trim() || firstName.trim().length < 2) {
+            setError('Il nome deve avere almeno 2 caratteri')
+            setSaving(false)
+            return
+        }
+        if (!lastName.trim() || lastName.trim().length < 2) {
+            setError('Il cognome deve avere almeno 2 caratteri')
             setSaving(false)
             return
         }
 
-        if (!address.trim() || !city.trim() || !postalCode.trim()) {
-            setError('Indirizzo completo obbligatorio')
+        // Indirizzo: obbligatorio, almeno 5 caratteri
+        if (!address.trim() || address.trim().length < 5) {
+            setError('Inserisci un indirizzo valido (minimo 5 caratteri, es. "Via Roma 10")')
             setSaving(false)
             return
         }
 
-        if (customerType === 'company' && !vatNumber.trim()) {
-            setError('La Partita IVA è obbligatoria per le aziende')
+        // Città: obbligatoria, almeno 2 caratteri
+        if (!city.trim() || city.trim().length < 2) {
+            setError('Inserisci una città valida')
             setSaving(false)
             return
         }
 
-        if (customerType === 'company' && !companyName.trim()) {
-            setError('La Ragione Sociale è obbligatoria per le aziende')
+        // CAP: esattamente 5 cifre
+        const capClean = postalCode.trim()
+        if (!/^\d{5}$/.test(capClean)) {
+            setError('Il CAP deve essere di 5 cifre (es. "20100")')
             setSaving(false)
             return
+        }
+
+        // --- PRIVATO ---
+        if (customerType === 'private') {
+            // Codice Fiscale: OBBLIGATORIO, 16 caratteri alfanumerici
+            const cfClean = fiscalCode.trim().toUpperCase()
+            if (!cfClean) {
+                setError('Il Codice Fiscale è obbligatorio per la fatturazione')
+                setSaving(false)
+                return
+            }
+            if (!/^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$/.test(cfClean)) {
+                setError('Il Codice Fiscale non è nel formato corretto (16 caratteri, es. "RSSMRA80A01H501U")')
+                setSaving(false)
+                return
+            }
+        }
+
+        // --- AZIENDA ---
+        if (customerType === 'company') {
+            if (!companyName.trim() || companyName.trim().length < 3) {
+                setError('La Ragione Sociale deve avere almeno 3 caratteri')
+                setSaving(false)
+                return
+            }
+
+            // Partita IVA: esattamente 11 cifre
+            const pivaClean = vatNumber.trim()
+            if (!/^\d{11}$/.test(pivaClean)) {
+                setError('La Partita IVA deve essere di 11 cifre (es. "12345678901")')
+                setSaving(false)
+                return
+            }
+
+            // Codice SDI o PEC: almeno uno dei due obbligatorio
+            const sdiClean = sdiCode.trim()
+            if (!sdiClean) {
+                setError('Il Codice SDI o la PEC sono obbligatori per la fatturazione elettronica')
+                setSaving(false)
+                return
+            }
+            // SDI: 7 caratteri alfanumerici, oppure PEC: deve contenere @
+            const isSdi = /^[A-Za-z0-9]{7}$/.test(sdiClean)
+            const isPec = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sdiClean)
+            if (!isSdi && !isPec) {
+                setError('Inserisci un Codice SDI valido (7 caratteri) oppure un indirizzo PEC valido')
+                setSaving(false)
+                return
+            }
         }
 
         try {
@@ -323,7 +383,7 @@ Simon Silver
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Codice SDI / PEC
+                                            Codice SDI / PEC <span className="text-red-500">*</span>
                                         </label>
                                         <input
                                             type="text"
@@ -341,7 +401,7 @@ Simon Silver
                         {customerType === 'private' && (
                             <div className="animate-in fade-in">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Codice Fiscale <span className="text-gray-400 font-normal">(opzionale)</span>
+                                    Codice Fiscale <span className="text-red-500">*</span>
                                 </label>
                                 <input
                                     type="text"

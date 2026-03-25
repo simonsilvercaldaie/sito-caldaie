@@ -308,7 +308,7 @@ export default function PacchettoCompletoPage() {
                                                 href="/completa-profilo?returnTo=/pacchetto-completo"
                                                 className="block w-full py-4 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition-all shadow-lg text-lg"
                                             >
-                                                ✏️ Completa il profilo per acquistare
+                                                ✏️ Compila il profilo<br/>per acquistare
                                             </Link>
                                         </div>
                                     ) : user && profileCompleted ? (

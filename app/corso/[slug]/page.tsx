@@ -728,7 +728,7 @@ export default function CorsoPage() {
                                                         href={`/completa-profilo?returnTo=/corso/${slug}`}
                                                         className="w-full py-4 bg-amber-500 text-white font-bold text-lg rounded-2xl hover:bg-amber-600 transition-all shadow-lg flex items-center justify-center gap-2"
                                                     >
-                                                        ✏️ Completa il profilo per acquistare
+                                                        ✏️ Compila il profilo<br/>per acquistare
                                                     </Link>
                                                 )}
 

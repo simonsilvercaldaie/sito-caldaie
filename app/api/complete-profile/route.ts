@@ -41,24 +41,48 @@ export async function POST(request: NextRequest) {
         } = body
 
         // 3. Validazioni
-        if (!first_name?.trim() || !last_name?.trim()) {
-            return NextResponse.json({ error: 'Nome e cognome obbligatori' }, { status: 400 })
+        if (!first_name?.trim() || first_name.trim().length < 2) {
+            return NextResponse.json({ error: 'Nome non valido (minimo 2 caratteri)' }, { status: 400 })
+        }
+        if (!last_name?.trim() || last_name.trim().length < 2) {
+            return NextResponse.json({ error: 'Cognome non valido (minimo 2 caratteri)' }, { status: 400 })
         }
 
-        if (!address?.trim() || !city?.trim() || !postal_code?.trim()) {
-            return NextResponse.json({ error: 'Indirizzo completo obbligatorio' }, { status: 400 })
+        if (!address?.trim() || address.trim().length < 5) {
+            return NextResponse.json({ error: 'Indirizzo non valido (minimo 5 caratteri)' }, { status: 400 })
+        }
+        if (!city?.trim() || city.trim().length < 2) {
+            return NextResponse.json({ error: 'Città non valida' }, { status: 400 })
+        }
+        if (!/^\d{5}$/.test(postal_code?.trim() || '')) {
+            return NextResponse.json({ error: 'CAP non valido (5 cifre)' }, { status: 400 })
         }
 
         if (!['private', 'company'].includes(customer_type)) {
             return NextResponse.json({ error: 'Tipo cliente non valido' }, { status: 400 })
         }
 
-        if (customer_type === 'company') {
-            if (!vat_number?.trim()) {
-                return NextResponse.json({ error: 'Partita IVA obbligatoria per aziende' }, { status: 400 })
+        // Validazioni per PRIVATO
+        if (customer_type === 'private') {
+            const cf = fiscal_code?.trim()?.toUpperCase() || ''
+            if (!/^[A-Z]{6}\d{2}[A-Z]\d{2}[A-Z]\d{3}[A-Z]$/.test(cf)) {
+                return NextResponse.json({ error: 'Codice Fiscale non valido (formato: RSSMRA80A01H501U)' }, { status: 400 })
             }
-            if (!company_name?.trim()) {
-                return NextResponse.json({ error: 'Ragione sociale obbligatoria per aziende' }, { status: 400 })
+        }
+
+        // Validazioni per AZIENDA
+        if (customer_type === 'company') {
+            if (!company_name?.trim() || company_name.trim().length < 3) {
+                return NextResponse.json({ error: 'Ragione Sociale non valida (minimo 3 caratteri)' }, { status: 400 })
+            }
+            if (!/^\d{11}$/.test(vat_number?.trim() || '')) {
+                return NextResponse.json({ error: 'Partita IVA non valida (11 cifre)' }, { status: 400 })
+            }
+            const sdi = sdi_code?.trim() || ''
+            const isSdi = /^[A-Za-z0-9]{7}$/.test(sdi)
+            const isPec = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sdi)
+            if (!isSdi && !isPec) {
+                return NextResponse.json({ error: 'Codice SDI (7 caratteri) o PEC obbligatorio' }, { status: 400 })
             }
         }
 

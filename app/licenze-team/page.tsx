@@ -186,7 +186,7 @@ export default function TeamLicensePage() {
                         href="/completa-profilo?returnTo=/licenze-team"
                         className="block w-full py-4 bg-amber-500 text-white font-bold rounded-xl text-center hover:bg-amber-600 transition-all shadow-lg"
                     >
-                        ✏️ Completa il profilo per acquistare
+                        ✏️ Compila il profilo<br/>per acquistare
                     </Link>
                 ) : user && profileCompleted ? (
                     tosAccepted ? (
