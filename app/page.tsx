@@ -62,7 +62,7 @@ export default function Home() {
                     <div className="mt-16 w-full max-w-4xl aspect-video bg-black rounded-2xl shadow-2xl overflow-hidden border-4 border-white/20 ring-1 ring-gray-900/10">
                         <iframe
                             className="w-full h-full"
-                            src="https://www.youtube.com/embed/3B3go9raH38?rel=0"
+                            src="https://www.youtube.com/embed/cI_mlyjYzDw?rel=0"
                             title="Presentazione Simon Silver Caldaie"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
