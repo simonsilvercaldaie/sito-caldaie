@@ -137,11 +137,14 @@ export default function TeamLicensePage() {
         }
     }
 
-    const TeamCard = ({ title, users, price, code, amount, icon, features, highlighted = false }: { title: string, users: number, price: string, code: string, amount: number, icon?: any, features?: string[], highlighted?: boolean }) => (
+    const TeamCard = ({ title, bigNumber, users, price, code, amount, icon, features, highlighted = false }: { title: string, bigNumber: string, users: number, price: string, code: string, amount: number, icon?: any, features?: string[], highlighted?: boolean }) => (
         <div className={`rounded-3xl p-8 shadow-xl transition-all duration-300 flex flex-col ${highlighted ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 hover:border-amber-400' : 'bg-white border-2 border-indigo-100 hover:border-indigo-300'}`}>
-            <div className="mb-6">
-                <h3 className={`text-2xl font-bold mb-2 ${highlighted ? 'text-amber-900' : 'text-indigo-900'}`}>{title}</h3>
-                <div className={`flex items-center gap-2 font-medium px-3 py-1 rounded-full inline-block ${highlighted ? 'text-amber-700 bg-amber-100' : 'text-indigo-600 bg-indigo-50'}`}>
+            <div className="mb-6 flex flex-col items-center text-center">
+                <h3 className={`text-xl font-bold mb-1 ${highlighted ? 'text-amber-900' : 'text-indigo-900'}`}>{title}</h3>
+                <div className={`text-5xl md:text-6xl font-black mb-4 ${highlighted ? 'text-amber-600' : 'text-indigo-600'}`}>
+                    {bigNumber}
+                </div>
+                <div className={`flex items-center gap-2 font-medium px-3 py-1 rounded-full ${highlighted ? 'text-amber-700 bg-amber-100' : 'text-indigo-600 bg-indigo-50'}`}>
                     {icon || <Users className="w-4 h-4" />}
                     <span>Fino a {users} {highlighted ? 'Partecipanti' : 'Tecnici'}</span>
                 </div>
@@ -257,21 +260,24 @@ export default function TeamLicensePage() {
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
                         <TeamCard
-                            title="Multidipendente 5"
+                            title="Multidipendente"
+                            bigNumber="5"
                             users={5}
                             price="3.000"
                             code="multi_5"
                             amount={3000}
                         />
                         <TeamCard
-                            title="Multidipendente 10"
+                            title="Multidipendente"
+                            bigNumber="10"
                             users={10}
                             price="4.000"
                             code="multi_10"
                             amount={4000}
                         />
                         <TeamCard
-                            title="Multidipendente 25"
+                            title="Multidipendente"
+                            bigNumber="25"
                             users={25}
                             price="5.000"
                             code="multi_25"
@@ -279,6 +285,7 @@ export default function TeamLicensePage() {
                         />
                         <TeamCard
                             title="🎓 Formazione"
+                            bigNumber="Scuola"
                             users={25}
                             price="5.000"
                             code="multi_25"
