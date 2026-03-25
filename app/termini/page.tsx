@@ -103,7 +103,7 @@ export default function TerminiPage() {
                             <p className="mt-4"><strong>7.3.</strong> <strong>Riassegnamento slot.</strong> Ogni licenza Multidipendente include un numero di riassegnamenti gratuiti pari ai posti acquistati (es. la Multidipendente 5 include 5 riassegnamenti gratuiti). Ogni riassegnamento consiste nella rimozione di un membro esistente e nella successiva aggiunta di un nuovo membro. Esauriti i riassegnamenti gratuiti, ogni ulteriore sostituzione comporta un costo di <strong>€400</strong>.</p>
                             <p className="mt-4">
                                 Per i dettagli completi sui tipi di licenza, consulta la pagina{' '}
-                                <Link href="/licenze-team" className="text-accent hover:underline font-semibold">Licenze Multidipendente</Link>.
+                                <Link href="/licenze-multidipendente" className="text-accent hover:underline font-semibold">Licenze Multidipendente</Link>.
                             </p>
                         </section>
 

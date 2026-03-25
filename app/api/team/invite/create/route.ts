@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
         // 4. Send Email (Mocked or Real)
         // TODO: Integrate Email Service. 
         // For now, return the URL for the frontend to show (or verify manually).
-        const inviteUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://simonsilvercaldaie.it'}/team/accept-invite?token=${rawToken}`
+        const inviteUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://simonsilvercaldaie.it'}/azienda/accetta-invito?token=${rawToken}`
 
         // If you have sendEmail logic:
         // await sendEmail({ to: email, subject: 'Invito Team', text: `Clicca qui: ${inviteUrl}` })

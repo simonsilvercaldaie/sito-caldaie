@@ -27,9 +27,9 @@ const PRODUCT_TO_LEVELS: Record<string, AccessLevel[]> = {
     'complete':         ['base', 'intermedio', 'avanzato'],
     'complete_bundle':  ['base', 'intermedio', 'avanzato'],
     // Team (all levels for all team members)
-    'team_5':           ['base', 'intermedio', 'avanzato'],
-    'team_10':          ['base', 'intermedio', 'avanzato'],
-    'team_25':          ['base', 'intermedio', 'avanzato'],
+    'multi_5':           ['base', 'intermedio', 'avanzato'],
+    'multi_10':          ['base', 'intermedio', 'avanzato'],
+    'multi_25':          ['base', 'intermedio', 'avanzato'],
 }
 
 // Course level → access_level mapping

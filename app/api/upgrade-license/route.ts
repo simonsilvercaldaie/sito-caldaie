@@ -108,11 +108,11 @@ export async function POST(request: NextRequest) {
         // 4. Determine upgrade key and validate price
         let upgradeKey = ''
         if (from_status === 'full_individual') {
-            upgradeKey = `individual_to_team_${target_team_size}`
+            upgradeKey = `individual_to_multi_${target_team_size}`
         } else if (from_status === 'team_5') {
-            upgradeKey = `team_5_to_team_${target_team_size}`
+            upgradeKey = `multi_5_to_multi_${target_team_size}`
         } else if (from_status === 'team_10') {
-            upgradeKey = `team_10_to_team_${target_team_size}`
+            upgradeKey = `multi_10_to_multi_${target_team_size}`
         }
 
         const expectedPrice = (user.email === 'simonsilvercaldaie@gmail.com')
@@ -204,7 +204,7 @@ export async function POST(request: NextRequest) {
             .from('purchases')
             .insert({
                 user_id: user.id,
-                product_code: `upgrade_to_team_${target_team_size}`,
+                product_code: `upgrade_to_multi_${target_team_size}`,
                 plan_type: 'team_upgrade',
                 amount_cents: expectedPrice,
                 paypal_capture_id: captureId

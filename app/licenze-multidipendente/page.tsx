@@ -183,7 +183,7 @@ export default function TeamLicensePage() {
             <div className="mt-auto">
                 {user && !profileCompleted ? (
                     <Link
-                        href="/completa-profilo?returnTo=/licenze-team"
+                        href="/completa-profilo?returnTo=/licenze-multidipendente"
                         className="block w-full py-4 bg-amber-500 text-white font-bold rounded-xl text-center hover:bg-amber-600 transition-all shadow-lg"
                     >
                         ✏️ Compila il profilo<br/>per acquistare
@@ -260,28 +260,28 @@ export default function TeamLicensePage() {
                             title="Multidipendente 5"
                             users={5}
                             price="3.000"
-                            code="team_5"
+                            code="multi_5"
                             amount={3000}
                         />
                         <TeamCard
                             title="Multidipendente 10"
                             users={10}
                             price="4.000"
-                            code="team_10"
+                            code="multi_10"
                             amount={4000}
                         />
                         <TeamCard
                             title="Multidipendente 25"
                             users={25}
                             price="5.000"
-                            code="team_25"
+                            code="multi_25"
                             amount={5000}
                         />
                         <TeamCard
                             title="🎓 Formazione"
                             users={25}
                             price="5.000"
-                            code="team_25"
+                            code="multi_25"
                             amount={5000}
                             highlighted={true}
                             icon={<GraduationCap className="w-4 h-4" />}

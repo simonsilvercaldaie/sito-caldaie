@@ -12,18 +12,18 @@ import { LEGAL_TEXT_CHECKOUT } from '@/lib/legalTexts'
 // Individual complete = 1000€ (bundle), Team5 = 3000€, Team10 = 4000€, Team25 = 5000€
 const UPGRADE_PRICES = {
     // From Individual (all 3) to Team
-    'individual_to_team_5': 2000,    // 3000 - 1000
-    'individual_to_team_10': 3000,   // 4000 - 1000
-    'individual_to_team_25': 4000,   // 5000 - 1000
+    'individual_to_multi_5': 2000,    // 3000 - 1000
+    'individual_to_multi_10': 3000,   // 4000 - 1000
+    'individual_to_multi_25': 4000,   // 5000 - 1000
 }
 
 type LicenseStatus =
     | 'none'
     | 'partial_individual'  // Has 1 or 2 levels
     | 'full_individual'     // Has all 3 levels
-    | 'team_5'
-    | 'team_10'
-    | 'team_25'
+    | 'multi_5'
+    | 'multi_10'
+    | 'multi_25'
 
 export default function UpgradePage() {
     const router = useRouter()
@@ -61,11 +61,11 @@ export default function UpgradePage() {
         if (teamLicense) {
             setTeamSize(teamLicense.max_members)
             if (teamLicense.max_members >= 25) {
-                setLicenseStatus('team_25')
+                setLicenseStatus('multi_25')
             } else if (teamLicense.max_members >= 10) {
-                setLicenseStatus('team_10')
+                setLicenseStatus('multi_10')
             } else {
-                setLicenseStatus('team_5')
+                setLicenseStatus('multi_5')
             }
             setLoading(false)
             return
@@ -255,7 +255,7 @@ export default function UpgradePage() {
                             </p>
                         </div>
                     )}
-                    {licenseStatus === 'team_5' && (
+                    {licenseStatus === 'multi_5' && (
                         <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
                             <Users className="w-5 h-5 text-indigo-600 flex-shrink-0" />
                             <p className="text-indigo-800">
@@ -263,7 +263,7 @@ export default function UpgradePage() {
                             </p>
                         </div>
                     )}
-                    {licenseStatus === 'team_10' && (
+                    {licenseStatus === 'multi_10' && (
                         <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
                             <Users className="w-5 h-5 text-indigo-600 flex-shrink-0" />
                             <p className="text-indigo-800">
@@ -271,7 +271,7 @@ export default function UpgradePage() {
                             </p>
                         </div>
                     )}
-                    {licenseStatus === 'team_25' && (
+                    {licenseStatus === 'multi_25' && (
                         <div className="flex items-center gap-3 p-4 bg-purple-50 rounded-lg border border-purple-100">
                             <CheckCircle2 className="w-5 h-5 text-purple-600 flex-shrink-0" />
                             <p className="text-purple-800">
@@ -313,27 +313,27 @@ export default function UpgradePage() {
                             <UpgradeCard
                                 title="Multidipendente 5"
                                 users={5}
-                                price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_5}
+                                price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_5}
                                 enabled={tosAccepted}
-                                onSuccess={(id) => handleUpgradeSuccess(id, 5, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_5)}
+                                onSuccess={(id) => handleUpgradeSuccess(id, 5, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_5)}
                             />
 
                             {/* Team 10 */}
                             <UpgradeCard
                                 title="Multidipendente 10"
                                 users={10}
-                                price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_10}
+                                price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_10}
                                 enabled={tosAccepted}
-                                onSuccess={(id) => handleUpgradeSuccess(id, 10, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_10)}
+                                onSuccess={(id) => handleUpgradeSuccess(id, 10, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_10)}
                             />
 
                             {/* Team 25 */}
                             <UpgradeCard
                                 title="Multidipendente 25"
                                 users={25}
-                                price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_25}
+                                price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_25}
                                 enabled={tosAccepted}
-                                onSuccess={(id) => handleUpgradeSuccess(id, 25, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_team_25)}
+                                onSuccess={(id) => handleUpgradeSuccess(id, 25, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_25)}
                                 highlight
                             />
                         </div>

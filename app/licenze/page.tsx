@@ -110,7 +110,7 @@ export default function LicenzePage() {
                                 </li>
                             </ul>
                             <Link
-                                href="/licenze-team"
+                                href="/licenze-multidipendente"
                                 className="w-full py-3 bg-amber-600 text-white font-bold rounded-xl hover:bg-amber-700 transition-colors flex items-center justify-center gap-2"
                             >
                                 Acquista Licenza Formazione

@@ -584,7 +584,7 @@ export default function CorsoPage() {
                                 {!hasPurchased && viewMode === null && (
                                     <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                         <Link
-                                            href="/licenze-team"
+                                            href="/licenze-multidipendente"
                                             className="block bg-indigo-50/50 border-2 border-indigo-200 rounded-2xl p-8 cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 hover:shadow-lg transition-all duration-300 group text-center"
                                         >
                                             <div className="flex flex-col items-center gap-4">

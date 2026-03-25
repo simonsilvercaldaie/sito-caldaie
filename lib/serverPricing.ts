@@ -8,10 +8,10 @@ export const PRODUCT_PRICES_CENTS = {
     'complete': 120000,  // 1200 EUR (prezzo pieno singoli)
     'complete_bundle': 100000, // 1000 EUR (bundle scontato -200€)
 
-    // Team (Complete)
-    'team_5': 300000,    // 3000 EUR
-    'team_10': 400000,   // 4000 EUR
-    'team_25': 500000    // 5000 EUR
+    // Multidipendente
+    'multi_5': 300000,    // 3000 EUR
+    'multi_10': 400000,   // 4000 EUR
+    'multi_25': 500000    // 5000 EUR
 } as const
 
 export type ProductCode = keyof typeof PRODUCT_PRICES_CENTS

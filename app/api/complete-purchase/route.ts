@@ -202,7 +202,7 @@ export async function POST(request: NextRequest) {
             .maybeSingle()
 
         const billing = billingData as BillingProfile | null
-        const isTeam = product_code.startsWith('team_')
+        const isTeam = product_code.startsWith('multi_')
 
         // Common snapshot data
         const snapshotData = {
@@ -217,7 +217,7 @@ export async function POST(request: NextRequest) {
 
         if (isTeam) {
             // --- RAMO TEAM ---
-            // Il numero nel product_code (es. team_5) indica i posti invitabili
+            // Il numero nel product_code (es. multi_5) indica i posti invitabili
             // +1 per includere anche l'admin come membro
             const seatsFromCode = parseInt(product_code.split('_')[1])
             const seats = seatsFromCode + 1

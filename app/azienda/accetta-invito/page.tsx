@@ -26,7 +26,7 @@ function AcceptInviteContent() {
             if (!session) {
                 // Save redirect for after login? 
                 // Simple: Redirect to login with return url
-                const returnUrl = encodeURIComponent(`/team/accept-invite?token=${token}`)
+                const returnUrl = encodeURIComponent(`/azienda/accetta-invito?token=${token}`)
                 router.push(`/login?redirect=${returnUrl}`)
                 return
             }

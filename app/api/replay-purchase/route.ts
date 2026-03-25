@@ -230,7 +230,7 @@ export async function POST(request: NextRequest) {
         let productCode: string | null = null
 
         // Cerca match esatto nella mappa prezzi
-        // PRODUCT_PRICES_CENTS è { "base": 20000, "team_5": 150000, ... }
+        // PRODUCT_PRICES_CENTS è { "base": 20000, "multi_5": 150000, ... }
         for (const [code, price] of Object.entries(PRODUCT_PRICES_CENTS)) {
             if (price === amountCents) {
                 productCode = code
@@ -261,7 +261,7 @@ export async function POST(request: NextRequest) {
 
         if (isTeam) {
             // --- LOGICA TEAM (Copiata da complete-purchase per coerenza) ---
-            // Il numero nel product_code (es. team_5) indica i posti invitabili
+            // Il numero nel product_code (es. multi_5) indica i posti invitabili
             // +1 per includere anche l'admin come membro
             const seatsFromCode = parseInt(productCode.split('_')[1])
             const seats = seatsFromCode + 1
