@@ -1,7 +1,7 @@
 'use client'
 import { useParams } from "next/navigation"
 import { getCourseBySlug, getAllCourses, Course } from "@/lib/coursesData"
-import { getLevelPricing } from "@/lib/pricingLogic"
+import { getLevelPricing, getTestPrice, formatPrice } from "@/lib/pricingLogic"
 import { PayPalBtn } from "@/components/PayPalBtn"
 import { LEGAL_TEXT_CHECKOUT } from "@/lib/legalTexts"
 import { supabase } from "@/lib/supabaseClient"
@@ -653,7 +653,7 @@ export default function CorsoPage() {
                                                     <h3 className={`font-bold text-2xl lg:text-3xl ${colors.title} mb-4`}>Licenza Singola</h3>
 
                                                     <div className="text-4xl lg:text-5xl font-extrabold text-primary mb-2">
-                                                        € ---
+                                                        {formatPrice(getTestPrice(pricingInfo!.amountToPay, user?.email))}
                                                     </div>
 
                                                     <p className="text-base lg:text-lg text-gray-700 font-medium mb-1">
@@ -695,7 +695,7 @@ export default function CorsoPage() {
                                             </h3>
 
                                             <div className="text-4xl font-extrabold text-primary mb-2">
-                                                € ---
+                                                {formatPrice(getTestPrice(pricingInfo!.amountToPay, user?.email))}
                                             </div>
                                             <p className="text-gray-500 text-sm">Include tutti i 9 corsi del livello</p>
                                         </div>
@@ -752,11 +752,11 @@ export default function CorsoPage() {
 
                                                 {viewMode === 'individual' && pricingInfo && (
                                                     tosAccepted ? (
-                                                        // ACQUISTI TEMPORANEAMENTE SOSPESI
-                                                        <div className="text-center p-4 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300">
-                                                            <p className="font-bold text-gray-500 mb-1">Acquisti momentaneamente sospesi</p>
-                                                            <p className="text-xs text-gray-400">In attesa del caricamento dei video definitivi.</p>
-                                                        </div>
+                                                        <PayPalBtn
+                                                            amount={String(getTestPrice(pricingInfo.amountToPay, user?.email))}
+                                                            courseTitle={`Pacchetto ${course.level} (9 Video)`}
+                                                            onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'individual' })}
+                                                        />
                                                     ) : (
                                                         !user ? (
                                                             <p className="text-xs text-gray-400 text-center mt-2">

@@ -287,7 +287,7 @@ export default function PacchettoCompletoPage() {
                                     <div className="text-center mb-8 bg-amber-50 rounded-2xl p-6 border border-amber-100">
                                         <p className="text-sm font-bold text-amber-800 uppercase tracking-wider mb-2">Prezzo Totale</p>
                                         <div className="flex items-end justify-center gap-3 mb-2">
-                                            <span className="text-6xl font-extrabold text-gray-900 tracking-tight">€ ---</span>
+                                            <span className="text-6xl font-extrabold text-gray-900 tracking-tight">€ {getTestPrice(BUNDLE_PRICE, user?.email).toLocaleString('it-IT')}</span>
                                         </div>
                                         <div className="inline-block bg-white text-green-700 font-bold px-4 py-1.5 rounded-full text-sm shadow-sm border border-green-100">
                                             Prezzo speciale!
@@ -316,11 +316,11 @@ export default function PacchettoCompletoPage() {
                                             </div>
 
                                             {tosAccepted ? (
-                                                // ACQUISTI TEMPORANEAMENTE SOSPESI
-                                                <div className="text-center p-4 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
-                                                    <p className="font-bold text-gray-500 mb-1">Acquisti momentaneamente sospesi</p>
-                                                    <p className="text-xs text-gray-400">In attesa del caricamento dei video definitivi.</p>
-                                                </div>
+                                                <PayPalBtn
+                                                    amount={String(getTestPrice(BUNDLE_PRICE, user?.email))}
+                                                    courseTitle="Pacchetto Completo (27 Video)"
+                                                    onSuccess={handlePurchaseSuccess}
+                                                />
                                             ) : (
                                                 <button disabled className="w-full py-4 bg-gray-200 text-gray-400 font-bold rounded-xl cursor-not-allowed">
                                                     Accetta i Termini per procedere
