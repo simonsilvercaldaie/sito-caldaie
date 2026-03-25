@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Loader2, AlertTriangle, CheckCircle, XCircle } from 'lucide-react'
 import Link from 'next/link'
+import { supabase } from '@/lib/supabaseClient'
 
 function ConfirmDeleteContent() {
     const searchParams = useSearchParams()
@@ -29,6 +30,9 @@ function ConfirmDeleteContent() {
             if (!res.ok) {
                 throw new Error(data.error || 'Errore sconosciuto')
             }
+
+            // Clear the local session now that the backend account is deleted
+            await supabase.auth.signOut()
 
             setStatus('success')
             // Redirect to home after 3 seconds
