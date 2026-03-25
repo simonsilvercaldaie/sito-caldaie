@@ -12,12 +12,14 @@ export const TOS_VERSION = '2026-01-18-v1'
 
 // Interruttore pagamenti SERVER-SIDE (Kill Switch)
 // Deve essere usato dalle API per bloccare le transazioni
+// DEFAULT: ATTIVO — per disattivare, impostare PAYMENTS_ENABLED=false su Vercel
 export const AUTH_MODE = 'google_only' as const
-export const SERVER_PAYMENTS_ENABLED = process.env.PAYMENTS_ENABLED === 'true'
+export const SERVER_PAYMENTS_ENABLED = process.env.PAYMENTS_ENABLED !== 'false'
 
 // Interruttore pagamenti CLIENT-SIDE (UI Toggle)
 // Usato per nascondere pulsanti, ma la sicurezza reale è sul server
-export const UI_PAYMENTS_ENABLED = process.env.NEXT_PUBLIC_PAYMENTS_ENABLED === 'true'
+// DEFAULT: ATTIVO — per disattivare, impostare NEXT_PUBLIC_PAYMENTS_ENABLED=false su Vercel
+export const UI_PAYMENTS_ENABLED = process.env.NEXT_PUBLIC_PAYMENTS_ENABLED !== 'false'
 
 // Ambiente PayPal: 'sandbox' o 'live'
 export const PAYPAL_ENV = (process.env.NEXT_PUBLIC_PAYPAL_ENV || 'sandbox') as 'sandbox' | 'live'
