@@ -163,9 +163,17 @@ export default function TerminiPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-bold text-primary">13. Accettazione</h2>
-                            <p><strong>13.1.</strong> L'acquisto di qualsiasi licenza comporta l'accettazione integrale dei presenti Termini e Condizioni.</p>
-                            <p className="mt-4"><strong>13.2.</strong> In fase di acquisto, l'utente conferma di aver letto e compreso le limitazioni della licenza selezionata.</p>
+                            <h2 className="text-xl font-bold text-primary">13. Cancellazione dell'Account e Perdita dei Dati</h2>
+                            <p><strong>13.1.</strong> L'utente ha il diritto di eliminare definitivamente il proprio account in qualsiasi momento dalla propria area personale, nel pieno rispetto del Regolamento UE sulla privacy (GDPR - Diritto all'oblio).</p>
+                            <p className="mt-4"><strong>13.2.</strong> <strong>L'eliminazione dell'account è un'azione irreversibile.</strong> Comporta la cancellazione fisica e definitiva dal sistema di tutti gli acquisti, storico fatturazioni, sessioni e certificati di licenza associati all'utente.</p>
+                            <p className="mt-4"><strong>13.3.</strong> Procedendo con l'eliminazione, <strong>l'utente perde irrevocabilmente l'accesso a tutti i contenuti e le licenze acquistate precedentemente</strong>. Non sarà possibile ripristinare o recuperare gli acquisti, né richiedere rimborsi totali o parziali a seguito dell'eliminazione volontaria dell'account.</p>
+                            <p className="mt-4"><strong>13.4.</strong> Una successiva registrazione utilizzando lo stesso indirizzo email o provider (Google) comporterà la creazione di un account completamente nuovo, privo delle vecchie licenze associate.</p>
+                        </section>
+
+                        <section>
+                            <h2 className="text-xl font-bold text-primary">14. Accettazione</h2>
+                            <p><strong>14.1.</strong> L'acquisto di qualsiasi licenza comporta l'accettazione integrale dei presenti Termini e Condizioni.</p>
+                            <p className="mt-4"><strong>14.2.</strong> In fase di acquisto, l'utente conferma di aver letto e compreso le limitazioni della licenza selezionata e le conseguenze della cancellazione dei dati.</p>
                         </section>
 
                     </div>

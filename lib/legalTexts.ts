@@ -25,6 +25,9 @@ La Licenza Formazione (Scuola) è riservata a istituti scolastici, centri di for
 **Tracciabilità**
 I contenuti video includono una filigrana dinamica (email dell'utente e ID ordine) a scopo di deterrenza e tracciabilità. Questo sistema non costituisce un DRM proprietario, ma uno standard di sicurezza orientato alla protezione dei contenuti.
 
+**Cancellazione Account**
+L'eliminazione volontaria dell'account comporta la cancellazione fisica di tutti i dati, inclusi gli acquisti, per rispettare il diritto all'oblio (GDPR). Cancellando l'account, perdi irreversibilmente l'accesso alle licenze senza alcun diritto di rimborso. Una nuova registrazione genererà un account vuoto.
+
 **Violazioni**
 In caso di utilizzi non conformi ai Termini d'Uso, la licenza potrà essere sospesa o revocata.
 `;
