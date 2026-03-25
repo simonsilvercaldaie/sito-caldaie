@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Loader2, User, Building2, CheckCircle, AlertCircle } from 'lucide-react'
@@ -7,6 +7,14 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 export default function CompletaProfiloPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-gray-50"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>}>
+            <CompletaProfiloContent />
+        </Suspense>
+    )
+}
+
+function CompletaProfiloContent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const returnTo = searchParams.get('returnTo')
