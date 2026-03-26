@@ -148,7 +148,10 @@ export async function POST(request: NextRequest) {
         const body = await request.json()
         const { orderId, product_code, amount_cents } = body
 
+        console.log(`[complete-purchase] START: email=${user.email}, orderId=${orderId}, product_code=${product_code}, amount_cents=${amount_cents}`)
+
         if (!orderId || !product_code || !amount_cents) {
+            console.log(`[complete-purchase] FAIL: missing_fields orderId=${orderId} product_code=${product_code} amount_cents=${amount_cents}`)
             return NextResponse.json({ ok: false, error: 'missing_fields' }, { status: 400 })
         }
 
@@ -157,6 +160,7 @@ export async function POST(request: NextRequest) {
         try {
             truthPrice = getExpectedPriceCents(product_code)
         } catch (e) {
+            console.log(`[complete-purchase] FAIL: invalid_product_code=${product_code}`)
             return NextResponse.json({ ok: false, error: 'invalid_product_code' }, { status: 400 })
         }
 
@@ -165,33 +169,56 @@ export async function POST(request: NextRequest) {
             'simonsilvercaldaie@gmail.com': 100,     // 1 EUR
             'simonsilvermotocross@gmail.com': 100,    // 1 EUR
         }
-        if (user.email && TEST_EMAILS_CENTS[user.email] !== undefined) {
-            truthPrice = TEST_EMAILS_CENTS[user.email]
+        const isTestAccount = user.email && TEST_EMAILS_CENTS[user.email] !== undefined
+        if (isTestAccount) {
+            truthPrice = TEST_EMAILS_CENTS[user.email!]
+            console.log(`[complete-purchase] TEST ACCOUNT: overriding truthPrice to ${truthPrice}`)
         }
 
         // Security Check: Client vs Server amount
         if (amount_cents !== truthPrice) {
+            console.log(`[complete-purchase] FAIL: price_mismatch client=${amount_cents} server=${truthPrice}`)
             return NextResponse.json({ ok: false, error: 'price_mismatch' }, { status: 400 })
         }
 
         // 4. Rate Limit
         const limitRes = await checkRateLimit(`purch_${user.id}`, 5, 60, false)
-        if (!limitRes.success) return NextResponse.json({ ok: false, error: 'rate_limit' }, { status: 429 })
+        if (!limitRes.success) {
+            console.log(`[complete-purchase] FAIL: rate_limit for user ${user.id}`)
+            return NextResponse.json({ ok: false, error: 'rate_limit' }, { status: 429 })
+        }
 
-        // 5. TOS
-        const { data: tos } = await supabaseAdmin.from('tos_acceptances').select('id').eq('user_id', user.id).eq('tos_version', TOS_VERSION).maybeSingle()
-        if (!tos) return NextResponse.json({ ok: false, error: 'tos_required' }, { status: 403 })
+        // 5. TOS (skip for test accounts)
+        if (!isTestAccount) {
+            const { data: tos } = await supabaseAdmin.from('tos_acceptances').select('id').eq('user_id', user.id).eq('tos_version', TOS_VERSION).maybeSingle()
+            if (!tos) {
+                console.log(`[complete-purchase] FAIL: tos_required for user ${user.id}`)
+                return NextResponse.json({ ok: false, error: 'tos_required' }, { status: 403 })
+            }
+        } else {
+            console.log(`[complete-purchase] TEST ACCOUNT: skipping TOS check`)
+        }
 
-        // 5b. Profile Completion Check (billing data required for invoice)
-        const { data: profileData } = await supabaseAdmin.from('profiles').select('profile_completed').eq('id', user.id).maybeSingle()
-        if (!profileData?.profile_completed) {
-            return NextResponse.json({ ok: false, error: 'profile_incomplete' }, { status: 403 })
+        // 5b. Profile Completion Check (skip for test accounts)
+        if (!isTestAccount) {
+            const { data: profileData } = await supabaseAdmin.from('profiles').select('profile_completed').eq('id', user.id).maybeSingle()
+            if (!profileData?.profile_completed) {
+                console.log(`[complete-purchase] FAIL: profile_incomplete for user ${user.id}`)
+                return NextResponse.json({ ok: false, error: 'profile_incomplete' }, { status: 403 })
+            }
+        } else {
+            console.log(`[complete-purchase] TEST ACCOUNT: skipping profile check`)
         }
 
         // 6. Verify PayPal
+        console.log(`[complete-purchase] Verifying PayPal order ${orderId} with truthPrice=${truthPrice}`)
         const ver = await verifyPayPalOrder(orderId, truthPrice, user.id)
-        if (!ver.valid || !ver.captureId) return NextResponse.json({ ok: false, error: ver.error }, { status: 402 })
+        if (!ver.valid || !ver.captureId) {
+            console.log(`[complete-purchase] FAIL: PayPal verify failed: ${ver.error}`)
+            return NextResponse.json({ ok: false, error: ver.error }, { status: 402 })
+        }
         const captureId = ver.captureId
+        console.log(`[complete-purchase] PayPal verified OK, captureId=${captureId}`)
 
         // 7. Idempotency on Capture ID
         const { data: existing } = await supabaseAdmin.from('purchases').select('id').eq('paypal_capture_id', captureId).maybeSingle()
