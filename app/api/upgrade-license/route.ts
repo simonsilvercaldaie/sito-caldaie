@@ -1,16 +1,14 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit } from '@/lib/rateLimit'
+import { PAYPAL_API_URL } from '@/lib/constants'
 
 // Service Role Client
 // Service Role Client
 // Removed top level init
 
 
-// PayPal Config
-const PAYPAL_API = process.env.PAYPAL_ENV === 'live'
-    ? 'https://api-m.paypal.com'
-    : 'https://api-m.sandbox.paypal.com'
+// PayPal Config — uses PAYPAL_API_URL from constants.ts for consistency
 
 // Expected upgrade prices in cents
 const UPGRADE_PRICES: Record<string, number> = {
@@ -27,7 +25,7 @@ async function getPayPalAccessToken(): Promise<string> {
         `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
     ).toString('base64')
 
-    const res = await fetch(`${PAYPAL_API}/v1/oauth2/token`, {
+    const res = await fetch(`${PAYPAL_API_URL}/v1/oauth2/token`, {
         method: 'POST',
         headers: {
             'Authorization': `Basic ${auth}`,
@@ -44,23 +42,34 @@ async function verifyPayPalOrder(orderId: string, expectedAmountCents: number): 
     try {
         const accessToken = await getPayPalAccessToken()
 
-        const res = await fetch(`${PAYPAL_API}/v2/checkout/orders/${orderId}`, {
+        const res = await fetch(`${PAYPAL_API_URL}/v2/checkout/orders/${orderId}`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json'
             }
         })
 
-        if (!res.ok) return { valid: false }
+        if (!res.ok) {
+            console.error(`[upgrade-license] PayPal API returned ${res.status}`)
+            return { valid: false }
+        }
 
         const order = await res.json()
+        console.log(`[upgrade-license] PayPal order status: ${order.status}, id: ${orderId}`)
 
-        if (order.status !== 'COMPLETED') return { valid: false }
+        if (order.status !== 'COMPLETED') {
+            console.error(`[upgrade-license] Order not COMPLETED, status: ${order.status}`)
+            return { valid: false }
+        }
 
         const capture = order.purchase_units?.[0]?.payments?.captures?.[0]
-        if (!capture) return { valid: false }
+        if (!capture) {
+            console.error('[upgrade-license] No capture found in order')
+            return { valid: false }
+        }
 
         const paidAmountCents = Math.round(parseFloat(capture.amount.value) * 100)
+        console.log(`[upgrade-license] Paid: ${paidAmountCents} cents, Expected: ${expectedAmountCents} cents`)
 
         // Allow small variance (€2)
         if (Math.abs(paidAmountCents - expectedAmountCents) > 200) {
