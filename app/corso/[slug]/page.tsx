@@ -57,46 +57,37 @@ export default function CorsoPage() {
     const youtubeRef = useRef<HTMLIFrameElement>(null)
     const bunnyRef = useRef<HTMLIFrameElement>(null)
 
-    // Mutual exclusion: pause YouTube when Bunny plays and vice versa
+    // Mutual exclusion: pause the other video when one is clicked
     useEffect(() => {
-        const handleMessage = (event: MessageEvent) => {
-            try {
-                const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data
+        const handleBlur = () => {
+            // When user clicks inside an iframe, window loses focus.
+            // We give it a tiny delay to let `document.activeElement` update to the clicked iframe.
+            setTimeout(() => {
+                const active = document.activeElement
+                if (!active) return
 
-                // 1. YouTube started playing
-                if (data.event === 'onStateChange' && data.info === 1) {
+                const isYouTube = active === youtubeRef.current
+                // VideoPlayerSecured wraps Bunny iframe. Let's check if the active element is the bunny iframe.
+                // We passed iframeRef={bunnyRef} to VideoPlayerSecured, so bunnyRef.current IS the iframe.
+                const isBunny = active === bunnyRef.current
+
+                if (isYouTube) {
+                    // User clicked YouTube -> pause Bunny
                     if (bunnyRef.current?.contentWindow) {
-                        // Bunny accepts player.js formatted messages
                         bunnyRef.current.contentWindow.postMessage('{"method":"pause"}', '*')
-                        bunnyRef.current.contentWindow.postMessage('{"context":"player.js","method":"pause"}', '*')
+                        bunnyRef.current.contentWindow.postMessage(JSON.stringify({context: "player.js", method: "pause"}), '*')
                     }
-                }
-
-                // 2. Bunny started playing (player.js format or exact object match)
-                if (data.event === 'play' || data.type === 'play') {
+                } else if (isBunny) {
+                    // User clicked Bunny -> pause YouTube
                     if (youtubeRef.current?.contentWindow) {
-                        youtubeRef.current.contentWindow.postMessage(
-                            JSON.stringify({ event: 'command', func: 'pauseVideo', args: [] }),
-                            '*'
-                        )
+                        youtubeRef.current.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*')
                     }
                 }
-            } catch {}
+            }, 50)
         }
 
-        window.addEventListener('message', handleMessage)
-
-        // YouTube requires us to send a 'listening' event before it broadcasts state changes
-        const pingInterval = setInterval(() => {
-            if (youtubeRef.current?.contentWindow) {
-                youtubeRef.current.contentWindow.postMessage('{"event":"listening","id":1}', '*')
-            }
-        }, 1500)
-
-        return () => {
-            window.removeEventListener('message', handleMessage)
-            clearInterval(pingInterval)
-        }
+        window.addEventListener('blur', handleBlur)
+        return () => window.removeEventListener('blur', handleBlur)
     }, [])
 
     // Session Guard — activates when user has purchased access
