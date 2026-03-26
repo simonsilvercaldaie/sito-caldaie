@@ -103,14 +103,20 @@ async function grantAccess(email: string, products: string[]) {
 
         let purchaseId: string | undefined
         if (!existing) {
-            const { data: newPurchase } = await supabaseAdmin.from('purchases').insert({
+            const { data: newPurchase, error: insertError } = await supabaseAdmin.from('purchases').insert({
                 user_id: userId,
+                user_email: email,
                 product_code: productCode,
                 amount_cents: 0,
+                currency: 'EUR',
                 plan_type: 'individual',
+                paypal_order_id: captureId,
                 paypal_capture_id: captureId,
                 snapshot_company_name: 'REGALO ADMIN'
             }).select('id').single()
+            if (insertError) {
+                console.error('[Admin grantAccess] Insert error:', insertError)
+            }
             purchaseId = newPurchase?.id
         } else {
             purchaseId = existing.id
