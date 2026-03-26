@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, RefObject } from 'react'
 import { Maximize } from 'lucide-react'
 
 interface VideoPlayerSecuredProps {
@@ -7,6 +7,7 @@ interface VideoPlayerSecuredProps {
     userEmail: string
     orderId: string
     className?: string
+    iframeRef?: RefObject<HTMLIFrameElement | null>
 }
 
 // Posizioni angolari fisse (mai al centro)
@@ -32,7 +33,8 @@ export default function VideoPlayerSecured({
     videoUrl,
     userEmail,
     orderId,
-    className = ''
+    className = '',
+    iframeRef
 }: VideoPlayerSecuredProps) {
     const containerRef = useRef<HTMLDivElement>(null)
     const [showWatermark, setShowWatermark] = useState(false)
@@ -105,6 +107,7 @@ export default function VideoPlayerSecured({
             {/* Video Element (Iframe o Video) */}
             {videoUrl.includes('iframe.mediadelivery.net') ? (
                 <iframe
+                    ref={iframeRef}
                     title="Simon Silver Video Player"
                     src={videoUrl}
                     loading="lazy"

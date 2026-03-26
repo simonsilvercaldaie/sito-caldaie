@@ -1,5 +1,6 @@
 'use client'
 import { useParams } from "next/navigation"
+import { useRef } from 'react'
 import { getCourseBySlug, getAllCourses, Course } from "@/lib/coursesData"
 import { getLevelPricing, getTestPrice, formatPrice } from "@/lib/pricingLogic"
 import { PayPalBtn } from "@/components/PayPalBtn"
@@ -52,6 +53,40 @@ export default function CorsoPage() {
     const [viewMode, setViewMode] = useState<'individual' | 'team' | null>(null)
     const [teamAccess, setTeamAccess] = useState(false)
     const [secureVideoUrl, setSecureVideoUrl] = useState<string>("")
+    const youtubeRef = useRef<HTMLIFrameElement>(null)
+    const bunnyRef = useRef<HTMLIFrameElement>(null)
+
+    // Mutual exclusion: pause YouTube when Bunny plays and vice versa
+    useEffect(() => {
+        const handleMessage = (event: MessageEvent) => {
+            // YouTube state change (1 = playing)
+            try {
+                if (typeof event.data === 'string') {
+                    const data = JSON.parse(event.data)
+                    if (data.event === 'onStateChange' && data.info === 1) {
+                        // YouTube started playing → pause Bunny
+                        if (bunnyRef.current?.contentWindow) {
+                            bunnyRef.current.contentWindow.postMessage('{"event":"command","func":"pause"}', '*')
+                        }
+                    }
+                }
+            } catch {}
+
+            // Bunny player state (play event)
+            if (event.data && typeof event.data === 'object' && event.data.type === 'play') {
+                // Bunny started playing → pause YouTube
+                if (youtubeRef.current?.contentWindow) {
+                    youtubeRef.current.contentWindow.postMessage(
+                        JSON.stringify({ event: 'command', func: 'pauseVideo', args: [] }),
+                        '*'
+                    )
+                }
+            }
+        }
+
+        window.addEventListener('message', handleMessage)
+        return () => window.removeEventListener('message', handleMessage)
+    }, [])
 
     // Session Guard — activates when user has purchased access
     const { status: sessionStatus, errorMessage: sessionError } = useSessionGuard({
@@ -444,8 +479,9 @@ export default function CorsoPage() {
                                     <div className="aspect-video bg-gray-900 relative">
                                         {course.youtubeId !== "PLACEHOLDER" ? (
                                             <iframe
+                                                ref={youtubeRef}
                                                 className="w-full h-full"
-                                                src={`https://www.youtube.com/embed/${course.youtubeId}`}
+                                                src={`https://www.youtube.com/embed/${course.youtubeId}?enablejsapi=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}`}
                                                 title={course.title}
                                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                                 allowFullScreen
@@ -512,6 +548,7 @@ export default function CorsoPage() {
                                                 videoUrl={secureVideoUrl || course.premiumVideoUrl!}
                                                 userEmail={user?.email || 'utente@simonsilver.it'}
                                                 orderId={activeOrderId || 'ORDER-XXXX'}
+                                                iframeRef={bunnyRef}
                                             />
                                         ) : (
                                             <div className="aspect-video bg-gray-900 relative">
