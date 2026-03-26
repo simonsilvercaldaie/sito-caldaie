@@ -31,7 +31,6 @@ export async function GET(request: NextRequest) {
             .from('team_licenses')
             .select('id, seats, created_at, company_name, free_reassignments_total, free_reassignments_used')
             .eq('owner_user_id', user.id)
-            .eq('status', 'active')
 
         if (licError) throw licError
         if (!licenses || licenses.length === 0) {
@@ -90,13 +89,14 @@ export async function GET(request: NextRequest) {
                 }
             }))
 
+            const employeeSlots = lic.seats - 1 // seats include admin
             teamsStats.push({
                 licenseId: lic.id,
-                seats: lic.seats,
-                seatsUsed: memberCount || 0,
+                seats: employeeSlots,
+                seatsUsed: Math.max(0, (memberCount || 0) - 1), // exclude admin from count
                 members: enrichedMembers,
                 invites: invites || [],
-                freeReassignmentsTotal: lic.free_reassignments_total || lic.seats,
+                freeReassignmentsTotal: lic.free_reassignments_total || employeeSlots,
                 freeReassignmentsUsed: lic.free_reassignments_used || 0
             })
         }
