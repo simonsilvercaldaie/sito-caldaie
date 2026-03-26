@@ -35,8 +35,7 @@ export default function DashboardPage() {
 
     // Upgrade eligibility state
     const [canUpgrade, setCanUpgrade] = useState(false)
-
-
+    const [hasTeamLicense, setHasTeamLicense] = useState(false)
 
     const router = useRouter()
 
@@ -86,8 +85,6 @@ export default function DashboardPage() {
                 setFullName(meta.full_name || '')
             }
 
-            setLoading(false)
-
             // 2. Carica Dispositivi (Bug 2.3 Fix)
             setLoadingDevices(true)
             try {
@@ -113,8 +110,11 @@ export default function DashboardPage() {
                     .from('team_licenses')
                     .select('seats')
                     .eq('owner_user_id', session.user.id)
-                    .eq('status', 'active')
                     .maybeSingle()
+
+                if (teamLicense) {
+                    setHasTeamLicense(true)
+                }
 
                 if (!teamLicense) {
                     // No team license — check individual purchases
@@ -138,6 +138,8 @@ export default function DashboardPage() {
             } catch (e) {
                 console.error('Error checking upgrade eligibility', e)
             }
+
+            setLoading(false)
         }
         checkUser()
     }, [router])
@@ -286,7 +288,7 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                <TeamDashboard />
+                {hasTeamLicense && <TeamDashboard />}
                 <PendingInviteBanner />
 
                 {/* TABS Navigation */}
