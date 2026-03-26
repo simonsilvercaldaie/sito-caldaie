@@ -60,7 +60,7 @@ export const courses: Course[] = [
         learnings: ["Osservazione preliminare", "Rumori e odori", "Pressioni e temperature a vista", "Errori da non commettere appena arrivati"],
         premiumContent: ["Checklist dei 3 minuti da stampare", "Come interrogare il cliente mentre osservi", "Segnali visivi spesso ignorati"],
         coverImage: "/images/courses/02-check-iniziale.webp",
-        bunnyVideoId: "944df291-2471-45c9-87e3-5e590f210906"
+        bunnyVideoId: "a69cb0ca-d401-43c8-9f6d-070d3748d9c4"
     },
     {
         id: "03-schema-funzionale",
@@ -164,7 +164,8 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["Valutazione costi/benefici", "Sicurezza impianto non a norma", "Caldaie a fine vita", "Etica professionale"],
         premiumContent: ["Come dire di no al cliente", "Responsabilità legale", "Proporre la sostituzione in modo etico"],
-        coverImage: "/images/courses/09-quando-non-intervenire.webp"
+        coverImage: "/images/courses/09-quando-non-intervenire.webp",
+        bunnyVideoId: "d2e594a3-6d49-46b4-ac86-db085afe0cdf"
     },
 
     // --- LIVELLO INTERMEDIO (9 Video) ---
@@ -180,7 +181,8 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Ciclo di accensione interrotto", "Fiamma che non tiene", "Salita temperatura troppo rapida", "Caduta di pressione immediata"],
         premiumContent: ["Analisi curve di temperatura", "Problemi di ionizzazione a caldo", "Diagnosi predittiva durante l'accensione"],
-        coverImage: "/images/courses/10-blocchi-prevedibili.webp"
+        coverImage: "/images/courses/10-blocchi-prevedibili.webp",
+        bunnyVideoId: "b01defd4-93bc-40f4-a376-a37655c584d3"
     },
     {
         id: "11-problema-impianto",
@@ -194,7 +196,8 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Mancanza di circolazione", "Aria nell'impianto", "Sporcizia e fanghi esterni", "Dimensionamento tubi errato"],
         premiumContent: ["Test a 'caldaia chiusa'", "Verifica prevalenza pompa", "Bilanciamento impianto base"],
-        coverImage: "/images/courses/11-problema-impianto.webp"
+        coverImage: "/images/courses/11-problema-impianto.webp",
+        bunnyVideoId: "4ef39891-8d74-47d8-9bf1-9a68a373d56c"
     },
     {
         id: "12-scambiatori-colpevoli",
@@ -208,7 +211,8 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Scambio termico inefficiente", "Sintomi calcare lato acqua", "Intasamento lato fumi", "Sostituire o lavare?"],
         premiumContent: ["Lavaggio chimico sicuro", "Calcolo delta T per diagnosi", "Casi reali di scambiatori 'finti guasti'"],
-        coverImage: "/images/courses/12-scambiatori-colpevoli.webp"
+        coverImage: "/images/courses/12-scambiatori-colpevoli.webp",
+        bunnyVideoId: "6356e3a9-9416-4f9d-9a60-87cbb8b760da"
     },
     {
         id: "13-valvola-tre-vie",
