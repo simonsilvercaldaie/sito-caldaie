@@ -105,10 +105,8 @@ async function grantAccess(email: string, products: string[]) {
         if (!existing) {
             const { data: newPurchase, error: insertError } = await supabaseAdmin.from('purchases').insert({
                 user_id: userId,
-                user_email: email,
                 product_code: productCode,
                 amount_cents: 0,
-                currency: 'EUR',
                 plan_type: 'individual',
                 paypal_order_id: captureId,
                 paypal_capture_id: captureId,

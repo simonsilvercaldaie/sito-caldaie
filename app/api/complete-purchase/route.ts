@@ -272,6 +272,7 @@ export async function POST(request: NextRequest) {
                 plan_type: 'team',
                 product_code: product_code,
                 amount_cents: truthPrice,
+                paypal_order_id: orderId,
                 paypal_capture_id: captureId,
                 team_license_id: lic.id,
                 ...snapshotData
@@ -288,6 +289,7 @@ export async function POST(request: NextRequest) {
                 plan_type: 'individual',
                 product_code: product_code,
                 amount_cents: truthPrice,
+                paypal_order_id: orderId,
                 paypal_capture_id: captureId,
                 team_license_id: null,
                 ...snapshotData

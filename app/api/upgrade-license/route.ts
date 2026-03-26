@@ -149,16 +149,13 @@ export async function POST(request: NextRequest) {
             // Create new team license
             // target_team_size indica i posti invitabili (+1 per l'admin)
             const maxMembers = target_team_size + 1
-            const validUntil = new Date()
-            validUntil.setFullYear(validUntil.getFullYear() + 100) // Lifetime
 
             const { data: teamLicense, error: teamError } = await supabaseAdmin
                 .from('team_licenses')
                 .insert({
-                    owner_id: user.id,
-                    max_members: maxMembers,
-                    status: 'active',
-                    valid_until: validUntil.toISOString()
+                    owner_user_id: user.id,
+                    seats: maxMembers,
+                    company_name: user.email
                 })
                 .select('id')
                 .single()
@@ -189,9 +186,8 @@ export async function POST(request: NextRequest) {
             const maxMembers = target_team_size + 1
             const { error: updateError } = await supabaseAdmin
                 .from('team_licenses')
-                .update({ max_members: maxMembers })
-                .eq('owner_id', user.id)
-                .eq('status', 'active')
+                .update({ seats: maxMembers })
+                .eq('owner_user_id', user.id)
 
             if (updateError) {
                 console.error('[upgrade-license] Team update error:', updateError)
