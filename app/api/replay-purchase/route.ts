@@ -358,10 +358,11 @@ export async function POST(request: NextRequest) {
 
     } catch (error) {
         console.error('[replay-purchase] Errore interno:', error)
+        const errorMessage = error instanceof Error ? error.message : String(error)
         return NextResponse.json({
             ok: false,
             status: 'error',
-            error: 'Errore interno server'
+            error: `Errore DB/Server: ${errorMessage}`
         }, { status: 500 })
     }
 }
