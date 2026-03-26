@@ -137,6 +137,29 @@ export default function CorsoPage() {
                     }
                 }
 
+                // 2b. Server-side fallback: check user_access table (catches admin gifts)
+                if (!hasAccess && course && session?.access_token) {
+                    try {
+                        const accessRes = await fetch('/api/video-access', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${session.access_token}`
+                            },
+                            body: JSON.stringify({ courseId: course.id })
+                        })
+                        if (accessRes.ok) {
+                            const accessData = await accessRes.json()
+                            if (accessData.authorized) {
+                                hasAccess = true
+                                orderLimitId = 'ACCESS-GRANTED'
+                            }
+                        }
+                    } catch (e) {
+                        console.error('Server-side access check failed', e)
+                    }
+                }
+
                 if (hasAccess && !orderLimitId) {
                     orderLimitId = "TEAM-LIC"
                 }
