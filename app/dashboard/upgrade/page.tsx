@@ -53,16 +53,15 @@ export default function UpgradePage() {
         // Check team license (owner)
         const { data: teamLicense } = await supabase
             .from('team_licenses')
-            .select('max_members, status')
-            .eq('owner_id', session.user.id)
-            .eq('status', 'active')
+            .select('seats')
+            .eq('owner_user_id', session.user.id)
             .maybeSingle()
 
         if (teamLicense) {
-            setTeamSize(teamLicense.max_members)
-            if (teamLicense.max_members >= 25) {
+            setTeamSize(teamLicense.seats)
+            if (teamLicense.seats >= 25) {
                 setLicenseStatus('multi_25')
-            } else if (teamLicense.max_members >= 10) {
+            } else if (teamLicense.seats >= 10) {
                 setLicenseStatus('multi_10')
             } else {
                 setLicenseStatus('multi_5')
@@ -313,27 +312,27 @@ export default function UpgradePage() {
                             <UpgradeCard
                                 title="Multidipendente 5"
                                 users={5}
-                                price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_5}
+                                price={user?.email === 'simonsilvercaldaie@gmail.com' || user?.email === 'simonsilvermotocross@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_5}
                                 enabled={tosAccepted}
-                                onSuccess={(id) => handleUpgradeSuccess(id, 5, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_5)}
+                                onSuccess={(id) => handleUpgradeSuccess(id, 5, user?.email === 'simonsilvercaldaie@gmail.com' || user?.email === 'simonsilvermotocross@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_5)}
                             />
 
                             {/* Team 10 */}
                             <UpgradeCard
                                 title="Multidipendente 10"
                                 users={10}
-                                price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_10}
+                                price={user?.email === 'simonsilvercaldaie@gmail.com' || user?.email === 'simonsilvermotocross@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_10}
                                 enabled={tosAccepted}
-                                onSuccess={(id) => handleUpgradeSuccess(id, 10, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_10)}
+                                onSuccess={(id) => handleUpgradeSuccess(id, 10, user?.email === 'simonsilvercaldaie@gmail.com' || user?.email === 'simonsilvermotocross@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_10)}
                             />
 
                             {/* Team 25 */}
                             <UpgradeCard
                                 title="Multidipendente 25"
                                 users={25}
-                                price={user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_25}
+                                price={user?.email === 'simonsilvercaldaie@gmail.com' || user?.email === 'simonsilvermotocross@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_25}
                                 enabled={tosAccepted}
-                                onSuccess={(id) => handleUpgradeSuccess(id, 25, user?.email === 'simonsilvercaldaie@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_25)}
+                                onSuccess={(id) => handleUpgradeSuccess(id, 25, user?.email === 'simonsilvercaldaie@gmail.com' || user?.email === 'simonsilvermotocross@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_25)}
                                 highlight
                             />
                         </div>
@@ -413,11 +412,11 @@ function UpgradeCard({ title, users, price, enabled, onSuccess, highlight = fals
 
             <div className="mt-auto">
                 {enabled ? (
-                    // DISABILITATO TEMPORANEAMENTE
-                    // <PayPalBtn ... />
-                    <div className="text-center p-3 bg-gray-50 rounded-xl border-2 border-dashed border-gray-200">
-                        <p className="font-bold text-gray-400 text-xs">Acquisti Upgrade Sospesi</p>
-                    </div>
+                    <PayPalBtn
+                        amount={String(price)}
+                        courseTitle={`Upgrade a ${title}`}
+                        onSuccess={onSuccess}
+                    />
                 ) : (
                     <button disabled className="w-full py-3 bg-gray-100 text-gray-400 font-bold rounded-xl cursor-not-allowed">
                         Accetta i termini sopra
