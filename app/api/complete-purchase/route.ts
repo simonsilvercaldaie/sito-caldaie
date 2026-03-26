@@ -160,9 +160,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ ok: false, error: 'invalid_product_code' }, { status: 400 })
         }
 
-        // ADMIN BYPASS FOR TESTING: Force price to 1.00 EUR (100 cents) if admin
-        if (user.email === 'simonsilvercaldaie@gmail.com') {
-            truthPrice = 100
+        // TEST ACCOUNT BYPASS: Override price for test emails
+        const TEST_EMAILS_CENTS: Record<string, number> = {
+            'simonsilvercaldaie@gmail.com': 100,     // 1 EUR
+            'simonsilvermotocross@gmail.com': 500,    // 5 EUR
+        }
+        if (user.email && TEST_EMAILS_CENTS[user.email] !== undefined) {
+            truthPrice = TEST_EMAILS_CENTS[user.email]
         }
 
         // Security Check: Client vs Server amount

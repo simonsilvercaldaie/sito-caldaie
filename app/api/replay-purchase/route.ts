@@ -248,6 +248,19 @@ export async function POST(request: NextRequest) {
             }
         }
 
+        // TEST ACCOUNT FALLBACK: match test amounts to their intended product
+        if (!productCode && user.email) {
+            const TEST_EMAILS_CENTS: Record<string, { cents: number; product: string }> = {
+                'simonsilvercaldaie@gmail.com': { cents: 100, product: 'base' },
+                'simonsilvermotocross@gmail.com': { cents: 500, product: 'base' },
+            }
+            const testEntry = TEST_EMAILS_CENTS[user.email]
+            if (testEntry && Math.abs(amountCents - testEntry.cents) <= 1) {
+                productCode = testEntry.product
+                console.log(`[replay-purchase] Test account match: ${user.email} -> ${productCode}`)
+            }
+        }
+
         if (!productCode) {
             console.error(`[replay-purchase] Importo non riconosciuto: ${amountCents}`)
             await logSecurityEvent(user.id, 'paypal_error', { context: 'replay', error: 'Unknown Amount', amountCents, orderId });
