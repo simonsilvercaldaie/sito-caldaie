@@ -6,6 +6,7 @@ import { LogOut, User, Smartphone, Save, Loader2, RefreshCw, Shield } from 'luci
 import Link from 'next/link'
 import Image from 'next/image'
 import TeamDashboard from '@/components/TeamDashboard'
+import PendingInviteBanner from '@/components/PendingInviteBanner'
 import SupportSection from '@/components/dashboard/SupportSection'
 
 export default function DashboardPage() {
@@ -286,6 +287,7 @@ export default function DashboardPage() {
                 </div>
 
                 <TeamDashboard />
+                <PendingInviteBanner />
 
                 {/* TABS Navigation */}
                 <div className="flex gap-4 border-b border-gray-200 mb-6 overflow-x-auto">
