@@ -506,16 +506,20 @@ export default function CorsoPage() {
                                                 </p>
                                             </div>
                                         )}
-                                        {/* Overlay: shown when Bunny is active, blocks YouTube interaction */}
-                                        {activePlayer === 'bunny' && (
+                                        {/* Overlay: transparent interceptor when no player selected, dark when Bunny is active */}
+                                        {activePlayer !== 'youtube' && (
                                             <div 
-                                                className="absolute inset-0 z-20 bg-black/70 flex items-center justify-center cursor-pointer transition-all"
+                                                className={`absolute inset-0 z-20 flex items-center justify-center cursor-pointer transition-all ${
+                                                    activePlayer === 'bunny' ? 'bg-black/70' : 'bg-transparent'
+                                                }`}
                                                 onClick={(e) => { e.stopPropagation(); activateYouTube(); }}
                                             >
-                                                <div className="text-center text-white">
-                                                    <PlayCircle className="w-12 h-12 mx-auto mb-2 opacity-80" />
-                                                    <p className="text-sm font-semibold opacity-80">Clicca per guardare Parte 1</p>
-                                                </div>
+                                                {activePlayer === 'bunny' && (
+                                                    <div className="text-center text-white">
+                                                        <PlayCircle className="w-12 h-12 mx-auto mb-2 opacity-80" />
+                                                        <p className="text-sm font-semibold opacity-80">Clicca per guardare Parte 1</p>
+                                                    </div>
+                                                )}
                                             </div>
                                         )}
                                     </div>
@@ -574,16 +578,20 @@ export default function CorsoPage() {
                                                     orderId={activeOrderId || 'ORDER-XXXX'}
                                                     iframeRef={bunnyRef}
                                                 />
-                                                {/* Overlay: shown when YouTube is active, blocks Bunny interaction */}
-                                                {activePlayer === 'youtube' && (
+                                                {/* Overlay: transparent interceptor when no player selected, dark when YouTube is active */}
+                                                {activePlayer !== 'bunny' && (
                                                     <div 
-                                                        className="absolute inset-0 z-20 bg-black/70 flex items-center justify-center cursor-pointer transition-all rounded-2xl"
+                                                        className={`absolute inset-0 z-20 flex items-center justify-center cursor-pointer transition-all rounded-2xl ${
+                                                            activePlayer === 'youtube' ? 'bg-black/70' : 'bg-transparent'
+                                                        }`}
                                                         onClick={(e) => { e.stopPropagation(); activateBunny(); }}
                                                     >
-                                                        <div className="text-center text-white">
-                                                            <PlayCircle className="w-12 h-12 mx-auto mb-2 opacity-80" />
-                                                            <p className="text-sm font-semibold opacity-80">Clicca per guardare Parte 2</p>
-                                                        </div>
+                                                        {activePlayer === 'youtube' && (
+                                                            <div className="text-center text-white">
+                                                                <PlayCircle className="w-12 h-12 mx-auto mb-2 opacity-80" />
+                                                                <p className="text-sm font-semibold opacity-80">Clicca per guardare Parte 2</p>
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 )}
                                             </div>

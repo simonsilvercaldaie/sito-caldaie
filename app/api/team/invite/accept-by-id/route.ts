@@ -51,36 +51,77 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Invito scaduto' }, { status: 410 })
         }
 
-        // 2. Use the RPC (same as token-based accept) with the stored token_hash
-        const { data: rpcResult, error: rpcErr } = await supabase
-            .rpc('accept_team_invitation', {
-                p_token_hash: invite.token_hash,
-                p_user_id: user.id
+        // 2. Check license seat availability and invite limits
+        const { data: license, error: licErr } = await supabase
+            .from('team_licenses')
+            .select('id, seats, max_invites_total, invites_used')
+            .eq('id', invite.team_license_id)
+            .single()
+
+        if (licErr || !license) {
+            return NextResponse.json({ error: 'Licenza non trovata' }, { status: 404 })
+        }
+
+        const employeeSlots = license.seats - 1 // seats include admin
+        const maxInvites = license.max_invites_total || (employeeSlots * 2)
+        const invitesUsed = license.invites_used || 0
+
+        // Check if invite limit reached
+        if (invitesUsed >= maxInvites) {
+            return NextResponse.json({ error: 'Limite inviti raggiunto. Contatta l\'amministratore.' }, { status: 409 })
+        }
+
+        // Count current active members
+        const { count: activeMembers } = await supabase
+            .from('team_members')
+            .select('*', { count: 'exact', head: true })
+            .eq('team_license_id', license.id)
+            .is('removed_at', null)
+
+        if ((activeMembers || 0) >= employeeSlots) {
+            return NextResponse.json({ error: 'Il gruppo è pieno. Non ci sono posti disponibili al momento.', code: 'seats_full' }, { status: 409 })
+        }
+
+        // Check if user is already a member
+        const { data: existing } = await supabase
+            .from('team_members')
+            .select('id')
+            .eq('team_license_id', license.id)
+            .eq('user_id', user.id)
+            .is('removed_at', null)
+            .maybeSingle()
+
+        if (existing) {
+            return NextResponse.json({ error: 'Sei già membro di questo team', code: 'already_member' }, { status: 409 })
+        }
+
+        // 3. Insert team member
+        const { error: insertErr } = await supabase
+            .from('team_members')
+            .insert({
+                team_license_id: license.id,
+                user_id: user.id,
+                added_at: new Date().toISOString()
             })
 
-        if (rpcErr) {
-            console.error('RPC Error', rpcErr)
-            return NextResponse.json({ error: 'Errore database' }, { status: 500 })
+        if (insertErr) {
+            console.error('Insert member error', insertErr)
+            return NextResponse.json({ error: 'Errore inserimento membro' }, { status: 500 })
         }
 
-        if (!rpcResult.success) {
-            const errCode = rpcResult.error
-            let msg = 'Errore durante accettazione'
-            let status = 400
+        // 4. Update invite status to accepted
+        await supabase
+            .from('team_invitations')
+            .update({ status: 'accepted' })
+            .eq('id', invite.id)
 
-            switch (errCode) {
-                case 'invitation_not_found': msg = 'Invito non valido'; status = 404; break
-                case 'invitation_not_pending': msg = 'Invito già accettato o revocato'; status = 410; break
-                case 'invitation_expired': msg = 'Invito scaduto'; status = 410; break
-                case 'already_member': msg = 'Sei già membro di questo team'; status = 409; break
-                case 'seats_full': msg = 'Il team ha raggiunto il numero massimo di membri'; status = 409; break
-                default: msg = `Errore: ${errCode}`
-            }
+        // 5. Increment invites_used on the license
+        await supabase
+            .from('team_licenses')
+            .update({ invites_used: invitesUsed + 1 })
+            .eq('id', license.id)
 
-            return NextResponse.json({ error: msg, code: errCode }, { status })
-        }
-
-        return NextResponse.json({ success: true, teamLicenseId: rpcResult.team_license_id })
+        return NextResponse.json({ success: true, teamLicenseId: license.id })
 
     } catch (e: any) {
         console.error('Accept-by-ID Error', e)

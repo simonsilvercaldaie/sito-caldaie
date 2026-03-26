@@ -13,14 +13,16 @@ interface PendingInvite {
     expiresAt: string
 }
 
-export default function PendingInviteBanner() {
-    const [invites, setInvites] = useState<PendingInvite[]>([])
-    const [loading, setLoading] = useState(true)
+export default function PendingInviteBanner({ initialInvites }: { initialInvites?: PendingInvite[] }) {
+    const [invites, setInvites] = useState<PendingInvite[]>(initialInvites || [])
+    const [loading, setLoading] = useState(!initialInvites)
     const [accepting, setAccepting] = useState<string | null>(null)
     const [accepted, setAccepted] = useState<string[]>([])
 
     useEffect(() => {
-        fetchPending()
+        if (!initialInvites) {
+            fetchPending()
+        }
     }, [])
 
     const fetchPending = async () => {

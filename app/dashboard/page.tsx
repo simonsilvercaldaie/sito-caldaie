@@ -37,6 +37,8 @@ export default function DashboardPage() {
     // Upgrade eligibility state
     const [canUpgrade, setCanUpgrade] = useState(false)
     const [hasTeamLicense, setHasTeamLicense] = useState(false)
+    const [teamData, setTeamData] = useState<any>(null)
+    const [pendingInvites, setPendingInvites] = useState<any[]>([])
 
     const router = useRouter()
 
@@ -116,6 +118,31 @@ export default function DashboardPage() {
 
                 if (teamLicense) {
                     setHasTeamLicense(true)
+                    // Pre-fetch team dashboard data so it renders instantly
+                    try {
+                        const teamRes = await fetch('/api/team/dashboard', {
+                            headers: { 'Authorization': `Bearer ${session.access_token}` }
+                        })
+                        if (teamRes.ok) {
+                            const teamJson = await teamRes.json()
+                            setTeamData(teamJson)
+                        }
+                    } catch (e) {
+                        console.error('Error prefetching team data', e)
+                    }
+                }
+
+                // Pre-fetch pending invites for PendingInviteBanner
+                try {
+                    const invRes = await fetch('/api/team/invite/pending', {
+                        headers: { 'Authorization': `Bearer ${session.access_token}` }
+                    })
+                    if (invRes.ok) {
+                        const invJson = await invRes.json()
+                        setPendingInvites(invJson.invites || [])
+                    }
+                } catch (e) {
+                    console.error('Error prefetching pending invites', e)
                 }
 
                 if (!teamLicense) {
@@ -290,8 +317,8 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {hasTeamLicense && <TeamDashboard />}
-                <PendingInviteBanner />
+                {hasTeamLicense && <TeamDashboard initialData={teamData} />}
+                <PendingInviteBanner initialInvites={pendingInvites} />
 
                 {/* TABS Navigation */}
                 <div className="flex gap-4 border-b border-gray-200 mb-6 overflow-x-auto">

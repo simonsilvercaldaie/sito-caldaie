@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
         // 3. Verify ownership
         const { data: license, error: licError } = await supabase
             .from('team_licenses')
-            .select('id, seats, owner_user_id, free_reassignments_total, free_reassignments_used')
+            .select('id, seats, owner_user_id')
             .eq('id', teamLicenseId)
             .single()
 
@@ -75,23 +75,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: 'Non puoi rimuovere te stesso dal team' }, { status: 400 })
         }
 
-        // 6. Check if free reassignments are available
-        const freeTotal = license.free_reassignments_total || license.seats
-        const freeUsed = license.free_reassignments_used || 0
-        const freeRemaining = freeTotal - freeUsed
-
-        if (freeRemaining <= 0) {
-            return NextResponse.json({
-                success: false,
-                error: 'Hai esaurito i riassegnamenti gratuiti. Contatta simonsilvercaldaie@gmail.com per acquistare nuovi riassegnamenti (€400 cad.)',
-                needsPayment: true,
-                cost: 400,
-                freeTotal,
-                freeUsed
-            }, { status: 402 }) // 402 Payment Required
-        }
-
-        // 7. Soft-delete member
+        // 6. Soft-delete member (frees the seat)
         const { error: removeError } = await supabase
             .from('team_members')
             .update({ removed_at: new Date().toISOString() })
@@ -102,28 +86,11 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ success: false, error: 'Errore nella rimozione' }, { status: 500 })
         }
 
-        // 8. Increment reassignment counter
-        const { error: counterError } = await supabase
-            .from('team_licenses')
-            .update({ free_reassignments_used: freeUsed + 1 })
-            .eq('id', teamLicenseId)
-
-        if (counterError) {
-            console.error('[remove-member] Counter update error:', counterError)
-            // Don't fail the removal, just log
-        }
-
-        // 9. Get user email for logging
+        // 7. Log
         const { data: removedUser } = await supabase.auth.admin.getUserById(member.user_id)
+        console.log(`[remove-member] User ${removedUser?.user?.email || member.user_id} removed from team ${teamLicenseId} by ${user.email}`)
 
-        console.log(`[remove-member] User ${removedUser?.user?.email || member.user_id} removed from team ${teamLicenseId} by ${user.email}. Reassignments: ${freeUsed + 1}/${freeTotal}`)
-
-        return NextResponse.json({
-            success: true,
-            freeRemaining: freeRemaining - 1,
-            freeTotal,
-            freeUsed: freeUsed + 1
-        })
+        return NextResponse.json({ success: true })
 
     } catch (e) {
         console.error('[remove-member] Unexpected error:', e)

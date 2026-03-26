@@ -24,13 +24,14 @@ interface TeamStats {
     seatsUsed: number
     members: TeamMember[]
     invites: TeamInvite[]
-    freeReassignmentsTotal: number
-    freeReassignmentsUsed: number
+    maxInvites: number
+    invitesUsed: number
+    invitesRemaining: number
 }
 
-export default function TeamDashboard() {
-    const [teams, setTeams] = useState<TeamStats[]>([])
-    const [loading, setLoading] = useState(true)
+export default function TeamDashboard({ initialData }: { initialData?: any }) {
+    const [teams, setTeams] = useState<TeamStats[]>(initialData?.teams || [])
+    const [loading, setLoading] = useState(!initialData)
     const [inviteEmail, setInviteEmail] = useState('')
     const [inviting, setInviting] = useState(false)
     const [inviteResult, setInviteResult] = useState<{ url: string, message: string } | null>(null)
@@ -60,7 +61,9 @@ export default function TeamDashboard() {
     }
 
     useEffect(() => {
-        fetchTeams()
+        if (!initialData) {
+            fetchTeams()
+        }
     }, [])
 
     const handleInvite = async (e: React.FormEvent, licenseId: string) => {
@@ -92,11 +95,11 @@ export default function TeamDashboard() {
             }
 
             setInviteResult({
-                url: data.debugUrl, // In prod, maybe just "Email sent"
+                url: data.debugUrl,
                 message: 'Invito creato con successo!'
             })
             setInviteEmail('')
-            fetchTeams() // Refresh list
+            fetchTeams()
 
         } catch (e: any) {
             setError(e.message)
@@ -126,14 +129,14 @@ export default function TeamDashboard() {
                 throw new Error(data.error)
             }
 
-            fetchTeams() // Refresh
+            fetchTeams()
         } catch (e: any) {
             alert('Errore revoca: ' + e.message)
         }
     }
 
     const handleRemoveMember = async (memberId: string, memberEmail: string, licenseId: string) => {
-        if (!confirm(`Sei sicuro di voler rimuovere ${memberEmail} dalla licenza aziendale? Questo utilizzerà un riassegnamento.`)) return
+        if (!confirm(`Sei sicuro di voler rimuovere ${memberEmail} dalla licenza aziendale? Il posto verrà liberato.`)) return
 
         setRemovingMember(memberId)
         try {
@@ -152,16 +155,11 @@ export default function TeamDashboard() {
             const data = await res.json()
 
             if (!res.ok) {
-                if (data.needsPayment) {
-                    alert('Hai esaurito i riassegnamenti gratuiti. Contatta simonsilvercaldaie@gmail.com per acquistare nuovi riassegnamenti (€400 cad.)')
-                } else {
-                    throw new Error(data.error || 'Errore nella rimozione')
-                }
-                return
+                throw new Error(data.error || 'Errore nella rimozione')
             }
 
-            alert(`${memberEmail} rimosso dalla licenza. Riassegnamenti gratuiti rimasti: ${data.freeRemaining}`)
-            fetchTeams() // Refresh
+            alert(`${memberEmail} rimosso dalla licenza. Il posto è ora disponibile.`)
+            fetchTeams()
         } catch (e: any) {
             alert('Errore: ' + e.message)
         } finally {
@@ -169,8 +167,8 @@ export default function TeamDashboard() {
         }
     }
 
-    if (loading) return null // Or simple loader
-    if (!teams || teams.length === 0) return null // Don't show if not an owner
+    if (loading) return null
+    if (!teams || teams.length === 0) return null
 
     return (
         <section className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-indigo-100 relative overflow-hidden">
@@ -200,22 +198,22 @@ export default function TeamDashboard() {
                             <div className="flex items-center gap-6">
                                 <div className="text-center">
                                     <div className="text-2xl font-bold text-indigo-600">{team.seatsUsed} / {team.seats}</div>
-                                    <div className="text-xs font-medium text-indigo-400 uppercase tracking-wider">Posti Utilizzati</div>
+                                    <div className="text-xs font-medium text-indigo-400 uppercase tracking-wider">Posti Attivi</div>
                                 </div>
                                 <div className="text-center border-l border-indigo-200 pl-6">
                                     <div className="text-2xl font-bold text-amber-600">
-                                        {Math.max(0, team.freeReassignmentsTotal - team.freeReassignmentsUsed)}
+                                        {team.invitesRemaining}
                                     </div>
-                                    <div className="text-xs font-medium text-amber-500 uppercase tracking-wider">Riassegnamenti Gratis</div>
+                                    <div className="text-xs font-medium text-amber-500 uppercase tracking-wider">Inviti Rimasti</div>
                                 </div>
                             </div>
                         </div>
 
-                        {/* Reassignment warning if exhausted */}
-                        {team.freeReassignmentsUsed >= team.freeReassignmentsTotal && (
+                        {/* Invite limit warning if exhausted */}
+                        {team.invitesRemaining <= 0 && (
                             <div className="p-3 bg-amber-50 text-amber-800 text-sm rounded-lg border border-amber-200 flex items-center gap-2">
                                 <RefreshCw className="w-4 h-4 flex-shrink-0" />
-                                <span>Riassegnamenti gratuiti esauriti. Per rimuovere e sostituire un membro contatta <strong>simonsilvercaldaie@gmail.com</strong> (€400/riassegnamento).</span>
+                                <span>Inviti esauriti ({team.invitesUsed}/{team.maxInvites} utilizzati). Contatta <strong>simonsilvercaldaie@gmail.com</strong> per acquistare inviti aggiuntivi.</span>
                             </div>
                         )}
 

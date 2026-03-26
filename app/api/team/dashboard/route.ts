@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
         // 1. Get Team Licenses owned by user
         const { data: licenses, error: licError } = await supabase
             .from('team_licenses')
-            .select('id, seats, created_at, company_name, free_reassignments_total, free_reassignments_used')
+            .select('id, seats, created_at, company_name, max_invites_total, invites_used')
             .eq('owner_user_id', user.id)
 
         if (licError) throw licError
@@ -53,14 +53,7 @@ export async function GET(request: NextRequest) {
             // Fetch Recent Members (for list)
             const { data: members, error: memListErr } = await supabase
                 .from('team_members')
-                .select('id, user_id, added_at') // Select email via Join if possible? 
-                // auth.users is not usually joinable via standard client unless FK exists and permissions allow.
-                // Admin client CAN join if we define relationship or just manual fetch.
-                // Since 'team_members.user_id' refs 'auth.users', supabase-js might allow it if we are admin.
-                // BUT 'auth.users' is in a separate schema. PostgREST usually doesn't expose auth schema directly via select without config.
-                // Better approach: Get user_ids, then fetch emails via admin.auth.admin.listUsers() or similar? 
-                // Or just return user_id and let frontend handle? Hard for owner to know who is who.
-                // Let's try to manual fetch emails for the IDs.
+                .select('id, user_id, added_at')
                 .eq('team_license_id', lic.id)
                 .is('removed_at', null)
                 .order('added_at', { ascending: false })
@@ -78,9 +71,6 @@ export async function GET(request: NextRequest) {
             if (invErr) throw invErr
 
             // Enrich Members with Emails
-            // Using admin.auth.admin.getUserById behaves one by one. 
-            // Batching is better but no listUsers(ids) API easily.
-            // We will map over them.
             const enrichedMembers = await Promise.all(members!.map(async (m: any) => {
                 const { data: u } = await supabase.auth.admin.getUserById(m.user_id)
                 return {
@@ -90,14 +80,18 @@ export async function GET(request: NextRequest) {
             }))
 
             const employeeSlots = lic.seats - 1 // seats include admin
+            const maxInvites = lic.max_invites_total || (employeeSlots * 2)
+            const invitesUsed = lic.invites_used || 0
+
             teamsStats.push({
                 licenseId: lic.id,
                 seats: employeeSlots,
-                seatsUsed: memberCount || 0, // team_members table only contains employees, not the admin
+                seatsUsed: memberCount || 0,
                 members: enrichedMembers,
                 invites: invites || [],
-                freeReassignmentsTotal: lic.free_reassignments_total || employeeSlots,
-                freeReassignmentsUsed: lic.free_reassignments_used || 0
+                maxInvites,
+                invitesUsed,
+                invitesRemaining: Math.max(0, maxInvites - invitesUsed)
             })
         }
 
