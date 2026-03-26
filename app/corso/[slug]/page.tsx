@@ -10,6 +10,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import Navbar from "@/components/Navbar"
 import VideoPlayerSecured from "@/components/VideoPlayerSecured"
+import FullScreenLoader from "@/components/FullScreenLoader"
 import {
     PlayCircle,
     Clock,
@@ -412,13 +413,7 @@ export default function CorsoPage() {
     }
 
     if (loading) {
-        return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="text-center">
-                    <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                </div>
-            </div>
-        )
+        return <FullScreenLoader />
     }
 
     const levelColors = {

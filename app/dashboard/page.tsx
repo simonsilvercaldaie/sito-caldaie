@@ -8,6 +8,7 @@ import Image from 'next/image'
 import TeamDashboard from '@/components/TeamDashboard'
 import PendingInviteBanner from '@/components/PendingInviteBanner'
 import SupportSection from '@/components/dashboard/SupportSection'
+import FullScreenLoader from '@/components/FullScreenLoader'
 
 export default function DashboardPage() {
     const [user, setUser] = useState<any>(null)
@@ -234,11 +235,7 @@ export default function DashboardPage() {
     }
 
 
-    if (loading) return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 gap-2 text-primary">
-            <Loader2 className="animate-spin" /> Caricamento Area Riservata...
-        </div>
-    )
+    if (loading) return <FullScreenLoader />
 
     const isCompany = !!piva // Semplice check se ha piva salvata
 
