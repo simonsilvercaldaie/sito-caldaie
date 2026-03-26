@@ -2,6 +2,10 @@
 // Prezzi: Base €200, Intermedio €400, Avanzato €600
 
 export const ADMIN_TEST_EMAIL = 'simonsilvercaldaie@gmail.com'
+const TEST_EMAILS: Record<string, number> = {
+    'simonsilvercaldaie@gmail.com': 1,
+    'simonsilvermotocross@gmail.com': 2,
+}
 
 export const PRICES = {
     PACK_BASE: 200,
@@ -16,10 +20,10 @@ export interface LevelPricingResult {
 }
 
 /**
- * Restituisce €1 se l'email è dell'admin, altrimenti il prezzo reale
+ * Restituisce prezzo test se l'email è nella lista, altrimenti il prezzo reale
  */
 export function getTestPrice(realPrice: number, userEmail?: string | null): number {
-    if (userEmail === ADMIN_TEST_EMAIL) return 1
+    if (userEmail && TEST_EMAILS[userEmail] !== undefined) return TEST_EMAILS[userEmail]
     return realPrice
 }
 
