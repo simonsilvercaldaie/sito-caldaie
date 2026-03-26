@@ -60,33 +60,43 @@ export default function CorsoPage() {
     // Mutual exclusion: pause YouTube when Bunny plays and vice versa
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
-            // YouTube state change (1 = playing)
             try {
-                if (typeof event.data === 'string') {
-                    const data = JSON.parse(event.data)
-                    if (data.event === 'onStateChange' && data.info === 1) {
-                        // YouTube started playing → pause Bunny
-                        if (bunnyRef.current?.contentWindow) {
-                            bunnyRef.current.contentWindow.postMessage('{"event":"command","func":"pause"}', '*')
-                        }
+                const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data
+
+                // 1. YouTube started playing
+                if (data.event === 'onStateChange' && data.info === 1) {
+                    if (bunnyRef.current?.contentWindow) {
+                        // Bunny accepts player.js formatted messages
+                        bunnyRef.current.contentWindow.postMessage('{"method":"pause"}', '*')
+                        bunnyRef.current.contentWindow.postMessage('{"context":"player.js","method":"pause"}', '*')
+                    }
+                }
+
+                // 2. Bunny started playing (player.js format or exact object match)
+                if (data.event === 'play' || data.type === 'play') {
+                    if (youtubeRef.current?.contentWindow) {
+                        youtubeRef.current.contentWindow.postMessage(
+                            JSON.stringify({ event: 'command', func: 'pauseVideo', args: [] }),
+                            '*'
+                        )
                     }
                 }
             } catch {}
-
-            // Bunny player state (play event)
-            if (event.data && typeof event.data === 'object' && event.data.type === 'play') {
-                // Bunny started playing → pause YouTube
-                if (youtubeRef.current?.contentWindow) {
-                    youtubeRef.current.contentWindow.postMessage(
-                        JSON.stringify({ event: 'command', func: 'pauseVideo', args: [] }),
-                        '*'
-                    )
-                }
-            }
         }
 
         window.addEventListener('message', handleMessage)
-        return () => window.removeEventListener('message', handleMessage)
+
+        // YouTube requires us to send a 'listening' event before it broadcasts state changes
+        const pingInterval = setInterval(() => {
+            if (youtubeRef.current?.contentWindow) {
+                youtubeRef.current.contentWindow.postMessage('{"event":"listening","id":1}', '*')
+            }
+        }, 1500)
+
+        return () => {
+            window.removeEventListener('message', handleMessage)
+            clearInterval(pingInterval)
+        }
     }, [])
 
     // Session Guard — activates when user has purchased access

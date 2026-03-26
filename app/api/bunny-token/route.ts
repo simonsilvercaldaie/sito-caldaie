@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
         const hashString = `${securityKey}${videoId}${expires}`
         const hash = crypto.createHash('sha256').update(hashString).digest('hex')
 
-        const embedUrl = `https://iframe.mediadelivery.net/embed/${libraryId}/${videoId}?token=${hash}&expires=${expires}&autoplay=true&preload=true`
+        const embedUrl = `https://iframe.mediadelivery.net/embed/${libraryId}/${videoId}?token=${hash}&expires=${expires}&autoplay=false&preload=true`
 
         return NextResponse.json({ embedUrl, expires })
 
