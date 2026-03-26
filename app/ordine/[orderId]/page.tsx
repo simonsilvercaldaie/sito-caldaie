@@ -173,10 +173,10 @@ export default function OrderStatusPage() {
                                 </p>
                             )}
                             <Link
-                                href="/dashboard"
+                                href="/"
                                 className="inline-block bg-green-600 text-white font-bold py-3 px-8 rounded-xl hover:bg-green-700 transition"
                             >
-                                Vai alla Dashboard
+                                Accesso al Premium
                             </Link>
 
                             {/* Device Policy Info Box */}
