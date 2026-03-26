@@ -96,6 +96,7 @@ export default function CorsoPage() {
 
     useEffect(() => {
         const checkUser = async () => {
+            const loadStartTime = Date.now()
             const { data: { session } } = await supabase.auth.getSession()
             const currentUser = session?.user || null
             setUser(currentUser)
@@ -218,6 +219,11 @@ export default function CorsoPage() {
                         console.error('Error fetching secure video URL', e)
                     }
                 }
+            }
+
+            const elapsed = Date.now() - loadStartTime
+            if (elapsed < 1500) {
+                await new Promise(r => setTimeout(r, 1500 - elapsed))
             }
             setLoading(false)
         }

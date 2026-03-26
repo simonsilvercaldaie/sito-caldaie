@@ -57,6 +57,7 @@ export default function DashboardPage() {
 
     useEffect(() => {
         const checkUser = async () => {
+            const loadStartTime = Date.now()
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) {
                 router.push('/login')
@@ -140,6 +141,10 @@ export default function DashboardPage() {
                 console.error('Error checking upgrade eligibility', e)
             }
 
+            const elapsed = Date.now() - loadStartTime
+            if (elapsed < 1500) {
+                await new Promise(r => setTimeout(r, 1500 - elapsed))
+            }
             setLoading(false)
         }
         checkUser()
