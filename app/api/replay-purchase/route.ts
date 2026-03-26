@@ -358,7 +358,13 @@ export async function POST(request: NextRequest) {
 
     } catch (error) {
         console.error('[replay-purchase] Errore interno:', error)
-        const errorMessage = error instanceof Error ? error.message : String(error)
+        let errorMessage = 'Sconosciuto'
+        try {
+            errorMessage = error instanceof Error ? error.message : JSON.stringify(error)
+        } catch (e) {
+            errorMessage = String(error)
+        }
+        
         return NextResponse.json({
             ok: false,
             status: 'error',
