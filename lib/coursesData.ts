@@ -59,7 +59,8 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["Osservazione preliminare", "Rumori e odori", "Pressioni e temperature a vista", "Errori da non commettere appena arrivati"],
         premiumContent: ["Checklist dei 3 minuti da stampare", "Come interrogare il cliente mentre osservi", "Segnali visivi spesso ignorati"],
-        coverImage: "/images/courses/02-check-iniziale.webp"
+        coverImage: "/images/courses/02-check-iniziale.webp",
+        bunnyVideoId: "944df291-2471-45c9-87e3-5e590f210906"
     },
     {
         id: "03-schema-funzionale",
@@ -73,7 +74,8 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["Schema idraulico vs elettrico", "Seguire il flusso logico", "Individuare il punto di rottura", "Mappa mentale del funzionamento"],
         premiumContent: ["Analisi schemi reali (Vaillant, Ariston, ecc.)", "Simulazione guasto su carta", "Dal sintomo al blocco nello schema"],
-        coverImage: "/images/courses/03-schema-funzionale.webp"
+        coverImage: "/images/courses/03-schema-funzionale.webp",
+        bunnyVideoId: "8f871c0c-d132-4a91-b835-e0c7e5e9d7c1"
     },
     {
         id: "04-acs-riscaldamento",
@@ -87,7 +89,8 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["Interazione tra i due circuiti", "Il ruolo della valvola deviatrice", "Scambio termico indesiderato", "Diagnosi differenziale"],
         premiumContent: ["Test pratici per isolare il circuito", "Problemi di trafilamento", "Caso studio: radiatori caldi in estate"],
-        coverImage: "/images/courses/04-acs-riscaldamento.webp"
+        coverImage: "/images/courses/04-acs-riscaldamento.webp",
+        bunnyVideoId: "7cd6812f-de95-4b16-ba16-bdda122c1ff0"
     },
     {
         id: "05-sicurezze",
@@ -101,7 +104,8 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["Sicurezza sovratemperatura", "Mancanza acqua", "Mancanza tiraggio", "Distinguere guasto sonda da intervento sicurezza"],
         premiumContent: ["Testare le sicurezze senza rischi", "Bypassare per test (con cautela)", "Gerarchia degli interventi"],
-        coverImage: "/images/courses/05-sicurezze.webp"
+        coverImage: "/images/courses/05-sicurezze.webp",
+        bunnyVideoId: "9ffb0100-2b34-4829-8b82-064e2db79c04"
     },
     {
         id: "06-falsi-colpevoli",
@@ -115,7 +119,8 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["La scheda elettronica (l'accusata n.1)", "La valvola gas", "Lo scambiatore", "Come scagionare i componenti innocenti"],
         premiumContent: ["Statistica reale dei guasti", "Casi in cui sembrava lui ma non era", "Risparmiare ricambi inutili"],
-        coverImage: "/images/courses/06-falsi-colpevoli.webp"
+        coverImage: "/images/courses/06-falsi-colpevoli.webp",
+        bunnyVideoId: "d8c12afe-3a26-4726-8f23-a8a55471d39b"
     },
     {
         id: "07-manutenzione-vera",
@@ -129,7 +134,8 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["Pulizia vs Controllo", "Punti critici da verificare sempre", "Prevenzione attiva", "Valore aggiunto per il cliente"],
         premiumContent: ["Checklist manutenzione 'Premium'", "Pulizia scambiatori condensazione", "Controllo vaso espansione obbligatorio"],
-        coverImage: "/images/courses/07-manutenzione-vera.webp"
+        coverImage: "/images/courses/07-manutenzione-vera.webp",
+        bunnyVideoId: "3949e42e-cb20-476f-ad44-246cffc04e5c"
     },
     {
         id: "08-segnali-deboli",
@@ -143,7 +149,8 @@ export const courses: Course[] = [
         price: "29.00",
         learnings: ["Ascolto della pompa", "Rumori di ebollizione", "Tempi di accensione ritardati", "Piccole oscillazioni di pressione"],
         premiumContent: ["Diagnostica acustica", "Interpretare i log (se presenti)", "Prevedere la rottura per fidelizzare il cliente"],
-        coverImage: "/images/courses/08-segnali-deboli.webp"
+        coverImage: "/images/courses/08-segnali-deboli.webp",
+        bunnyVideoId: "49d958d3-db0c-4f68-a1a0-940d646dbcc5"
     },
     {
         id: "09-quando-non-intervenire",
