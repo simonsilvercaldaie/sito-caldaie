@@ -318,7 +318,8 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Analisi fumi avanzata", "Eccesso d'aria nascosto", "CO2 instabile", "Punti di rugiada"],
         premiumContent: ["Tarare valvole gas elettroniche", "Lettura critica scontrino analizzatore", "Combustione condensazione vs premiscelata"],
-        coverImage: "/images/courses/19-combustione-falsa.webp"
+        coverImage: "/images/courses/19-combustione-falsa.webp",
+        bunnyVideoId: "2bf75775-c12a-426c-b28a-f3ab669a4553"
     },
     {
         id: "20-guasti-intermittenti",
@@ -332,7 +333,8 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Strategia di monitoraggio", "Replicare le condizioni del guasto", "Fattori ambientali (vento, tensione)", "Pazienza metodica"],
         premiumContent: ["Strumenti di logging", "Intervistare il cliente come un detective", "Il metodo 'Trappola'"],
-        coverImage: "/images/courses/20-guasti-intermittenti.webp"
+        coverImage: "/images/courses/20-guasti-intermittenti.webp",
+        bunnyVideoId: "0f04459d-fc2e-4514-a3fc-c0a4069cc585"
     },
     {
         id: "21-cinque-domande",
@@ -346,7 +348,8 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["L'anamnesi tecnica", "Cosa è cambiato da ieri?", "Lo fa sempre o solo quando...?", "Chi l'ha toccata per ultimo?"],
         premiumContent: ["Script di intervista completo", "Decodificare le risposte dei clienti", "Trovare la bugia innocente"],
-        coverImage: "/images/courses/21-cinque-domande.webp"
+        coverImage: "/images/courses/21-cinque-domande.webp",
+        bunnyVideoId: "ce50ba4f-fb9e-4782-85a6-54a58f2a9b62"
     },
     {
         id: "22-parametri-corretti-guasto",
@@ -360,7 +363,8 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Conflitti software", "Problemi di messa a terra/neutro", "Interferenze elettromagnetiche", "Bug del firmware"],
         premiumContent: ["Uso dell'oscilloscopio (base)", "Verifica terra e polarità avanzata", "Reset di fabbrica e riconfigurazione"],
-        coverImage: "/images/courses/22-parametri-corretti-guasto.webp"
+        coverImage: "/images/courses/22-parametri-corretti-guasto.webp",
+        bunnyVideoId: "34f3baa9-1388-418e-9117-5da8151d8ad4"
     },
     {
         id: "23-perdite-invisibili",
@@ -374,7 +378,8 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Perdite nello scambiatore primario (evaporano)", "Valvole sicurezza che gocciolano solo a caldo", "Vaso scarico ma non rotto", "Perdite sottotraccia"],
         premiumContent: ["Tecniche di ricerca perdite", "Isolare caldaia vs impianto", "Gestione del vaso espansione problematica"],
-        coverImage: "/images/courses/23-perdite-invisibili.webp"
+        coverImage: "/images/courses/23-perdite-invisibili.webp",
+        bunnyVideoId: "36f47fc6-a760-4f3a-9ced-b32c98f3e2a2"
     },
     {
         id: "24-problema-insieme",
@@ -388,7 +393,8 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Compatibilità caldaia/impianto", "Pendolamenti dovuti ai termostati", "Portate minime non rispettate", "Problemi idraulici complessi"],
         premiumContent: ["Analisi sistemica", "Risolvere senza cambiare caldaia", "Modifiche impiantistiche correttive"],
-        coverImage: "/images/courses/24-problema-insieme.webp"
+        coverImage: "/images/courses/24-problema-insieme.webp",
+        bunnyVideoId: "f32b5fd0-3540-4df0-bf27-31070d6b5cf7"
     },
     {
         id: "25-decisione-finale",
@@ -402,7 +408,8 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Valutazione del rischio", "Preventivazione onesta", "Responsabilità civile e penale", "Dormire sonni tranquilli"],
         premiumContent: ["Procedure di messa fuori servizio", "Documentazione da lasciare", "Gestire il cliente arrabbiato"],
-        coverImage: "/images/courses/25-decisione-finale.webp"
+        coverImage: "/images/courses/25-decisione-finale.webp",
+        bunnyVideoId: "8afeb86d-102e-4ad8-a34b-9becefc56901"
     },
     {
         id: "26-gestire-cliente",
@@ -416,7 +423,8 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Comunicazione assertiva", "Spiegare il guasto in parole semplici", "Giustificare il prezzo", "Farsi rispettare come professionista"],
         premiumContent: ["Frasi da dire e da non dire", "Gestire l'obiezione 'è troppo caro'", "Costruire fiducia immediata"],
-        coverImage: "/images/courses/26-gestire-cliente.webp"
+        coverImage: "/images/courses/26-gestire-cliente.webp",
+        bunnyVideoId: "4fa240be-d127-4ad3-886c-7508ea645af1"
     },
     {
         id: "27-pensare-primario",
@@ -430,7 +438,8 @@ export const courses: Course[] = [
         price: "49.00",
         learnings: ["Visione d'insieme", "Mindset diagnostico superiore", "L'esperienza codificata", "Diventare un riferimento"],
         premiumContent: ["Il manifesto del tecnico evoluto", "Next steps per la carriera", "Saluti finali e augurio"],
-        coverImage: "/images/courses/27-pensare-primario.webp"
+        coverImage: "/images/courses/27-pensare-primario.webp",
+        bunnyVideoId: "9ba0d6b9-4657-49f1-9309-cdec8757b4da"
     }
 ]
 
