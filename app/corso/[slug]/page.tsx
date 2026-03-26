@@ -474,7 +474,40 @@ export default function CorsoPage() {
                                 </div>
                                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-accent/20 relative">
                                     {hasPurchased ? (
-                                        secureVideoUrl || course.premiumVideoUrl ? (
+                                        (sessionStatus === 'kicked' || sessionStatus === 'device_limit') ? (
+                                            <div className="aspect-video bg-red-950 relative">
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-6">
+                                                    {sessionStatus === 'kicked'
+                                                        ? <AlertTriangle className="w-16 h-16 text-red-400 mb-4" />
+                                                        : <Monitor className="w-16 h-16 text-red-400 mb-4" />
+                                                    }
+                                                    <h3 className="text-2xl font-bold text-red-200 mb-2">
+                                                        {sessionStatus === 'kicked'
+                                                            ? 'Sessione Chiusa'
+                                                            : 'Limite Dispositivi Raggiunto'
+                                                        }
+                                                    </h3>
+                                                    <p className="text-red-300 text-center max-w-md mb-4">
+                                                        {sessionError || 'Hai effettuato l\'accesso da un altro dispositivo.'}
+                                                    </p>
+                                                    {sessionStatus === 'kicked' ? (
+                                                        <button
+                                                            onClick={() => window.location.reload()}
+                                                            className="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors"
+                                                        >
+                                                            Riprova accesso
+                                                        </button>
+                                                    ) : (
+                                                        <Link
+                                                            href="/dashboard"
+                                                            className="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors"
+                                                        >
+                                                            Vai alla Dashboard per resettare
+                                                        </Link>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ) : secureVideoUrl || course.premiumVideoUrl ? (
                                             <VideoPlayerSecured
                                                 videoUrl={secureVideoUrl || course.premiumVideoUrl!}
                                                 userEmail={user?.email || 'utente@simonsilver.it'}
@@ -518,42 +551,7 @@ export default function CorsoPage() {
                                 </div>
                             </div>
 
-                            {/* Session Guard Overlay */}
-                            {hasPurchased && (sessionStatus === 'kicked' || sessionStatus === 'device_limit') && (
-                                <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-6 text-center">
-                                    <div className="p-4 bg-red-100 rounded-2xl inline-block mb-4">
-                                        {sessionStatus === 'kicked'
-                                            ? <AlertTriangle className="w-10 h-10 text-red-600" />
-                                            : <Monitor className="w-10 h-10 text-red-600" />
-                                        }
-                                    </div>
-                                    <h3 className="text-xl font-bold text-red-900 mb-2">
-                                        {sessionStatus === 'kicked'
-                                            ? 'Sessione Chiusa'
-                                            : 'Limite Dispositivi Raggiunto'
-                                        }
-                                    </h3>
-                                    <p className="text-red-700 mb-4">
-                                        {sessionError}
-                                    </p>
-                                    {sessionStatus === 'device_limit' && (
-                                        <Link
-                                            href="/dashboard"
-                                            className="inline-block px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors"
-                                        >
-                                            Vai alla Dashboard per resettare
-                                        </Link>
-                                    )}
-                                    {sessionStatus === 'kicked' && (
-                                        <button
-                                            onClick={() => window.location.reload()}
-                                            className="inline-block px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors"
-                                        >
-                                            Riprova accesso
-                                        </button>
-                                    )}
-                                </div>
-                            )}
+
 
                             <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8">
                                 <h2 className="text-2xl font-bold text-primary mb-4">Descrizione del Corso</h2>
