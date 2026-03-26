@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
             teamsStats.push({
                 licenseId: lic.id,
                 seats: employeeSlots,
-                seatsUsed: Math.max(0, (memberCount || 0) - 1), // exclude admin from count
+                seatsUsed: memberCount || 0, // team_members table only contains employees, not the admin
                 members: enrichedMembers,
                 invites: invites || [],
                 freeReassignmentsTotal: lic.free_reassignments_total || employeeSlots,
