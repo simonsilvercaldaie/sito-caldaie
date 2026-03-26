@@ -255,16 +255,12 @@ export default function TeamDashboard() {
                                 {error && <p className="text-red-600 text-sm bg-red-50 p-2 rounded">{error}</p>}
 
                                 {inviteResult && (
-                                    <div className="p-4 bg-green-50 border border-green-100 rounded-xl space-y-2">
+                                    <div className="p-4 bg-green-50 border border-green-100 rounded-xl">
                                         <div className="flex items-center gap-2 text-green-700 font-bold text-sm">
                                             <Check className="w-4 h-4" /> {inviteResult.message}
                                         </div>
-                                        {/* DEBUG ONLY: Show URL */}
-                                        <div className="text-xs text-gray-500 break-all p-2 bg-white rounded border border-gray-100 select-all font-mono">
-                                            {inviteResult.url}
-                                        </div>
-                                        <p className="text-xs text-gray-400">
-                                            (Copia il link se l'email non arriva)
+                                        <p className="text-xs text-gray-500 mt-2">
+                                            L'invitato troverà l'invito nella propria Dashboard dopo il login.
                                         </p>
                                     </div>
                                 )}

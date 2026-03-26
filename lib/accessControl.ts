@@ -198,11 +198,45 @@ export async function checkCourseAccess(userId: string, courseId: string): Promi
 
     if (error) {
         console.error('[accessControl] Check error:', error)
-        return { authorized: false, requiredLevel, courseTitle: course.title, courseNotFound: false }
+    }
+
+    if (data) {
+        return { authorized: true, requiredLevel, courseTitle: course.title, courseNotFound: false }
+    }
+
+    // 3. Check team membership (team members get full access to all levels)
+    const { data: teamMember, error: teamErr } = await supabase
+        .from('team_members')
+        .select('team_license_id')
+        .eq('user_id', userId)
+        .is('removed_at', null)
+        .maybeSingle()
+
+    if (teamErr) {
+        console.error('[accessControl] Team check error:', teamErr)
+    }
+
+    if (teamMember) {
+        return { authorized: true, requiredLevel, courseTitle: course.title, courseNotFound: false }
+    }
+
+    // 4. Check team ownership (owner also gets full access)
+    const { data: ownedTeam, error: ownErr } = await supabase
+        .from('team_licenses')
+        .select('id')
+        .eq('owner_user_id', userId)
+        .maybeSingle()
+
+    if (ownErr) {
+        console.error('[accessControl] Owner check error:', ownErr)
+    }
+
+    if (ownedTeam) {
+        return { authorized: true, requiredLevel, courseTitle: course.title, courseNotFound: false }
     }
 
     return {
-        authorized: !!data,
+        authorized: false,
         requiredLevel,
         courseTitle: course.title,
         courseNotFound: false
