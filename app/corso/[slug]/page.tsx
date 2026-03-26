@@ -152,7 +152,7 @@ export default function CorsoPage() {
                             const accessData = await accessRes.json()
                             if (accessData.authorized) {
                                 hasAccess = true
-                                orderLimitId = 'ACCESS-GRANTED'
+                                orderLimitId = 'LIC-' + new Date().toISOString().slice(0, 10).replace(/-/g, '')
                             }
                         }
                     } catch (e) {

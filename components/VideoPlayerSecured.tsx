@@ -93,17 +93,7 @@ export default function VideoPlayerSecured({
         return () => document.removeEventListener('fullscreenchange', handleFsChange)
     }, [])
 
-    // Mascheramento parziale email
-    const maskEmail = (email: string): string => {
-        const [local, domain] = email.split('@')
-        if (!domain) return email
-        const maskedLocal = local.length > 2
-            ? local[0] + '***' + local[local.length - 1]
-            : local
-        return `${maskedLocal}@${domain}`
-    }
-
-    const watermarkText = `${maskEmail(userEmail)} • #${orderId.slice(-8).toUpperCase()}`
+    const watermarkText = `${userEmail} • ${orderId.slice(0, 12).toUpperCase()}`
     const currentPos = CORNER_POSITIONS[cornerIndex]
 
     return (
