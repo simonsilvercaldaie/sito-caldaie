@@ -57,38 +57,48 @@ export default function CorsoPage() {
     const youtubeRef = useRef<HTMLIFrameElement>(null)
     const bunnyRef = useRef<HTMLIFrameElement>(null)
 
-    // Mutual exclusion: pause the other video when one is clicked
-    useEffect(() => {
-        const handleBlur = () => {
-            // When user clicks inside an iframe, window loses focus.
-            // We give it a tiny delay to let `document.activeElement` update to the clicked iframe.
-            setTimeout(() => {
-                const active = document.activeElement
-                if (!active) return
+    // Mutual video exclusion: overlay-based approach
+    const [activePlayer, setActivePlayer] = useState<'none' | 'youtube' | 'bunny'>('none')
+    const savedYouTubeSrc = useRef<string>('')
 
-                const isYouTube = active === youtubeRef.current
-                // VideoPlayerSecured wraps Bunny iframe. Let's check if the active element is the bunny iframe.
-                // We passed iframeRef={bunnyRef} to VideoPlayerSecured, so bunnyRef.current IS the iframe.
-                const isBunny = active === bunnyRef.current
-
-                if (isYouTube) {
-                    // User clicked YouTube -> pause Bunny
-                    if (bunnyRef.current?.contentWindow) {
-                        bunnyRef.current.contentWindow.postMessage('{"method":"pause"}', '*')
-                        bunnyRef.current.contentWindow.postMessage(JSON.stringify({context: "player.js", method: "pause"}), '*')
-                    }
-                } else if (isBunny) {
-                    // User clicked Bunny -> pause YouTube
-                    if (youtubeRef.current?.contentWindow) {
-                        youtubeRef.current.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*')
-                    }
-                }
-            }, 50)
+    const activateYouTube = () => {
+        if (activePlayer === 'youtube') return
+        // Restore YouTube src if it was blanked
+        if (youtubeRef.current && savedYouTubeSrc.current && youtubeRef.current.src !== savedYouTubeSrc.current) {
+            youtubeRef.current.src = savedYouTubeSrc.current
         }
+        // Kill Bunny by blanking its src to stop audio
+        if (bunnyRef.current) {
+            bunnyRef.current.src = 'about:blank'
+        }
+        setActivePlayer('youtube')
+    }
 
-        window.addEventListener('blur', handleBlur)
-        return () => window.removeEventListener('blur', handleBlur)
-    }, [])
+    const activateBunny = () => {
+        if (activePlayer === 'bunny') return
+        // Kill YouTube by blanking its src to stop audio
+        if (youtubeRef.current) {
+            if (!savedYouTubeSrc.current) {
+                savedYouTubeSrc.current = youtubeRef.current.src
+            }
+            youtubeRef.current.src = 'about:blank'
+        }
+        // Restore Bunny (reload by re-setting the url)
+        if (bunnyRef.current && secureVideoUrl) {
+            const currentSrc = bunnyRef.current.src
+            if (currentSrc === 'about:blank' || !currentSrc) {
+                bunnyRef.current.src = secureVideoUrl
+            }
+        }
+        setActivePlayer('bunny')
+    }
+
+    // Save the youtube src on first render
+    useEffect(() => {
+        if (youtubeRef.current && !savedYouTubeSrc.current) {
+            savedYouTubeSrc.current = youtubeRef.current.src
+        }
+    })
 
     // Session Guard — activates when user has purchased access
     const { status: sessionStatus, errorMessage: sessionError } = useSessionGuard({
@@ -477,7 +487,7 @@ export default function CorsoPage() {
                                     <h2 className="text-xl font-bold text-gray-800">Video Gratuito (YouTube)</h2>
                                 </div>
                                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
-                                    <div className="aspect-video bg-gray-900 relative">
+                                    <div className="aspect-video bg-gray-900 relative" onClick={activateYouTube}>
                                         {course.youtubeId !== "PLACEHOLDER" ? (
                                             <iframe
                                                 ref={youtubeRef}
@@ -494,6 +504,18 @@ export default function CorsoPage() {
                                                 <p className="text-white/70 text-center px-4">
                                                     Disponibile a breve sul canale YouTube
                                                 </p>
+                                            </div>
+                                        )}
+                                        {/* Overlay: shown when Bunny is active, blocks YouTube interaction */}
+                                        {activePlayer === 'bunny' && (
+                                            <div 
+                                                className="absolute inset-0 z-20 bg-black/70 flex items-center justify-center cursor-pointer transition-all"
+                                                onClick={(e) => { e.stopPropagation(); activateYouTube(); }}
+                                            >
+                                                <div className="text-center text-white">
+                                                    <PlayCircle className="w-12 h-12 mx-auto mb-2 opacity-80" />
+                                                    <p className="text-sm font-semibold opacity-80">Clicca per guardare Parte 1</p>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -545,12 +567,26 @@ export default function CorsoPage() {
                                                 </div>
                                             </div>
                                         ) : secureVideoUrl || course.premiumVideoUrl ? (
-                                            <VideoPlayerSecured
-                                                videoUrl={secureVideoUrl || course.premiumVideoUrl!}
-                                                userEmail={user?.email || 'utente@simonsilver.it'}
-                                                orderId={activeOrderId || 'ORDER-XXXX'}
-                                                iframeRef={bunnyRef}
-                                            />
+                                            <div className="relative" onClick={activateBunny}>
+                                                <VideoPlayerSecured
+                                                    videoUrl={secureVideoUrl || course.premiumVideoUrl!}
+                                                    userEmail={user?.email || 'utente@simonsilver.it'}
+                                                    orderId={activeOrderId || 'ORDER-XXXX'}
+                                                    iframeRef={bunnyRef}
+                                                />
+                                                {/* Overlay: shown when YouTube is active, blocks Bunny interaction */}
+                                                {activePlayer === 'youtube' && (
+                                                    <div 
+                                                        className="absolute inset-0 z-20 bg-black/70 flex items-center justify-center cursor-pointer transition-all rounded-2xl"
+                                                        onClick={(e) => { e.stopPropagation(); activateBunny(); }}
+                                                    >
+                                                        <div className="text-center text-white">
+                                                            <PlayCircle className="w-12 h-12 mx-auto mb-2 opacity-80" />
+                                                            <p className="text-sm font-semibold opacity-80">Clicca per guardare Parte 2</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
                                         ) : (
                                             <div className="aspect-video bg-gray-900 relative">
                                                 <div className="absolute inset-0 flex flex-col items-center justify-center text-white bg-slate-800">
