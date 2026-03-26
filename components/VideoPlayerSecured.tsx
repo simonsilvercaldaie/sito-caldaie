@@ -1,5 +1,6 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { Maximize } from 'lucide-react'
 
 interface VideoPlayerSecuredProps {
     videoUrl: string
@@ -8,12 +9,24 @@ interface VideoPlayerSecuredProps {
     className?: string
 }
 
+// Posizioni angolari fisse (mai al centro)
+const CORNER_POSITIONS = [
+    { x: 8, y: 8 },      // Alto sinistra
+    { x: 92, y: 8 },      // Alto destra
+    { x: 8, y: 88 },      // Basso sinistra
+    { x: 92, y: 88 },     // Basso destra
+    { x: 50, y: 8 },      // Centro alto
+    { x: 50, y: 92 },     // Centro basso
+    { x: 8, y: 50 },      // Centro sinistra
+    { x: 92, y: 50 },     // Centro destra
+]
+
 /**
- * Secured Video Player with dynamic watermark overlay
- * - Email utente e Order ID visibili come filigrana
- * - Posizione casuale che cambia ogni 20-40 secondi
- * - Opacità 10-15% per deterrenza senza disturbare la visione
- * - Blocco context menu per prevenire download facile
+ * Secured Video Player with "Flash Discreto" watermark
+ * - Filigrana visibile 5 secondi ogni 45-60 secondi
+ * - Solo negli angoli/bordi, MAI al centro del video
+ * - Opacità 28% per leggibilità senza disturbo
+ * - Funziona anche in fullscreen
  */
 export default function VideoPlayerSecured({
     videoUrl,
@@ -22,45 +35,62 @@ export default function VideoPlayerSecured({
     className = ''
 }: VideoPlayerSecuredProps) {
     const containerRef = useRef<HTMLDivElement>(null)
-    const [watermarkPosition, setWatermarkPosition] = useState({ x: 20, y: 20 })
-    const [watermarkOpacity, setWatermarkOpacity] = useState(0.12)
-    const [secondaryPosition, setSecondaryPosition] = useState({ x: 70, y: 70 })
+    const [showWatermark, setShowWatermark] = useState(false)
+    const [cornerIndex, setCornerIndex] = useState(0)
+    const [isFullscreen, setIsFullscreen] = useState(false)
 
+    // Ciclo "Flash Discreto": 5s visibile, poi 45-60s nascosto
     useEffect(() => {
-        // Posizione iniziale casuale
-        const randomizePosition = () => ({
-            x: Math.random() * 50 + 15, // 15-65%
-            y: Math.random() * 50 + 15  // 15-65%
-        })
+        let showTimeout: ReturnType<typeof setTimeout>
+        let hideTimeout: ReturnType<typeof setTimeout>
 
-        setWatermarkPosition(randomizePosition())
-        setSecondaryPosition(randomizePosition())
+        const flash = () => {
+            // Scegli angolo casuale (diverso dal precedente)
+            setCornerIndex(prev => {
+                let next = Math.floor(Math.random() * CORNER_POSITIONS.length)
+                while (next === prev) next = Math.floor(Math.random() * CORNER_POSITIONS.length)
+                return next
+            })
 
-        // Cambia posizione ogni 20-40 secondi
-        const updatePositions = () => {
-            setWatermarkPosition(randomizePosition())
-            setSecondaryPosition(randomizePosition())
+            // Mostra per 5 secondi
+            setShowWatermark(true)
+            hideTimeout = setTimeout(() => {
+                setShowWatermark(false)
 
-            // Varia leggermente l'opacità (10-15%)
-            setWatermarkOpacity(0.10 + Math.random() * 0.05)
+                // Prossimo flash tra 45-60 secondi
+                const nextDelay = (45 + Math.random() * 15) * 1000
+                showTimeout = setTimeout(flash, nextDelay)
+            }, 5000)
         }
 
-        // Intervallo random tra 20 e 40 secondi
-        const scheduleNext = () => {
-            const delay = (20 + Math.random() * 20) * 1000
-            return setTimeout(() => {
-                updatePositions()
-                intervalRef.current = scheduleNext()
-            }, delay)
-        }
-
-        const intervalRef = { current: scheduleNext() }
+        // Primo flash dopo 8-15 secondi (lascia partire il video)
+        const initialDelay = (8 + Math.random() * 7) * 1000
+        showTimeout = setTimeout(flash, initialDelay)
 
         return () => {
-            if (intervalRef.current) {
-                clearTimeout(intervalRef.current)
-            }
+            clearTimeout(showTimeout)
+            clearTimeout(hideTimeout)
         }
+    }, [])
+
+    // Fullscreen: fa andare il CONTAINER in fullscreen (non l'iframe)
+    const toggleFullscreen = useCallback(() => {
+        if (!containerRef.current) return
+
+        if (!document.fullscreenElement) {
+            containerRef.current.requestFullscreen().catch(() => {})
+        } else {
+            document.exitFullscreen().catch(() => {})
+        }
+    }, [])
+
+    // Ascolta i cambiamenti di fullscreen
+    useEffect(() => {
+        const handleFsChange = () => {
+            setIsFullscreen(!!document.fullscreenElement)
+        }
+        document.addEventListener('fullscreenchange', handleFsChange)
+        return () => document.removeEventListener('fullscreenchange', handleFsChange)
     }, [])
 
     // Mascheramento parziale email
@@ -73,22 +103,23 @@ export default function VideoPlayerSecured({
         return `${maskedLocal}@${domain}`
     }
 
-    const watermarkText = `${userEmail} | #${orderId.slice(-8).toUpperCase()}`
-    const shortWatermark = maskEmail(userEmail)
+    const watermarkText = `${maskEmail(userEmail)} • #${orderId.slice(-8).toUpperCase()}`
+    const currentPos = CORNER_POSITIONS[cornerIndex]
 
     return (
         <div
             ref={containerRef}
-            className={`relative aspect-video w-full bg-black rounded-2xl overflow-hidden shadow-2xl ${className}`}
+            className={`relative aspect-video w-full bg-black rounded-2xl overflow-hidden shadow-2xl group ${className}`}
+            onContextMenu={(e) => e.preventDefault()}
         >
             {/* Video Element (Iframe o Video) */}
             {videoUrl.includes('iframe.mediadelivery.net') ? (
                 <iframe
-                    title="Scuola 10 Video Player"
+                    title="Simon Silver Video Player"
                     src={videoUrl}
                     loading="lazy"
                     allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
-                    allowFullScreen={true}
+                    allowFullScreen={false}
                     className="w-full h-full border-none"
                 />
             ) : (
@@ -105,67 +136,33 @@ export default function VideoPlayerSecured({
                 </video>
             )}
 
-            {/* Primary Watermark - Full info */}
+            {/* Flash Watermark - Solo angoli, 5s ogni ~50s */}
             <div
-                className="absolute pointer-events-none select-none transition-all duration-[5000ms] ease-in-out z-10"
+                className="absolute pointer-events-none select-none z-20 transition-opacity duration-700"
                 style={{
-                    left: `${watermarkPosition.x}%`,
-                    top: `${watermarkPosition.y}%`,
-                    opacity: watermarkOpacity,
+                    left: `${currentPos.x}%`,
+                    top: `${currentPos.y}%`,
+                    opacity: showWatermark ? 0.28 : 0,
                     transform: 'translate(-50%, -50%)',
-                    textShadow: '1px 1px 3px rgba(0,0,0,0.7)',
+                    textShadow: '1px 1px 4px rgba(0,0,0,0.8), -1px -1px 4px rgba(0,0,0,0.8)',
                     whiteSpace: 'nowrap'
                 }}
             >
-                <span className="text-white text-sm md:text-base font-mono tracking-wider">
+                <span className="text-white text-xs md:text-sm font-mono tracking-wider">
                     {watermarkText}
                 </span>
             </div>
 
-            {/* Secondary Watermark - Minimal, different position */}
-            <div
-                className="absolute pointer-events-none select-none transition-all duration-[8000ms] ease-in-out z-10"
-                style={{
-                    left: `${secondaryPosition.x}%`,
-                    top: `${secondaryPosition.y}%`,
-                    opacity: watermarkOpacity * 0.8,
-                    transform: 'translate(-50%, -50%) rotate(15deg)',
-                    textShadow: '1px 1px 2px rgba(0,0,0,0.5)',
-                    whiteSpace: 'nowrap'
-                }}
+            {/* Bottone Fullscreen personalizzato (in basso a destra, sopra il player) */}
+            <button
+                onClick={toggleFullscreen}
+                className="absolute bottom-3 right-3 z-30 p-2 bg-black/50 hover:bg-black/80 
+                           rounded-lg text-white/70 hover:text-white transition-all duration-200
+                           opacity-0 group-hover:opacity-100 cursor-pointer"
+                title={isFullscreen ? 'Esci da schermo intero' : 'Schermo intero'}
             >
-                <span className="text-white text-xs font-mono tracking-wide">
-                    {shortWatermark}
-                </span>
-            </div>
-
-            {/* Corner Watermark - Always visible, subtle */}
-            <div
-                className="absolute bottom-4 right-4 pointer-events-none select-none z-10"
-                style={{
-                    opacity: 0.08,
-                    textShadow: '1px 1px 2px rgba(0,0,0,0.3)'
-                }}
-            >
-                <span className="text-white text-xs font-mono">
-                    SSC-{orderId.slice(-6).toUpperCase()}
-                </span>
-            </div>
-
-            {/* Anti-screen-record pattern (very subtle grid) */}
-            <div
-                className="absolute inset-0 pointer-events-none z-5"
-                style={{
-                    backgroundImage: `repeating-linear-gradient(
-                        45deg,
-                        transparent,
-                        transparent 50px,
-                        rgba(255,255,255,0.003) 50px,
-                        rgba(255,255,255,0.003) 100px
-                    )`,
-                    mixBlendMode: 'overlay'
-                }}
-            />
+                <Maximize className="w-5 h-5" />
+            </button>
         </div>
     )
 }
