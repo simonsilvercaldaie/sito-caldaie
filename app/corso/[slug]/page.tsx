@@ -602,17 +602,11 @@ export default function CorsoPage() {
                                             <h3 className={`font-bold text-xl ${teamAccess ? 'text-indigo-900' : 'text-green-900'} mb-2`}>
                                                 {teamAccess ? 'Accesso Team Attivo' : 'Accesso Attivo'}
                                             </h3>
-                                            <p className="text-gray-600 mb-4">
+                                            <p className="text-gray-600">
                                                 {teamAccess
                                                     ? 'Hai accesso completo a tutti i livelli.'
                                                     : 'Hai già accesso a questo livello.'}
                                             </p>
-                                            <a
-                                                href="#premium-section"
-                                                className={`inline-block py-3 px-6 ${teamAccess ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-green-600 hover:bg-green-700'} text-white font-bold rounded-xl transition-all duration-300 hover:shadow-lg`}
-                                            >
-                                                Vai al contenuto premium
-                                            </a>
                                         </div>
                                     </div>
                                 )}
