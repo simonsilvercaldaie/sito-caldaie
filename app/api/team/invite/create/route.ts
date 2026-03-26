@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
+import { sendEmail } from '@/lib/email'
 
 function getSupabaseAdmin() {
     return createClient(
@@ -49,9 +50,7 @@ export async function POST(request: NextRequest) {
         }
 
         // 2. Generate Token
-        // Secure random 32 bytes hex
         const rawToken = crypto.randomBytes(32).toString('hex')
-        // Hash it for DB
         const tokenHash = crypto.createHash('sha256').update(rawToken).digest('hex')
 
         // 3. Insert Invite
@@ -65,24 +64,27 @@ export async function POST(request: NextRequest) {
             })
 
         if (insErr) {
-            if (insErr.code === '23505') { // Unique constraint violation (pending email)
+            if (insErr.code === '23505') {
                 return NextResponse.json({ error: 'Invito già pendente per questa email' }, { status: 409 })
             }
             throw insErr
         }
 
-        // 4. Send Email (Mocked or Real)
-        // TODO: Integrate Email Service. 
-        // For now, return the URL for the frontend to show (or verify manually).
+        // 4. Build invite URL
         const inviteUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://simonsilvercaldaie.it'}/azienda/accetta-invito?token=${rawToken}`
 
-        // If you have sendEmail logic:
-        // await sendEmail({ to: email, subject: 'Invito Team', text: `Clicca qui: ${inviteUrl}` })
+        // 5. Send invite email
+        const emailSent = await sendEmail('INVITO_TEAM', {
+            to_email: email.toLowerCase().trim(),
+            inviteUrl,
+            ownerName: user.email || 'il tuo responsabile'
+        })
 
         return NextResponse.json({
             success: true,
-            message: 'Invito creato',
-            debugUrl: inviteUrl // Remove in strict prod if email works, keep for now as requested "ritorna anche invite_url"
+            message: emailSent ? 'Invito inviato via email' : 'Invito creato (email non inviata, usa il link)',
+            emailSent,
+            debugUrl: inviteUrl
         })
 
     } catch (e: any) {

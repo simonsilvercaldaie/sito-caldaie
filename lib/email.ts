@@ -4,6 +4,7 @@ export type EmailType =
     | 'ACQUISTO_INTERMEDIO'
     | 'ACQUISTO_AVANZATO'
     | 'ACQUISTO_TEAM'
+    | 'INVITO_TEAM'
     | 'CANCELLAZIONE'
     | 'REGISTRAZIONE_OK'
 
@@ -142,6 +143,27 @@ Se sei sicuro, clicca sul link seguente entro 15 minuti:
 ${confirmUrl}
 
 Se non hai richiesto tu la cancellazione, ignora questa email e contatta l'assistenza.
+                `.trim()
+            }
+            break
+        case 'INVITO_TEAM':
+            const inviteUrl = params.inviteUrl || '#'
+            const ownerName = params.ownerName || 'il tuo responsabile'
+            specificParams = {
+                subject: '📩 Invito al Team - Simon Silver Caldaie',
+                message: `
+Ciao!
+
+Sei stato invitato da ${ownerName} ad accedere ai corsi Simon Silver Caldaie tramite una licenza aziendale Multidipendente.
+
+Per accettare l'invito e accedere a tutti i contenuti, clicca sul link seguente:
+${inviteUrl}
+
+Se non hai un account, ti verrà chiesto di registrarti prima.
+L'invito scade tra 7 giorni.
+
+Buon lavoro!
+Simon Silver
                 `.trim()
             }
             break
