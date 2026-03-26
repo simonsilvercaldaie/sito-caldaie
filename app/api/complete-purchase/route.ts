@@ -163,7 +163,7 @@ export async function POST(request: NextRequest) {
         // TEST ACCOUNT BYPASS: Override price for test emails
         const TEST_EMAILS_CENTS: Record<string, number> = {
             'simonsilvercaldaie@gmail.com': 100,     // 1 EUR
-            'simonsilvermotocross@gmail.com': 500,    // 5 EUR
+            'simonsilvermotocross@gmail.com': 100,    // 1 EUR
         }
         if (user.email && TEST_EMAILS_CENTS[user.email] !== undefined) {
             truthPrice = TEST_EMAILS_CENTS[user.email]

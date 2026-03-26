@@ -252,7 +252,7 @@ export async function POST(request: NextRequest) {
         if (!productCode && user.email) {
             const TEST_EMAILS_CENTS: Record<string, { cents: number; product: string }> = {
                 'simonsilvercaldaie@gmail.com': { cents: 100, product: 'base' },
-                'simonsilvermotocross@gmail.com': { cents: 500, product: 'base' },
+                'simonsilvermotocross@gmail.com': { cents: 100, product: 'base' },
             }
             const testEntry = TEST_EMAILS_CENTS[user.email]
             if (testEntry && Math.abs(amountCents - testEntry.cents) <= 1) {
