@@ -226,7 +226,8 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Trafilamento interno", "Blocco meccanico", "Motore vs Corpo valvola", "Diagnosi certa al 100%"],
         premiumContent: ["Revisione cartuccia", "Test motore elettrico", "Bypassare temporaneamente per diagnosi"],
-        coverImage: "/images/courses/13-valvola-tre-vie.webp"
+        coverImage: "/images/courses/13-valvola-tre-vie.webp",
+        bunnyVideoId: "14ca2d89-3672-4812-8b3c-449f97937bad"
     },
     {
         id: "14-sensori-ntc",
@@ -240,7 +241,8 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Deriva termica NTC", "Isteresi pressostati", " falsi contatti", "Leggere col multimetro vs leggere dalla scheda"],
         premiumContent: ["Tabella valori Ohm/Temp universale", "Costruire un simulatore di sensori", "Casi di sensori 'bugiardi'"],
-        coverImage: "/images/courses/14-sensori-ntc.webp"
+        coverImage: "/images/courses/14-sensori-ntc.webp",
+        bunnyVideoId: "152a8bd8-db70-43d6-a6c5-f8ab831f04bf"
     },
     {
         id: "15-scheda-elettronica",
@@ -254,7 +256,8 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Codici generici vs specifici", "La scheda come 'vittima' di altri guasti", "Reset software vs Guasto hardware", "Quando sostituirla davvero"],
         premiumContent: ["Verifica alimentazioni a bordo", "Relè incollati", "Tracce bruciate o saldature fredde"],
-        coverImage: "/images/courses/15-scheda-elettronica.webp"
+        coverImage: "/images/courses/15-scheda-elettronica.webp",
+        bunnyVideoId: "a8e23a63-cfe6-42d1-a3d8-1e6400349fb0"
     },
     {
         id: "16-calcare-magnetite",
@@ -268,7 +271,8 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Differenza Calcare vs Magnetite", "Danni alle pompe modulanti", "Surriscaldamenti localizzati", "Prevenzione efficace"],
         premiumContent: ["Analisi acqua impianto", "Installazione filtri defangatori", "Lavaggio risanante: quando e come"],
-        coverImage: "/images/courses/16-calcare-magnetite.webp"
+        coverImage: "/images/courses/16-calcare-magnetite.webp",
+        bunnyVideoId: "8bedc4b2-9b51-4109-a33c-aae13546bd9b"
     },
     {
         id: "17-errori-installazione",
@@ -282,7 +286,8 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Scarichi fumi non a norma", "Mancanza prese d'aria", "Diametri gas insufficienti", "Assenza vasi espansione sanitari"],
         premiumContent: ["Gestire l'errore altrui col cliente", "Normative UNI essenziali", "Correggere senza rifare tutto"],
-        coverImage: "/images/courses/17-errori-installazione.webp"
+        coverImage: "/images/courses/17-errori-installazione.webp",
+        bunnyVideoId: "ecf9903e-892e-4846-b0fb-61e62d518638"
     },
     {
         id: "18-riparare-senza-cambiare",
@@ -296,7 +301,8 @@ export const courses: Course[] = [
         price: "39.00",
         learnings: ["Sbloccare pompe e valvole", "Pulire contatti ed elettrodi", "Ricaricare vasi", "Tarare anziché sostituire"],
         premiumContent: ["Kit di sopravvivenza (paglietta, spray, ecc.)", "Interventi 'Mondo Reale'", "Quando la pulizia vale più del ricambio"],
-        coverImage: "/images/courses/18-riparare-senza-cambiare.webp"
+        coverImage: "/images/courses/18-riparare-senza-cambiare.webp",
+        bunnyVideoId: "ded2d816-29fd-400f-b48c-0262337df141"
     },
 
     // --- LIVELLO AVANZATO (9 Video) ---
