@@ -257,7 +257,7 @@ export default function CorsoPage() {
                 "Laboratorio": "advanced"
             }
             product_code = map[course.level]
-            amount_cents = pricingInfo.amountToPay * 100
+            amount_cents = getTestPrice(pricingInfo.amountToPay, user?.email) * 100
         }
 
         if (!product_code || !amount_cents) {
