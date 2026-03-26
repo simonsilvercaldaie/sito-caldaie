@@ -81,18 +81,29 @@ export default function VideoPlayerSecured({
             ref={containerRef}
             className={`relative aspect-video w-full bg-black rounded-2xl overflow-hidden shadow-2xl ${className}`}
         >
-            {/* Video Element */}
-            <video
-                className="w-full h-full object-cover"
-                controls
-                controlsList="nodownload noplaybackrate"
-                disablePictureInPicture
-                onContextMenu={(e) => e.preventDefault()}
-                src={videoUrl}
-                playsInline
-            >
-                Il tuo browser non supporta il tag video.
-            </video>
+            {/* Video Element (Iframe o Video) */}
+            {videoUrl.includes('iframe.mediadelivery.net') ? (
+                <iframe
+                    title="Scuola 10 Video Player"
+                    src={videoUrl}
+                    loading="lazy"
+                    allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                    allowFullScreen={true}
+                    className="w-full h-full border-none"
+                />
+            ) : (
+                <video
+                    className="w-full h-full object-cover"
+                    controls
+                    controlsList="nodownload noplaybackrate"
+                    disablePictureInPicture
+                    onContextMenu={(e) => e.preventDefault()}
+                    src={videoUrl}
+                    playsInline
+                >
+                    Il tuo browser non supporta il tag video.
+                </video>
+            )}
 
             {/* Primary Watermark - Full info */}
             <div

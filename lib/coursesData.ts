@@ -16,6 +16,7 @@ export interface Course {
     featured?: boolean
     coverImage?: string
     premiumVideoUrl?: string
+    bunnyVideoId?: string
 }
 
 export const courses: Course[] = [
@@ -43,7 +44,8 @@ export const courses: Course[] = [
         ],
         featured: true,
         coverImage: "/images/courses/01-caldaia-decisioni.webp",
-        premiumVideoUrl: "/videos/test.mp4" // PLACEHOLDER: Carica il tuo video qui
+        premiumVideoUrl: "/videos/test.mp4", // PLACEHOLDER: Carica il tuo video qui
+        bunnyVideoId: "20f3af78-14a0-486e-b0a4-6b46c8c34547"
     },
     {
         id: "02-check-iniziale",

@@ -49,9 +49,9 @@ export default function CorsoPage() {
     const [tosLoading, setTosLoading] = useState(false)
     const [profileCompleted, setProfileCompleted] = useState(false)
 
-    // Team UI State
     const [viewMode, setViewMode] = useState<'individual' | 'team' | null>(null)
     const [teamAccess, setTeamAccess] = useState(false)
+    const [secureVideoUrl, setSecureVideoUrl] = useState<string>("")
 
     // Session Guard — activates when user has purchased access
     const { status: sessionStatus, errorMessage: sessionError } = useSessionGuard({
@@ -144,6 +144,21 @@ export default function CorsoPage() {
                 setPurchasedCourses(userCourseIds)
                 setHasPurchased(hasAccess)
                 setActiveOrderId(orderLimitId)
+
+                // 3. Fetch Bunny Secure Token if access granted
+                if (hasAccess && course?.bunnyVideoId) {
+                    try {
+                        const tokenRes = await fetch(`/api/bunny-token?videoId=${course.bunnyVideoId}`, {
+                            headers: { 'Authorization': `Bearer ${session?.access_token}` }
+                        })
+                        const tokenData = await tokenRes.json()
+                        if (tokenData.embedUrl) {
+                            setSecureVideoUrl(tokenData.embedUrl)
+                        }
+                    } catch (e) {
+                        console.error('Error fetching secure video URL', e)
+                    }
+                }
             }
             setLoading(false)
         }
@@ -436,9 +451,9 @@ export default function CorsoPage() {
                                 </div>
                                 <div className="bg-white rounded-2xl shadow-lg overflow-hidden border-2 border-accent/20 relative">
                                     {hasPurchased ? (
-                                        course.premiumVideoUrl ? (
+                                        secureVideoUrl || course.premiumVideoUrl ? (
                                             <VideoPlayerSecured
-                                                videoUrl={course.premiumVideoUrl}
+                                                videoUrl={secureVideoUrl || course.premiumVideoUrl!}
                                                 userEmail={user?.email || 'utente@simonsilver.it'}
                                                 orderId={activeOrderId || 'ORDER-XXXX'}
                                             />
