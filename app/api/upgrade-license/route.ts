@@ -14,12 +14,12 @@ const PAYPAL_API = process.env.PAYPAL_ENV === 'live'
 
 // Expected upgrade prices in cents
 const UPGRADE_PRICES: Record<string, number> = {
-    'individual_to_team_5': 80000,
-    'individual_to_team_10': 180000,
-    'individual_to_team_25': 280000,
-    'team_5_to_team_10': 100000,
-    'team_5_to_team_25': 200000,
-    'team_10_to_team_25': 100000,
+    'individual_to_multi_5': 200000,    // 3000 - 1000 = 2000€
+    'individual_to_multi_10': 300000,   // 4000 - 1000 = 3000€
+    'individual_to_multi_25': 400000,   // 5000 - 1000 = 4000€
+    'multi_5_to_multi_10': 100000,      // 4000 - 3000 = 1000€
+    'multi_5_to_multi_25': 200000,      // 5000 - 3000 = 2000€
+    'multi_10_to_multi_25': 100000,     // 5000 - 4000 = 1000€
 }
 
 async function getPayPalAccessToken(): Promise<string> {
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
             upgradeKey = `multi_10_to_multi_${target_team_size}`
         }
 
-        const expectedPrice = (user.email === 'simonsilvercaldaie@gmail.com')
+        const expectedPrice = (user.email === 'simonsilvercaldaie@gmail.com' || user.email === 'simonsilvermotocross@gmail.com')
             ? 100
             : UPGRADE_PRICES[upgradeKey]
 
