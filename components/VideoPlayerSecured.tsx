@@ -129,7 +129,14 @@ export default function VideoPlayerSecured({
                 </video>
             )}
 
-            {/* Flash Watermark - Solo angoli, 5s ogni ~50s */}
+            {/* In basso a destra: Firma statica persistente */}
+            <div className="absolute bottom-3 right-14 pointer-events-none select-none z-20">
+                <span className="text-white/30 text-[10px] md:text-xs font-mono tracking-wide" style={{ textShadow: '1px 1px 2px rgba(0,0,0,0.8)' }}>
+                    {userEmail}
+                </span>
+            </div>
+
+            {/* Flash Watermark - Solo angoli, 5s ogni ~4 minuti */}
             <div
                 className="absolute pointer-events-none select-none z-20 transition-opacity duration-700"
                 style={{
