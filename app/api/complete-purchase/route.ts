@@ -234,7 +234,7 @@ export async function POST(request: NextRequest) {
 
         const billing = billingData as BillingProfile | null
         const isTeam = product_code.startsWith('multi_') || product_code.startsWith('scuola_')
-        const isExtraInvites = product_code.startsWith('extra_inviti_')
+        const isExtraInvites = product_code.startsWith('extra_invito_')
 
         // Common snapshot data
         const snapshotData = {
