@@ -263,10 +263,10 @@ export default function PacchettoCompletoPage() {
                                         <h2 className="text-3xl font-bold text-gray-900 mb-2">Hai già accesso completo!</h2>
                                         <p className="text-gray-600 mb-8 text-lg">Tutti i 27 corsi sono già sbloccati nel tuo account.</p>
                                         <Link
-                                            href="/catalogo"
+                                            href="/"
                                             className="inline-flex items-center gap-2 bg-green-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-green-700 transition-all hover:shadow-lg hover:-translate-y-0.5"
                                         >
-                                            Vai ai Corsi <ArrowRight className="w-5 h-5" />
+                                            Torna alla Home <ArrowRight className="w-5 h-5" />
                                         </Link>
                                     </>
                                 ) : bundleBlockReason === 'has_team' ? (
@@ -277,10 +277,10 @@ export default function PacchettoCompletoPage() {
                                         <h2 className="text-3xl font-bold text-gray-900 mb-2">Hai già una licenza multi-accesso</h2>
                                         <p className="text-gray-600 mb-8 text-lg">La tua licenza team include già tutti i corsi.</p>
                                         <Link
-                                            href="/catalogo"
+                                            href="/"
                                             className="inline-flex items-center gap-2 bg-blue-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-blue-700 transition-all hover:shadow-lg hover:-translate-y-0.5"
                                         >
-                                            Vai ai Corsi <ArrowRight className="w-5 h-5" />
+                                            Torna alla Home <ArrowRight className="w-5 h-5" />
                                         </Link>
                                     </>
                                 ) : (
@@ -291,10 +291,10 @@ export default function PacchettoCompletoPage() {
                                         <h2 className="text-3xl font-bold text-gray-900 mb-2">Hai già acquistato dei livelli singoli</h2>
                                         <p className="text-gray-600 mb-8 text-lg">Il pacchetto completo è disponibile solo per chi non ha ancora acquistato livelli singoli. Puoi completare i livelli mancanti dal catalogo.</p>
                                         <Link
-                                            href="/catalogo"
+                                            href="/"
                                             className="inline-flex items-center gap-2 bg-amber-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-amber-700 transition-all hover:shadow-lg hover:-translate-y-0.5"
                                         >
-                                            Vai al Catalogo <ArrowRight className="w-5 h-5" />
+                                            Torna alla Home <ArrowRight className="w-5 h-5" />
                                         </Link>
                                     </>
                                 )}
@@ -406,9 +406,9 @@ export default function PacchettoCompletoPage() {
 
                     {/* Back Link */}
                     <div className="text-center mt-12">
-                        <Link href="/catalogo" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors font-medium">
-                            <ArrowRight className="w-4 h-4 rotate-180" /> Torna al Catalogo
-                        </Link>
+                        <button onClick={() => window.history.back()} className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors font-medium">
+                            <ArrowRight className="w-4 h-4 rotate-180" /> Torna Indietro
+                        </button>
                     </div>
                 </div>
             </main>
