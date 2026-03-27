@@ -21,13 +21,16 @@ function CompletaProfiloContent() {
     const returnTo = searchParams.get('returnTo')
     const supabase = createClient()
 
+    // Determina se l'acquisto è per team/scuola (obbliga P.IVA, nasconde toggle)
+    const isTeamPurchase = returnTo === '/licenze-multidipendente' || returnTo === '/acquista-inviti-extra'
+
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
     const [user, setUser] = useState<any>(null)
     const [error, setError] = useState<string | null>(null)
 
     // Form state
-    const [customerType, setCustomerType] = useState<'private' | 'company'>('private')
+    const [customerType, setCustomerType] = useState<'private' | 'company'>('company')
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
     const [companyName, setCompanyName] = useState('')
@@ -278,30 +281,39 @@ Simon Silver
                     <div className="text-[10px] text-gray-300 font-mono text-center mb-4">Build: INPUT-FIX-01</div>
 
                     {/* Tipo cliente switch */}
-                    <div className="flex p-1 bg-gray-100 rounded-xl mb-6">
-                        <button
-                            type="button"
-                            onClick={() => setCustomerType('private')}
-                            className={`flex-1 py-3 px-4 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${customerType === 'private'
-                                ? 'bg-white shadow-md text-primary'
-                                : 'text-gray-500 hover:text-gray-700'
-                                }`}
-                        >
-                            <User className="w-4 h-4" />
-                            Privato
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => setCustomerType('company')}
-                            className={`flex-1 py-3 px-4 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${customerType === 'company'
-                                ? 'bg-white shadow-md text-primary'
-                                : 'text-gray-500 hover:text-gray-700'
-                                }`}
-                        >
-                            <Building2 className="w-4 h-4" />
-                            Azienda / P.IVA
-                        </button>
-                    </div>
+                    {isTeamPurchase ? (
+                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6 flex items-center gap-3">
+                            <Building2 className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                            <p className="text-sm text-blue-800">
+                                <strong>Licenza Aziendale:</strong> questo tipo di acquisto richiede obbligatoriamente la fatturazione con Partita IVA.
+                            </p>
+                        </div>
+                    ) : (
+                        <div className="flex p-1 bg-gray-100 rounded-xl mb-6">
+                            <button
+                                type="button"
+                                onClick={() => setCustomerType('private')}
+                                className={`flex-1 py-3 px-4 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${customerType === 'private'
+                                    ? 'bg-white shadow-md text-primary'
+                                    : 'text-gray-500 hover:text-gray-700'
+                                    }`}
+                            >
+                                <User className="w-4 h-4" />
+                                Privato
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setCustomerType('company')}
+                                className={`flex-1 py-3 px-4 text-sm font-bold rounded-lg transition-all flex items-center justify-center gap-2 ${customerType === 'company'
+                                    ? 'bg-white shadow-md text-primary'
+                                    : 'text-gray-500 hover:text-gray-700'
+                                    }`}
+                            >
+                                <Building2 className="w-4 h-4" />
+                                Azienda / P.IVA
+                            </button>
+                        </div>
+                    )}
 
                     <form onSubmit={handleSubmit} className="space-y-6">
 
