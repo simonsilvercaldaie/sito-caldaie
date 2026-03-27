@@ -677,11 +677,11 @@ export default function CorsoPage() {
                             <div id="purchase-card" className="bg-white rounded-2xl shadow-lg p-6 sticky top-8">
                                 {hasPurchased && (
                                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                        <div className={`${teamAccess ? 'bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200' : 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200'} border-2 rounded-2xl p-6 text-center`}>
-                                            <div className={`p-4 ${teamAccess ? 'bg-indigo-100 text-indigo-600' : 'bg-green-100 text-green-600'} rounded-2xl mb-4 inline-block`}>
+                                        <div className="bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 border-2 rounded-2xl p-6 text-center">
+                                            <div className="p-4 bg-green-100 text-green-600 rounded-2xl mb-4 inline-block">
                                                 <CheckCircle2 className="w-10 h-10" />
                                             </div>
-                                            <h3 className={`font-bold text-xl ${teamAccess ? 'text-indigo-900' : 'text-green-900'} mb-2`}>
+                                            <h3 className="font-bold text-xl text-green-900 mb-2">
                                                 {teamAccess ? 'Accesso Team Attivo' : 'Accesso Attivo'}
                                             </h3>
                                             <p className="text-gray-600">
