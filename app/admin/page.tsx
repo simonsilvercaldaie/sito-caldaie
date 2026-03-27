@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import { Loader2, AlertTriangle, UserX, ShieldAlert, RefreshCw, MonitorX } from 'lucide-react'
+import { Loader2, AlertTriangle, UserX, ShieldAlert, RefreshCw, MonitorX, Search, X, ChevronDown, ChevronUp, FileText, Shield, Clock } from 'lucide-react'
 
 export default function AdminPage() {
     const [loading, setLoading] = useState(true)
@@ -50,7 +50,6 @@ export default function AdminPage() {
                 const data = await res.json()
                 setStats(data)
                 setAuthorized(true)
-                // Fetch all data
                 Promise.all([
                     fetchOrders(session.access_token),
                     fetchTickets(session.access_token),
@@ -153,22 +152,17 @@ export default function AdminPage() {
 
     const handleRevoke = async (userId: string) => {
         if (!confirm('SEI SICURO? Questo eliminerà gli acquisti dell\'utente e lo disconnetterà immediatamente.')) return
-
         setActionLoading(true)
         const { data: { session } } = await supabase.auth.getSession()
-
         try {
             const res = await fetch('/api/admin', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session?.access_token}`
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
                 body: JSON.stringify({ action: 'revoke_user', userId, reason: 'Manual Admin Revocation' })
             })
             if (res.ok) {
                 alert('Utente revocato.')
-                fetchOrders(session!.access_token) // refresh
+                fetchOrders(session!.access_token)
             } else {
                 alert('Errore revoca.')
             }
@@ -179,24 +173,16 @@ export default function AdminPage() {
 
     const handleWarning = async (email: string) => {
         if (!confirm(`Inviare email di avviso a ${email}?`)) return
-
         setActionLoading(true)
         const { data: { session } } = await supabase.auth.getSession()
-
         try {
             const res = await fetch('/api/admin', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session?.access_token}`
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
                 body: JSON.stringify({ action: 'send_warning', email, reason: 'Abuse detected' })
             })
-            if (res.ok) {
-                alert('Email inviata.')
-            } else {
-                alert('Errore invio.')
-            }
+            if (res.ok) alert('Email inviata.')
+            else alert('Errore invio.')
         } finally {
             setActionLoading(false)
         }
@@ -221,7 +207,7 @@ export default function AdminPage() {
                             🏠 Home
                         </a>
                     </div>
-                    <p className="text-[10px] text-slate-400 font-mono mt-1">Build: ADMIN-FIX-TICKETS-01</p>
+                    <p className="text-[10px] text-slate-400 font-mono mt-1">Build: ADMIN-USERCARD-AUDIT-01</p>
                 </div>
                 <button onClick={() => window.location.reload()} className="p-2 bg-white rounded-lg shadow-sm hover:shadow">
                     <RefreshCw className="w-5 h-5 text-slate-600" />
@@ -249,6 +235,9 @@ export default function AdminPage() {
                     <div className="text-3xl font-extrabold text-red-600 mt-2">{stats?.securityEvents?.length || 0}</div>
                 </div>
             </div>
+
+            {/* USER CARD SEARCH — New Feature */}
+            <UserCardSearch />
 
             <div className="grid lg:grid-cols-3 gap-8">
                 {/* LEFT COLUMN: TICKETS & GRANT ACCESS */}
@@ -296,7 +285,7 @@ export default function AdminPage() {
                     <GrantAccessForm />
                     <ResetDevicesForm />
 
-                    {/* SECURITY LOGS (Moved here to balance layout) */}
+                    {/* SECURITY LOGS */}
                     <div className="bg-white rounded-xl shadow-sm border border-slate-200 h-fit">
                         <div className="p-6 border-b border-slate-100 pb-4">
                             <h2 className="font-bold text-lg text-slate-800">Eventi di Sicurezza</h2>
@@ -333,7 +322,7 @@ export default function AdminPage() {
                     </div>
                 </div>
 
-                {/* RIGHT COLUMN: ORDERS (Spans 2 cols) */}
+                {/* RIGHT COLUMN: ORDERS */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
                         <div className="p-6 border-b border-slate-100 pb-4">
@@ -367,7 +356,7 @@ export default function AdminPage() {
                                                     {order.product_code || 'N/A'}
                                                 </span>
                                             </td>
-                                            <td className="p-4 font-mono">€{(order.amount / 100).toFixed(2)}</td>
+                                            <td className="p-4 font-mono">€{(order.amount_cents / 100).toFixed(2)}</td>
                                             <td className="p-4 text-right flex justify-end gap-2">
                                                 <button
                                                     onClick={() => handleWarning(order.user?.email)}
@@ -439,9 +428,9 @@ export default function AdminPage() {
                                         </td>
                                         <td className="p-4 flex items-center gap-3">
                                             <div className="flex items-center">
-                                                <input 
-                                                    type="number" 
-                                                    defaultValue={team.seats} 
+                                                <input
+                                                    type="number"
+                                                    defaultValue={team.seats}
                                                     min={1}
                                                     id={`seats-${team.id}`}
                                                     aria-label="Posti Totali"
@@ -472,6 +461,397 @@ export default function AdminPage() {
                 </div>
             </div>
 
+        </div>
+    )
+}
+
+// ===================================================================
+// USER CARD SEARCH — Complete user profile lookup
+// ===================================================================
+function UserCardSearch() {
+    const [email, setEmail] = useState('')
+    const [loading, setLoading] = useState(false)
+    const [card, setCard] = useState<any>(null)
+    const [error, setError] = useState('')
+    const [expanded, setExpanded] = useState(true)
+    const [noteText, setNoteText] = useState('')
+    const [noteLoading, setNoteLoading] = useState(false)
+
+    const handleSearch = async (e?: React.FormEvent) => {
+        e?.preventDefault()
+        if (!email) return
+        setLoading(true)
+        setError('')
+        setCard(null)
+        const { data: { session } } = await supabase.auth.getSession()
+        try {
+            const res = await fetch('/api/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+                body: JSON.stringify({ action: 'get_user_card', email })
+            })
+            const data = await res.json()
+            if (res.ok) setCard(data)
+            else setError(data.error || 'Errore')
+        } catch { setError('Errore di rete') }
+        finally { setLoading(false) }
+    }
+
+    const handleRevokeLevel = async (userId: string, level: string) => {
+        const reason = prompt(`Motivo revoca "${level}":`)
+        if (!reason) return
+        const { data: { session } } = await supabase.auth.getSession()
+        const res = await fetch('/api/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+            body: JSON.stringify({ action: 'admin_revoke_access', userId, levels: [level], reason })
+        })
+        if (res.ok) { alert('Revocato!'); handleSearch() }
+        else alert('Errore revoca')
+    }
+
+    const handleGrantLevel = async (userId: string) => {
+        const { data: { session } } = await supabase.auth.getSession()
+        const levels = prompt('Livelli da sbloccare (separati da virgola, es: base,intermedio,avanzato):')
+        if (!levels) return
+        const products = levels.split(',').map(l => l.trim())
+        const res = await fetch('/api/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+            body: JSON.stringify({ action: 'grant_access', email: card.user.email, products })
+        })
+        if (res.ok) { alert('Accesso concesso!'); handleSearch() }
+        else alert('Errore grant')
+    }
+
+    const handleResetDevices = async (userId: string) => {
+        if (!confirm('Sei sicuro? Reset dispositivi e sessioni.')) return
+        const { data: { session } } = await supabase.auth.getSession()
+        const res = await fetch('/api/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+            body: JSON.stringify({ action: 'reset_devices', userId })
+        })
+        if (res.ok) { alert('Dispositivi resettati!'); handleSearch() }
+        else alert('Errore reset')
+    }
+
+    const handleAddNote = async () => {
+        if (!noteText || !card) return
+        setNoteLoading(true)
+        const { data: { session } } = await supabase.auth.getSession()
+        const res = await fetch('/api/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+            body: JSON.stringify({ action: 'admin_add_note', userId: card.user.id, note: noteText })
+        })
+        if (res.ok) { setNoteText(''); handleSearch() }
+        else alert('Errore salvataggio nota')
+        setNoteLoading(false)
+    }
+
+    return (
+        <div className="mb-8">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6 border-b border-slate-100 flex justify-between items-center cursor-pointer" onClick={() => setExpanded(!expanded)}>
+                    <h2 className="font-bold text-lg text-slate-800 flex items-center gap-2">
+                        <Search className="w-5 h-5 text-indigo-600" />
+                        Scheda Utente
+                    </h2>
+                    {expanded ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+                </div>
+
+                {expanded && (
+                    <div className="p-6">
+                        {/* Search Bar */}
+                        <form onSubmit={handleSearch} className="flex gap-3 mb-6">
+                            <input
+                                type="email"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                                placeholder="Cerca per email utente..."
+                                className="flex-1 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm"
+                            />
+                            <button type="submit" disabled={loading} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50">
+                                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                                Cerca
+                            </button>
+                            {card && (
+                                <button type="button" onClick={() => { setCard(null); setEmail('') }} className="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors">
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
+                        </form>
+
+                        {error && <p className="text-red-600 text-sm font-bold mb-4">{error}</p>}
+
+                        {/* User Card Result */}
+                        {card && (
+                            <div className="space-y-6">
+                                {/* ANOMALIE */}
+                                {card.anomalies?.length > 0 && (
+                                    <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                                        <h3 className="font-bold text-red-700 text-sm mb-2 flex items-center gap-2">
+                                            <AlertTriangle className="w-4 h-4" /> Anomalie Rilevate
+                                        </h3>
+                                        <ul className="text-xs text-red-600 space-y-1">
+                                            {card.anomalies.map((a: string, i: number) => <li key={i}>{a}</li>)}
+                                        </ul>
+                                    </div>
+                                )}
+
+                                {/* Row 1: Profile + Quick Actions */}
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    {/* PROFILO */}
+                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Profilo</h3>
+                                        <div className="space-y-2 text-sm">
+                                            <div className="flex justify-between"><span className="text-slate-500">Email</span><span className="font-mono font-bold text-slate-800">{card.user.email}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">ID</span><span className="font-mono text-xs text-slate-600">{card.user.id.slice(0, 12)}...</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">Provider</span><span className="font-bold text-slate-700">{card.user.provider}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">Registrato</span><span className="text-slate-700">{new Date(card.user.created_at).toLocaleDateString()}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">Ultimo Login</span><span className="text-slate-700">{card.user.last_sign_in_at ? new Date(card.user.last_sign_in_at).toLocaleString() : 'Mai'}</span></div>
+                                            {card.profile && (
+                                                <>
+                                                    <div className="flex justify-between"><span className="text-slate-500">Nome</span><span className="text-slate-700">{card.profile.full_name || '-'}</span></div>
+                                                    <div className="flex justify-between"><span className="text-slate-500">Profilo Completo</span><span className={card.profile.profile_completed ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>{card.profile.profile_completed ? 'SÌ' : 'NO'}</span></div>
+                                                </>
+                                            )}
+                                            {card.billing && (
+                                                <>
+                                                    <div className="flex justify-between"><span className="text-slate-500">Azienda</span><span className="text-slate-700">{card.billing.company_name || '-'}</span></div>
+                                                    <div className="flex justify-between"><span className="text-slate-500">P.IVA</span><span className="font-mono text-slate-700">{card.billing.vat_number || '-'}</span></div>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    {/* AZIONI RAPIDE */}
+                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Azioni Rapide</h3>
+                                        <div className="space-y-3">
+                                            <button onClick={() => handleGrantLevel(card.user.id)} className="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
+                                                <Shield className="w-4 h-4" /> Grant Accesso
+                                            </button>
+                                            <button onClick={() => handleResetDevices(card.user.id)} className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
+                                                <MonitorX className="w-4 h-4" /> Reset Dispositivi
+                                            </button>
+                                        </div>
+
+                                        {/* Online status */}
+                                        <div className="mt-4 p-3 bg-white rounded-lg border border-slate-200">
+                                            <div className="text-xs text-slate-500 uppercase font-bold mb-1">Stato Online</div>
+                                            {card.presence ? (
+                                                <div className="flex items-center gap-2 text-sm">
+                                                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                                    <span className="text-green-700 font-bold">Online</span>
+                                                    <span className="text-slate-400 text-xs">— {new Date(card.presence.last_seen_at).toLocaleString()}</span>
+                                                </div>
+                                            ) : (
+                                                <div className="text-sm text-slate-400">Offline</div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Row 2: Purchases + Access */}
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    {/* ACQUISTI */}
+                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Acquisti ({card.purchases.length})</h3>
+                                        {card.purchases.length === 0 ? (
+                                            <p className="text-sm text-slate-400">Nessun acquisto</p>
+                                        ) : (
+                                            <div className="space-y-2 max-h-60 overflow-y-auto">
+                                                {card.purchases.map((p: any) => (
+                                                    <div key={p.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs">
+                                                        <div className="flex justify-between items-start mb-1">
+                                                            <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold border border-blue-100">{p.product_code}</span>
+                                                            <span className="font-mono text-slate-600">€{(p.amount_cents / 100).toFixed(2)}</span>
+                                                        </div>
+                                                        <div className="text-slate-500 mt-1">{new Date(p.created_at).toLocaleString()}</div>
+                                                        <div className="font-mono text-[10px] text-slate-400 mt-1 break-all">capture: {p.paypal_capture_id?.slice(0, 20)}...</div>
+                                                        {p.snapshot_company_name === 'REGALO ADMIN' && (
+                                                            <span className="mt-1 inline-block px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded">REGALO ADMIN</span>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* ACCESSI ATTIVI */}
+                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Accessi Attivi ({card.access.length})</h3>
+                                        {card.access.length === 0 ? (
+                                            <p className="text-sm text-slate-400">Nessun accesso</p>
+                                        ) : (
+                                            <div className="space-y-2">
+                                                {card.access.map((a: any) => (
+                                                    <div key={a.id} className="bg-white p-3 rounded-lg border border-slate-200 flex justify-between items-center">
+                                                        <div>
+                                                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${a.access_level === 'base' ? 'bg-green-50 text-green-700 border border-green-200' :
+                                                                a.access_level === 'intermedio' ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' :
+                                                                    'bg-purple-50 text-purple-700 border border-purple-200'
+                                                                }`}>{a.access_level.toUpperCase()}</span>
+                                                            <span className="text-[10px] text-slate-400 ml-2">via {a.source}</span>
+                                                        </div>
+                                                        <button
+                                                            onClick={() => handleRevokeLevel(card.user.id, a.access_level)}
+                                                            className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                            title={`Revoca ${a.access_level}`}
+                                                        >
+                                                            <X className="w-3.5 h-3.5" />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Row 3: Devices + Sessions */}
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    {/* DISPOSITIVI */}
+                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Dispositivi ({card.devices.length})</h3>
+                                        {card.devices.length === 0 ? (
+                                            <p className="text-sm text-slate-400">Nessun dispositivo</p>
+                                        ) : (
+                                            <div className="space-y-2 max-h-40 overflow-y-auto">
+                                                {card.devices.map((d: any) => (
+                                                    <div key={d.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs">
+                                                        <div className="font-bold text-slate-700">{d.device_name || 'Dispositivo sconosciuto'}</div>
+                                                        <div className="text-slate-400 font-mono mt-1 text-[10px]">FP: {d.fingerprint?.slice(0, 16)}...</div>
+                                                        <div className="text-slate-400 mt-1">Creato: {new Date(d.created_at).toLocaleString()}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* SESSIONI */}
+                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Sessioni Attive ({card.sessions.length})</h3>
+                                        {card.sessions.length === 0 ? (
+                                            <p className="text-sm text-slate-400">Nessuna sessione</p>
+                                        ) : (
+                                            <div className="space-y-2 max-h-40 overflow-y-auto">
+                                                {card.sessions.map((s: any) => (
+                                                    <div key={s.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs">
+                                                        <div className="flex justify-between">
+                                                            <span className="text-slate-500">Last Seen</span>
+                                                            <span className="text-slate-700 font-mono">{new Date(s.last_seen_at).toLocaleString()}</span>
+                                                        </div>
+                                                        <div className="text-slate-400 font-mono mt-1 text-[10px]">ID: {s.id.slice(0, 12)}...</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Row 4: Team Info */}
+                                {(card.teamOwnership.length > 0 || card.teamMembership.length > 0) && (
+                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Team</h3>
+                                        {card.teamOwnership.length > 0 && (
+                                            <div className="mb-3">
+                                                <div className="text-xs text-indigo-600 font-bold uppercase mb-2">👑 Owner di:</div>
+                                                {card.teamOwnership.map((t: any) => (
+                                                    <div key={t.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs mb-2">
+                                                        <div className="font-bold text-slate-700">{t.company_name || 'Team'}</div>
+                                                        <div className="text-slate-500 mt-1">Seats: {t.seats} | Max Inviti: {t.max_invites_total || 'N/A'}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                        {card.teamMembership.length > 0 && (
+                                            <div>
+                                                <div className="text-xs text-slate-600 font-bold uppercase mb-2">👤 Membro di:</div>
+                                                {card.teamMembership.map((m: any) => (
+                                                    <div key={m.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs mb-2">
+                                                        <div className="font-bold text-slate-700">{m.team_license?.company_name || 'Team'}</div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Row 5: Notes + Security Events */}
+                                <div className="grid md:grid-cols-2 gap-6">
+                                    {/* NOTE ASSISTENZA */}
+                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider flex items-center gap-2">
+                                            <FileText className="w-4 h-4" /> Note Assistenza
+                                        </h3>
+                                        <div className="flex gap-2 mb-3">
+                                            <input
+                                                type="text"
+                                                value={noteText}
+                                                onChange={e => setNoteText(e.target.value)}
+                                                placeholder="Scrivi una nota..."
+                                                className="flex-1 p-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                                            />
+                                            <button
+                                                onClick={handleAddNote}
+                                                disabled={noteLoading || !noteText}
+                                                className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg disabled:opacity-50"
+                                            >
+                                                {noteLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Salva'}
+                                            </button>
+                                        </div>
+                                        {card.notes.length === 0 ? (
+                                            <p className="text-xs text-slate-400">Nessuna nota</p>
+                                        ) : (
+                                            <div className="space-y-2 max-h-40 overflow-y-auto">
+                                                {card.notes.map((n: any) => (
+                                                    <div key={n.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs">
+                                                        <div className="text-slate-700">{n.note}</div>
+                                                        <div className="text-slate-400 mt-1 flex justify-between">
+                                                            <span>{n.admin_email}</span>
+                                                            <span>{new Date(n.created_at).toLocaleString()}</span>
+                                                        </div>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* EVENTI RECENTI */}
+                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider flex items-center gap-2">
+                                            <Clock className="w-4 h-4" /> Eventi Recenti
+                                        </h3>
+                                        {card.securityEvents.length === 0 ? (
+                                            <p className="text-xs text-slate-400">Nessun evento</p>
+                                        ) : (
+                                            <div className="space-y-2 max-h-40 overflow-y-auto">
+                                                {card.securityEvents.map((ev: any) => (
+                                                    <div key={ev.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs">
+                                                        <div className="flex justify-between items-start">
+                                                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${ev.event_type.includes('blocked') ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'}`}>
+                                                                {ev.event_type}
+                                                            </span>
+                                                            <span className="text-slate-400 text-[10px]">{new Date(ev.created_at).toLocaleString()}</span>
+                                                        </div>
+                                                        {ev.metadata && (
+                                                            <div className="text-[10px] text-slate-500 mt-1 font-mono bg-slate-50 p-1 rounded break-all">
+                                                                {JSON.stringify(ev.metadata).slice(0, 120)}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
         </div>
     )
 }
@@ -640,4 +1020,3 @@ function ResetDevicesForm() {
         </div>
     )
 }
-
