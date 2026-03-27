@@ -235,7 +235,13 @@ export default function DashboardPage() {
             return
         }
 
-        if (!confirm('Sei sicuro di voler resettare tutti i dispositivi? Dovrai rieffettuare l\'accesso.')) {
+        if (!confirm(
+            '⚠️ ATTENZIONE: Stai per resettare tutti i dispositivi autorizzati.\n\n' +
+            '• Verrai disconnesso da TUTTI i dispositivi\n' +
+            '• Dovrai rieffettuare l\'accesso sui dispositivi che vuoi usare\n' +
+            '• Dopo questo reset, dovrai aspettare 30 GIORNI prima di poter resettare di nuovo\n\n' +
+            'Sei sicuro di voler procedere?'
+        )) {
             return
         }
 
