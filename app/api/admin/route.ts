@@ -60,6 +60,15 @@ export async function POST(request: NextRequest) {
         if (action === 'get_live_users') {
             return await getLiveUsers()
         }
+        if (action === 'reset_devices') {
+            return await resetUserDevices(body.userId)
+        }
+        if (action === 'get_teams') {
+            return await getTeams()
+        }
+        if (action === 'update_team_seats') {
+            return await updateTeamSeats(body.teamId, body.seats)
+        }
 
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
 
@@ -263,4 +272,73 @@ async function getLiveUsers() {
 
     // console.log(`[Admin] Live Users Count: ${count}`) // Optional debug
     return NextResponse.json({ count: count || 0 })
+}
+
+async function resetUserDevices(userId: string) {
+    if (!userId) return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
+    
+    // Clear trusted_devices and active_sessions explicitly
+    await supabaseAdmin.from('trusted_devices').delete().eq('user_id', userId)
+    await supabaseAdmin.from('active_sessions').delete().eq('user_id', userId)
+    
+    // Update last reset date so user doesn't hit cooldown logic for old traces
+    await supabaseAdmin.from('profiles').update({
+        last_device_reset_at: new Date().toISOString()
+    }).eq('id', userId)
+
+    return NextResponse.json({ success: true, message: 'Dispositivi e sessioni resettati con successo.' })
+}
+
+async function getTeams() {
+    // 1. Get raw team licenses
+    const { data: teams, error } = await supabaseAdmin
+        .from('team_licenses')
+        .select('*')
+        .order('created_at', { ascending: false })
+    
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    if (!teams || teams.length === 0) return NextResponse.json({ teams: [] })
+
+    // 2. Map Owner Emails
+    const { data: { users } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
+    const userMap = new Map()
+    users.forEach((u: any) => userMap.set(u.id, u.email))
+
+    // 3. Count active members per team
+    const teamIds = teams.map((t: any) => t.id)
+    const { data: members, error: memErr } = await supabaseAdmin
+        .from('team_members')
+        .select('team_license_id')
+        .is('removed_at', null)
+        .in('team_license_id', teamIds)
+        
+    const memCounts = new Map()
+    if (!memErr && members) {
+        members.forEach((m: any) => {
+            memCounts.set(m.team_license_id, (memCounts.get(m.team_license_id) || 0) + 1)
+        })
+    }
+
+    // 4. Connect Data
+    const enrichedTeams = teams.map((t: any) => ({
+        ...t,
+        owner_email: userMap.get(t.owner_user_id) || 'Sconosciuto',
+        active_members_count: memCounts.get(t.id) || 0
+    }))
+
+    return NextResponse.json({ teams: enrichedTeams })
+}
+
+async function updateTeamSeats(teamId: string, seats: number) {
+    if (!teamId || typeof seats !== 'number' || seats < 1) {
+        return NextResponse.json({ error: 'Dati validi necessari' }, { status: 400 })
+    }
+    
+    const { error } = await supabaseAdmin
+        .from('team_licenses')
+        .update({ seats })
+        .eq('id', teamId)
+        
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ success: true, message: 'Posti aggiornati con successo.' })
 }

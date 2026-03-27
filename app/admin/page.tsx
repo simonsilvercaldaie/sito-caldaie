@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import { Loader2, AlertTriangle, UserX, ShieldAlert, RefreshCw } from 'lucide-react'
+import { Loader2, AlertTriangle, UserX, ShieldAlert, RefreshCw, MonitorX } from 'lucide-react'
 
 export default function AdminPage() {
     const [loading, setLoading] = useState(true)
@@ -10,6 +10,7 @@ export default function AdminPage() {
     const [orders, setOrders] = useState<any[]>([])
     const [tickets, setTickets] = useState<any[]>([])
     const [liveUsers, setLiveUsers] = useState<number>(0)
+    const [teams, setTeams] = useState<any[]>([])
     const [actionLoading, setActionLoading] = useState(false)
 
     useEffect(() => {
@@ -53,7 +54,8 @@ export default function AdminPage() {
                 Promise.all([
                     fetchOrders(session.access_token),
                     fetchTickets(session.access_token),
-                    fetchLiveUsers(session.access_token)
+                    fetchLiveUsers(session.access_token),
+                    fetchTeams(session.access_token)
                 ])
             } else {
                 setAuthorized(false)
@@ -99,6 +101,53 @@ export default function AdminPage() {
         if (res.ok) {
             const data = await res.json()
             setLiveUsers(data.count || 0)
+        }
+    }
+
+    const fetchTeams = async (token: string) => {
+        const res = await fetch('/api/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({ action: 'get_teams' })
+        })
+        if (res.ok) {
+            const data = await res.json()
+            setTeams(data.teams || [])
+        }
+    }
+
+    const handleResetDevices = async (userId: string) => {
+        if (!confirm('SEI SICURO? Questo resetterà tutti i dispositivi dell\'utente e lo costringerà a rifare il login.')) return
+        setActionLoading(true)
+        const { data: { session } } = await supabase.auth.getSession()
+        try {
+            const res = await fetch('/api/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+                body: JSON.stringify({ action: 'reset_devices', userId })
+            })
+            if (res.ok) alert('Dispositivi resettati.')
+            else alert('Errore reset.')
+        } finally {
+            setActionLoading(false)
+        }
+    }
+
+    const handleUpdateSeats = async (teamId: string, seats: number) => {
+        setActionLoading(true)
+        const { data: { session } } = await supabase.auth.getSession()
+        try {
+            const res = await fetch('/api/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+                body: JSON.stringify({ action: 'update_team_seats', teamId, seats })
+            })
+            if (res.ok) {
+                alert('Posti aggiornati.')
+                fetchTeams(session!.access_token)
+            } else alert('Errore aggiornamento.')
+        } finally {
+            setActionLoading(false)
         }
     }
 
@@ -328,6 +377,14 @@ export default function AdminPage() {
                                                     <ShieldAlert className="w-4 h-4" />
                                                 </button>
                                                 <button
+                                                    onClick={() => handleResetDevices(order.user_id)}
+                                                    disabled={actionLoading}
+                                                    title="FORZA RESET DISPOSITIVI"
+                                                    className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors border border-transparent hover:border-indigo-200"
+                                                >
+                                                    <MonitorX className="w-4 h-4" />
+                                                </button>
+                                                <button
                                                     onClick={() => handleRevoke(order.user_id)}
                                                     disabled={actionLoading}
                                                     title="REVOCA LICENZA (Irreversibile)"
@@ -344,6 +401,76 @@ export default function AdminPage() {
                     </div>
                 </div>
             </div>
+
+            {/* TEAM LICENSES */}
+            <div className="grid grid-cols-1 mt-8">
+                <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                    <div className="p-6 border-b border-slate-100 pb-4 flex justify-between items-center">
+                        <h2 className="font-bold text-lg text-slate-800">Gestione Licenze Team</h2>
+                        <span className="bg-indigo-100 text-indigo-700 text-xs font-bold px-2 py-1 rounded-full">
+                            {teams.length} Team Attivi
+                        </span>
+                    </div>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-slate-50 text-slate-500 font-semibold">
+                                <tr>
+                                    <th className="p-4">Data Creazione</th>
+                                    <th className="p-4">Azienda (Proprietario)</th>
+                                    <th className="p-4 text-center">Posti Occupati / Max</th>
+                                    <th className="p-4">Azioni (Modifica Slot Max)</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {teams.map((team: any) => (
+                                    <tr key={team.id} className="hover:bg-slate-50/50 transition-colors">
+                                        <td className="p-4 text-gray-500 font-mono text-xs">{new Date(team.created_at).toLocaleDateString()}</td>
+                                        <td className="p-4 font-medium text-slate-900">
+                                            {team.company_name || 'Sconosciuta'}
+                                            <span className="block text-xs text-gray-500 font-normal mt-0.5">
+                                                {team.owner_email}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 text-center">
+                                            <span className={`px-2 py-1 rounded-full text-xs font-bold border ${team.active_members_count >= team.seats ? 'bg-red-50 text-red-700 border-red-200' : 'bg-slate-50 text-slate-700 border-slate-200'}`}>
+                                                {team.active_members_count} / {team.seats}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 flex items-center gap-3">
+                                            <div className="flex items-center">
+                                                <input 
+                                                    type="number" 
+                                                    defaultValue={team.seats} 
+                                                    min={1}
+                                                    id={`seats-${team.id}`}
+                                                    aria-label="Posti Totali"
+                                                    className="w-16 p-1.5 border border-slate-300 rounded-lg text-center font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none"
+                                                />
+                                            </div>
+                                            <button
+                                                disabled={actionLoading}
+                                                onClick={() => {
+                                                    const val = (document.getElementById(`seats-${team.id}`) as HTMLInputElement).value;
+                                                    handleUpdateSeats(team.id, parseInt(val, 10));
+                                                }}
+                                                className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors disabled:opacity-50"
+                                            >
+                                                Salva
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {teams.length === 0 && (
+                                    <tr>
+                                        <td colSpan={4} className="p-8 text-center text-gray-400">Nessun team trovato.</td>
+                                    </tr>
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </div>
     )
 }
