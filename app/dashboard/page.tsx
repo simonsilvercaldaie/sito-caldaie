@@ -250,7 +250,7 @@ export default function DashboardPage() {
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) throw new Error('Sessione non valida')
 
-            const response = await fetch('/api/devices/reset', {
+            const response = await fetch('/api/devices', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${session.access_token}`
