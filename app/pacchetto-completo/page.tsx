@@ -337,6 +337,7 @@ export default function PacchettoCompletoPage() {
                                                     amount={String(getTestPrice(BUNDLE_PRICE, user?.email))}
                                                     courseTitle="Pacchetto Completo (27 Video)"
                                                     onSuccess={handlePurchaseSuccess}
+                                                    productCode="complete_bundle"
                                                 />
                                             ) : (
                                                 <button disabled className="w-full py-4 bg-gray-200 text-gray-400 font-bold rounded-xl cursor-not-allowed">

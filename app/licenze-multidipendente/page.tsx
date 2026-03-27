@@ -197,6 +197,7 @@ export default function TeamLicensePage() {
                             amount={String(getTestPrice(amount, user?.email))}
                             courseTitle={`Licenza ${title}`}
                             onSuccess={(id) => handlePurchaseSuccess(id, { product_code: code, amount_cents: getTestPrice(amount, user?.email) * 100 })}
+                            productCode={code}
                         />
                     ) : (
                         <button disabled className="w-full py-4 bg-slate-100 text-slate-400 font-bold rounded-xl cursor-not-allowed">

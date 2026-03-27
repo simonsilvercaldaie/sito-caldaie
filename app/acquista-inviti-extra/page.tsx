@@ -256,6 +256,7 @@ export default function AcquistaInvitiExtraPage() {
                                                 amount={String(getTestPrice(EXTRA_PRICE, user?.email))}
                                                 courseTitle="Acquisto 1 Invito Extra"
                                                 onSuccess={handlePurchaseSuccess}
+                                                productCode="extra_invito_1"
                                             />
                                         ) : (
                                             <button disabled className="w-full py-4 bg-gray-200 text-gray-400 font-bold rounded-xl cursor-not-allowed">

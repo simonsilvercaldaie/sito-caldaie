@@ -416,6 +416,7 @@ function UpgradeCard({ title, users, price, enabled, onSuccess, highlight = fals
                         amount={String(price)}
                         courseTitle={`Upgrade a ${title}`}
                         onSuccess={onSuccess}
+                        productCode={`upgrade_to_multi_${users}`}
                     />
                 ) : (
                     <button disabled className="w-full py-3 bg-gray-100 text-gray-400 font-bold rounded-xl cursor-not-allowed">

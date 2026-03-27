@@ -968,6 +968,7 @@ export default function CorsoPage() {
                                                             amount={String(getTestPrice(pricingInfo.amountToPay, user?.email))}
                                                             courseTitle={`Pacchetto ${course.level} (9 Video)`}
                                                             onSuccess={(id) => handlePurchaseSuccess(id, { plan_type: 'individual' })}
+                                                            productCode={({'Base': 'base', 'Intermedio': 'intermediate', 'Avanzato': 'advanced', 'Laboratorio': 'advanced'} as Record<string, string>)[course.level] || 'base'}
                                                         />
                                                     ) : (
                                                         !user ? (

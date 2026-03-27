@@ -7,9 +7,10 @@ interface PayPalBtnProps {
     courseTitle: string;
     onSuccess: (orderId: string) => void;
     showDisclaimer?: boolean;   // New prop
+    productCode?: string;       // For webhook: embedded as custom_id in PayPal order
 }
 
-export function PayPalBtn({ amount, courseTitle, onSuccess, showDisclaimer = true }: PayPalBtnProps) {
+export function PayPalBtn({ amount, courseTitle, onSuccess, showDisclaimer = true, productCode }: PayPalBtnProps) {
 
     // DEBUG: Verifica stato variabile
     console.log('[PayPalBtn] UI_PAYMENTS_ENABLED:', UI_PAYMENTS_ENABLED);
@@ -48,6 +49,7 @@ export function PayPalBtn({ amount, courseTitle, onSuccess, showDisclaimer = tru
                                         value: amount,
                                         currency_code: "EUR"
                                     },
+                                    custom_id: productCode || undefined,
                                 },
                             ],
                         });
