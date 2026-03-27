@@ -26,6 +26,10 @@ export default function Navbar() {
     }, [])
 
     const handleLogout = async () => {
+        // Clear device session token to avoid phantom slot occupation for next login
+        if (typeof window !== 'undefined') {
+            localStorage.removeItem('ssc_session_token')
+        }
         await supabase.auth.signOut()
         setUser(null)
         router.refresh() // Ricarica la pagina corrente per aggiornare stati server-side se ce ne sono

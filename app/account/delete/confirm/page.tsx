@@ -32,6 +32,9 @@ function ConfirmDeleteContent() {
             }
 
             // Clear the local session now that the backend account is deleted
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('ssc_session_token')
+            }
             await supabase.auth.signOut()
 
             setStatus('success')
