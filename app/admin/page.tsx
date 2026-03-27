@@ -294,6 +294,7 @@ export default function AdminPage() {
                     </div>
 
                     <GrantAccessForm />
+                    <ResetDevicesForm />
 
                     {/* SECURITY LOGS (Moved here to balance layout) */}
                     <div className="bg-white rounded-xl shadow-sm border border-slate-200 h-fit">
@@ -569,3 +570,74 @@ function GrantAccessForm() {
         </div>
     )
 }
+
+function ResetDevicesForm() {
+    const [email, setEmail] = useState('')
+    const [loading, setLoading] = useState(false)
+
+    const handleReset = async (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!email) return
+
+        if (!confirm(`Vuoi davvero forzare il reset dei dispositivi per ${email}?`)) return
+
+        setLoading(true)
+        const { data: { session } } = await supabase.auth.getSession()
+
+        try {
+            const res = await fetch('/api/admin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session?.access_token}`
+                },
+                body: JSON.stringify({ action: 'reset_devices_by_email', email })
+            })
+
+            const data = await res.json()
+            if (res.ok) {
+                alert('Successo! Dispositivi resettati per ' + email)
+                setEmail('')
+            } else {
+                alert('Errore: ' + data.error)
+            }
+        } catch (err) {
+            console.error(err)
+            alert('Errore di rete')
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    return (
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 mb-6 h-fit">
+            <h2 className="font-bold text-lg text-slate-800 mb-4 flex items-center gap-2">
+                <MonitorX className="w-5 h-5 text-indigo-600" />
+                Forza Reset Dispositivi
+            </h2>
+            <form onSubmit={handleReset} className="space-y-4">
+                <div>
+                    <label htmlFor="reset-email" className="block text-xs font-bold text-slate-500 uppercase mb-1">Email Utente</label>
+                    <input
+                        id="reset-email"
+                        type="email"
+                        required
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        placeholder="utente@esempio.com"
+                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                    />
+                    <p className="text-xs text-slate-400 mt-1">Svuota le sessioni di questo account.</p>
+                </div>
+                <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-colors flex justify-center items-center gap-2"
+                >
+                    {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Effettua Reset'}
+                </button>
+            </form>
+        </div>
+    )
+}
+

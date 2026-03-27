@@ -63,6 +63,9 @@ export async function POST(request: NextRequest) {
         if (action === 'reset_devices') {
             return await resetUserDevices(body.userId)
         }
+        if (action === 'reset_devices_by_email') {
+            return await resetDevicesByEmail(body.email)
+        }
         if (action === 'get_teams') {
             return await getTeams()
         }
@@ -272,6 +275,20 @@ async function getLiveUsers() {
 
     // console.log(`[Admin] Live Users Count: ${count}`) // Optional debug
     return NextResponse.json({ count: count || 0 })
+}
+
+async function resetDevicesByEmail(email: string) {
+    if (!email) return NextResponse.json({ error: 'Missing email' }, { status: 400 })
+
+    // Find User
+    const { data: { users: allUsers } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 10000 })
+    const targetUser = allUsers.find((u: any) => u.email?.toLowerCase() === email.toLowerCase())
+
+    if (!targetUser) {
+        return NextResponse.json({ error: 'Utente non trovato.' }, { status: 404 })
+    }
+
+    return await resetUserDevices(targetUser.id)
 }
 
 async function resetUserDevices(userId: string) {
