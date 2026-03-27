@@ -46,7 +46,7 @@ export default function Navbar() {
                         className="object-contain"
                     />
                 </div>
-                <span className="hidden sm:inline text-xl md:text-2xl font-bold text-primary tracking-tight">
+                <span className="text-base sm:text-xl md:text-2xl font-bold text-primary tracking-tight">
                     Simon Silver <span className="text-accent">Caldaie</span>
                 </span>
             </Link>
@@ -64,7 +64,7 @@ export default function Navbar() {
                             title="Il Mio Account"
                         >
                             <LayoutDashboard className="w-4 h-4 flex-shrink-0" />
-                            <span className="hidden sm:inline">Account</span>
+                            <span>Account</span>
                         </Link>
                         <button
                             onClick={handleLogout}
@@ -72,7 +72,7 @@ export default function Navbar() {
                             title="Esci"
                         >
                             <LogOut className="w-4 h-4" />
-                            <span className="hidden md:inline">Esci</span>
+                            <span>Esci</span>
                         </button>
                     </>
                 ) : (
