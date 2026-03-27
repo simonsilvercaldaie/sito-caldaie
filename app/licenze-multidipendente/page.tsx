@@ -296,9 +296,18 @@ export default function TeamLicensePage() {
                         <div className="max-w-xl mx-auto mb-12 bg-amber-50 p-8 rounded-2xl border border-amber-200 text-center">
                             <Users className="w-16 h-16 text-amber-500 mx-auto mb-4" />
                             <h2 className="text-2xl font-bold text-gray-900 mb-2">Completa prima tutti i livelli</h2>
-                            <p className="text-gray-600 mb-6">Per passare a una licenza Multidipendente devi prima acquistare tutti e 3 i livelli singoli (Base, Intermedio, Avanzato). Dopo potrai fare l'upgrade.</p>
+                            <p className="text-gray-600 mb-6">Per passare a una licenza Multidipendente devi prima acquistare tutti e 3 i livelli singoli (Base, Intermedio, Avanzato). Dopo potrai fare l&apos;upgrade.</p>
                             <Link href="/catalogo" className="inline-flex items-center gap-2 bg-amber-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-amber-700 transition-all">
                                 Vai al Catalogo <ArrowRight className="w-5 h-5" />
+                            </Link>
+                        </div>
+                    ) : eligibility === 'eligible_multi_only' ? (
+                        <div className="max-w-xl mx-auto mb-12 bg-green-50 p-8 rounded-2xl border border-green-200 text-center">
+                            <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
+                            <h2 className="text-2xl font-bold text-gray-900 mb-2">Hai tutti e 3 i livelli!</h2>
+                            <p className="text-gray-600 mb-6">Puoi fare l&apos;upgrade a una licenza Multidipendente direttamente dal tuo Account.</p>
+                            <Link href="/dashboard/upgrade" className="inline-flex items-center gap-2 bg-green-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-green-700 transition-all">
+                                Vai al tuo Account per l&apos;Upgrade <ArrowRight className="w-5 h-5" />
                             </Link>
                         </div>
                     ) : (
@@ -354,7 +363,6 @@ export default function TeamLicensePage() {
                             code="scuola_10"
                             amount={5000}
                             highlighted={true}
-                            disabled={eligibility === 'eligible_multi_only'}
                             icon={<GraduationCap className="w-4 h-4" />}
                             features={[
                                 '<strong>Proiezione in aula</strong> autorizzata',
