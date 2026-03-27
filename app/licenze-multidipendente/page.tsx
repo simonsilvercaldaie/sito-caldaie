@@ -137,7 +137,7 @@ export default function TeamLicensePage() {
         }
     }
 
-    const TeamCard = ({ title, bigNumber, users, badgeText, price, code, amount, icon, features, highlighted = false }: { title: string, bigNumber: string, users: number, badgeText?: string, price: string, code: string, amount: number, icon?: any, features?: string[], highlighted?: boolean }) => (
+    const TeamCard = ({ title, bigNumber, users, badgeText, code, amount, icon, features, highlighted = false }: { title: string, bigNumber: string, users: number, badgeText?: string, code: string, amount: number, icon?: any, features?: string[], highlighted?: boolean }) => (
         <div className={`rounded-3xl p-8 shadow-xl transition-all duration-300 flex flex-col ${highlighted ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 hover:border-amber-400' : 'bg-white border-2 border-indigo-100 hover:border-indigo-300'}`}>
             <div className="mb-6 flex flex-col items-center text-center">
                 <h3 className={`text-xl font-bold mb-1 ${highlighted ? 'text-amber-900' : 'text-indigo-900'}`}>{title}</h3>
@@ -151,7 +151,7 @@ export default function TeamLicensePage() {
             </div>
 
             <div className="mb-8">
-                <div className="text-4xl font-extrabold text-slate-800">€ {price}</div>
+                <div className="text-4xl font-extrabold text-slate-800">€ {getTestPrice(amount, user?.email).toLocaleString('it-IT')}</div>
                 <div className="text-sm text-slate-500 mt-1">Pagamento unico · Accesso a vita</div>
             </div>
 
@@ -263,7 +263,6 @@ export default function TeamLicensePage() {
                             title="Multidipendente"
                             bigNumber="5"
                             users={5}
-                            price="3.000"
                             code="multi_5"
                             amount={3000}
                         />
@@ -271,7 +270,6 @@ export default function TeamLicensePage() {
                             title="Multidipendente"
                             bigNumber="10"
                             users={10}
-                            price="4.000"
                             code="multi_10"
                             amount={4000}
                         />
@@ -279,7 +277,6 @@ export default function TeamLicensePage() {
                             title="Multidipendente"
                             bigNumber="25"
                             users={25}
-                            price="5.000"
                             code="multi_25"
                             amount={5000}
                         />
@@ -288,7 +285,6 @@ export default function TeamLicensePage() {
                             bigNumber="Scuola"
                             users={10} 
                             badgeText="Allievi Illimitati"
-                            price="5.000"
                             code="scuola_10"
                             amount={5000}
                             highlighted={true}
