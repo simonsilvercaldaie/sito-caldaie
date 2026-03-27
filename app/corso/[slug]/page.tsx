@@ -52,7 +52,7 @@ export default function CorsoPage() {
     const [profileCompleted, setProfileCompleted] = useState(false)
 
     const [viewMode, setViewMode] = useState<'individual' | 'team' | null>(null)
-    const [teamAccess, setTeamAccess] = useState(false)
+    const [teamAccess, setTeamAccess] = useState<'none' | 'multi' | 'scuola'>('none')
     const [secureVideoUrl, setSecureVideoUrl] = useState<string>("")
     const youtubeRef = useRef<HTMLIFrameElement>(null)
     const bunnyRef = useRef<HTMLIFrameElement>(null)
@@ -145,6 +145,7 @@ export default function CorsoPage() {
                     .select(`
                         team_license_id,
                         team_licenses (
+                            id,
                             status,
                             valid_until
                         )
@@ -159,7 +160,16 @@ export default function CorsoPage() {
                     const validUntil = new Date(lic.valid_until)
 
                     if (lic.status === 'active' && (!lic.valid_until || validUntil > now)) {
-                        setTeamAccess(true)
+                        // Determine if scuola or multi by checking the original purchase
+                        const { data: licPurchase } = await supabase
+                            .from('purchases')
+                            .select('product_code')
+                            .eq('team_license_id', lic.id)
+                            .not('product_code', 'like', 'extra_invito_%')
+                            .limit(1)
+                            .maybeSingle()
+                        const isScuola = licPurchase?.product_code?.startsWith('scuola_')
+                        setTeamAccess(isScuola ? 'scuola' : 'multi')
                         hasAccess = true
                     }
                 }
@@ -682,10 +692,10 @@ export default function CorsoPage() {
                                                 <CheckCircle2 className="w-10 h-10" />
                                             </div>
                                             <h3 className="font-bold text-xl text-green-900 mb-2">
-                                                {teamAccess ? 'Accesso Team Attivo' : 'Accesso Attivo'}
+                                                {teamAccess === 'scuola' ? 'Accesso Formatore Attivo' : teamAccess === 'multi' ? 'Accesso Team Attivo' : 'Accesso Attivo'}
                                             </h3>
                                             <p className="text-gray-600">
-                                                {teamAccess
+                                                {teamAccess !== 'none'
                                                     ? 'Hai accesso completo a tutti i livelli.'
                                                     : 'Hai già accesso a questo livello.'}
                                             </p>
@@ -824,7 +834,7 @@ export default function CorsoPage() {
                                             <div className="space-y-4">
                                                 <div className="bg-green-50 text-green-800 p-4 rounded-xl text-center">
                                                     <CheckCircle2 className="w-8 h-8 mx-auto mb-2" />
-                                                    <p className="font-bold">{teamAccess ? 'Accesso Team Attivo!' : 'Pacchetto Attivo!'}</p>
+                                                    <p className="font-bold">{teamAccess === 'scuola' ? 'Accesso Formatore Attivo!' : teamAccess === 'multi' ? 'Accesso Team Attivo!' : 'Pacchetto Attivo!'}</p>
                                                 </div>
                                                 <Link
                                                     href="/dashboard"
