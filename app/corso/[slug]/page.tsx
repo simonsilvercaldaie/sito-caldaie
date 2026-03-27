@@ -61,6 +61,17 @@ export default function CorsoPage() {
     const [activePlayer, setActivePlayer] = useState<'none' | 'youtube' | 'bunny'>('none')
     const savedYouTubeSrc = useRef<string>('')
 
+    // Device Authorization State
+    const [deviceConfirmed, setDeviceConfirmed] = useState(false)
+
+    // Check if device is already known on mount
+    useEffect(() => {
+        const { getSessionToken } = require('@/lib/deviceFingerprint')
+        if (getSessionToken()) {
+            setDeviceConfirmed(true)
+        }
+    }, [])
+
     const activateYouTube = () => {
         if (activePlayer === 'youtube') return
         // Restore YouTube src if it was blanked
@@ -100,10 +111,31 @@ export default function CorsoPage() {
         }
     })
 
-    // Session Guard — activates when user has purchased access
+    // Session Guard — activates when user has purchased access AND confirmed the device
     const { status: sessionStatus, errorMessage: sessionError } = useSessionGuard({
-        enabled: hasPurchased && !loading
+        enabled: hasPurchased && !loading && deviceConfirmed
     })
+
+    // Fetch Bunny Secure Token only when session becomes active
+    useEffect(() => {
+        const fetchBunnyToken = async () => {
+            if (sessionStatus === 'active' && hasPurchased && course?.bunnyVideoId) {
+                try {
+                    const { data: { session } } = await supabase.auth.getSession()
+                    const tokenRes = await fetch(`/api/bunny-token?videoId=${course.bunnyVideoId}`, {
+                        headers: { 'Authorization': `Bearer ${session?.access_token}` }
+                    })
+                    const tokenData = await tokenRes.json()
+                    if (tokenData.embedUrl) {
+                        setSecureVideoUrl(tokenData.embedUrl)
+                    }
+                } catch (e) {
+                    console.error('Error fetching secure video URL', e)
+                }
+            }
+        }
+        fetchBunnyToken()
+    }, [sessionStatus, hasPurchased, course?.bunnyVideoId])
 
     useEffect(() => {
         const checkUser = async () => {
@@ -225,21 +257,6 @@ export default function CorsoPage() {
                 setPurchasedCourses(userCourseIds)
                 setHasPurchased(hasAccess)
                 setActiveOrderId(orderLimitId)
-
-                // 3. Fetch Bunny Secure Token if access granted
-                if (hasAccess && course?.bunnyVideoId) {
-                    try {
-                        const tokenRes = await fetch(`/api/bunny-token?videoId=${course.bunnyVideoId}`, {
-                            headers: { 'Authorization': `Bearer ${session?.access_token}` }
-                        })
-                        const tokenData = await tokenRes.json()
-                        if (tokenData.embedUrl) {
-                            setSecureVideoUrl(tokenData.embedUrl)
-                        }
-                    } catch (e) {
-                        console.error('Error fetching secure video URL', e)
-                    }
-                }
             }
 
             const elapsed = Date.now() - loadStartTime
@@ -579,6 +596,35 @@ export default function CorsoPage() {
                                                         </Link>
                                                     )}
                                                 </div>
+                                            </div>
+                                        ) : !deviceConfirmed ? (
+                                            <div className="aspect-video bg-gradient-to-br from-slate-900 to-indigo-950 relative flex items-center justify-center p-6 text-center">
+                                                <div className="max-w-md w-full bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 shadow-2xl">
+                                                    <div className="bg-indigo-500/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6">
+                                                        <ShieldCheck className="w-8 h-8 text-indigo-300" />
+                                                    </div>
+                                                    <h3 className="text-2xl font-bold text-white mb-2">Autorizza Dispositivo</h3>
+                                                    <p className="text-indigo-200 text-sm mb-6">
+                                                        Stai per accedere a un contenuto Premium. Questo dispositivo <strong>occuperà 1 dei 2 slot</strong> disponibili nella tua licenza.
+                                                    </p>
+                                                    
+                                                    <button
+                                                        onClick={() => setDeviceConfirmed(true)}
+                                                        className="w-full py-4 bg-primary text-white font-bold text-lg rounded-xl hover:bg-primary/90 transition-all shadow-lg hover:shadow-primary/30 flex items-center justify-center gap-2"
+                                                    >
+                                                        <Lock className="w-5 h-5" />
+                                                        Autorizza e Guarda Ora
+                                                    </button>
+                                                    
+                                                    <p className="text-xs text-slate-400 mt-4">
+                                                        Se raggiungi il limite, potrai resettare i dispositivi dal tuo Account (1 volta ogni 30 giorni).
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        ) : sessionStatus === 'connecting' ? (
+                                            <div className="aspect-video bg-slate-900 relative flex flex-col items-center justify-center">
+                                                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-4"></div>
+                                                <p className="text-slate-300 animate-pulse">Verifica licenza in corso...</p>
                                             </div>
                                         ) : secureVideoUrl || course.premiumVideoUrl ? (
                                             <div className="relative" onClick={activateBunny}>
