@@ -104,7 +104,7 @@ export default function AcquistaInvitiExtraPage() {
             return
         }
 
-        const product_code = 'extra_inviti_5'
+        const product_code = 'extra_invito_1'
         const amount_cents = getTestPrice(EXTRA_PRICE, user?.email) * 100
 
         try {
@@ -160,10 +160,10 @@ export default function AcquistaInvitiExtraPage() {
                             ESPANSIONE LICENZA
                         </div>
                         <h1 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">
-                            Pacchetto <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">Inviti Extra</span>
+                            Acquista <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">1 Invito Extra</span>
                         </h1>
                         <p className="text-lg text-gray-600 max-w-xl mx-auto">
-                            Aggiungi <strong>5 nuovi posti</strong> e <strong>10 inviti</strong> alla tua licenza aziendale esistente.
+                            Aggiungi il diritto di formare <strong>1 nuova singola persona</strong> alla tua licenza aziendale esistente.
                         </p>
                     </div>
 
@@ -176,8 +176,8 @@ export default function AcquistaInvitiExtraPage() {
                                 <div className="p-4 bg-green-100 text-green-600 rounded-full inline-block mb-4">
                                     <CheckCircle2 className="w-16 h-16" />
                                 </div>
-                                <h2 className="text-2xl font-bold text-gray-900 mb-2">Inviti aggiunti con successo!</h2>
-                                <p className="text-gray-600 mb-6">I nuovi inviti sono già disponibili nella tua dashboard.</p>
+                                <h2 className="text-2xl font-bold text-gray-900 mb-2">Invito aggiunto con successo!</h2>
+                                <p className="text-gray-600 mb-6">Il nuovo invito è già disponibile nella tua dashboard.</p>
                                 <p className="text-sm text-gray-400">Reindirizzamento alla dashboard...</p>
                             </div>
                         ) : !hasTeamLicense ? (
@@ -199,15 +199,15 @@ export default function AcquistaInvitiExtraPage() {
                                     <ul className="space-y-3">
                                         <li className="flex items-center gap-3 text-indigo-800">
                                             <CheckCircle2 className="w-5 h-5 text-indigo-500 flex-shrink-0" />
-                                            <span><strong>+5 posti</strong> per nuovi collaboratori</span>
+                                            <span><strong>+1 invito</strong> da usare per un nuovo collaboratore</span>
                                         </li>
                                         <li className="flex items-center gap-3 text-indigo-800">
                                             <CheckCircle2 className="w-5 h-5 text-indigo-500 flex-shrink-0" />
-                                            <span><strong>+10 inviti</strong> aggiuntivi alla tua licenza</span>
+                                            <span>I posti contemporanei attivi non cambiano</span>
                                         </li>
                                         <li className="flex items-center gap-3 text-indigo-800">
                                             <CheckCircle2 className="w-5 h-5 text-indigo-500 flex-shrink-0" />
-                                            <span>Si sommano alla licenza esistente</span>
+                                            <span>L'invito si somma permanentemente a quelli della tua licenza</span>
                                         </li>
                                     </ul>
                                 </div>
@@ -254,7 +254,7 @@ export default function AcquistaInvitiExtraPage() {
                                         {tosAccepted ? (
                                             <PayPalBtn
                                                 amount={String(getTestPrice(EXTRA_PRICE, user?.email))}
-                                                courseTitle="Pacchetto Inviti Extra (5 posti + 10 inviti)"
+                                                courseTitle="Acquisto 1 Invito Extra"
                                                 onSuccess={handlePurchaseSuccess}
                                             />
                                         ) : (

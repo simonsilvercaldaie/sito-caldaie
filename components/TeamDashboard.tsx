@@ -219,13 +219,13 @@ export default function TeamDashboard({ initialData }: { initialData?: any }) {
                                 {team.invitesRemaining <= 0 ? (
                                     <div className="p-4 bg-amber-50 text-amber-900 rounded-xl border border-amber-200 text-center">
                                         <p className="mb-4 text-sm font-medium">
-                                            Hai esaurito gli inviti a tua disposizione. Per continuare ad invitare collaboratori devi acquistare un nuovo pacchetto inviti.
+                                            Hai esaurito gli inviti a tua disposizione. Per continuare ad invitare collaboratori devi acquistare un nuovo invito.
                                         </p>
                                         <a 
                                             href="/acquista-inviti-extra" 
                                             className="inline-block w-full py-2.5 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition shadow-lg shadow-amber-200"
                                         >
-                                            Acquista Nuovi Inviti — €400
+                                            Acquista 1 Nuovo Invito — €400
                                         </a>
                                     </div>
                                 ) : team.seatsUsed >= team.seats ? (

@@ -262,9 +262,8 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ ok: false, error: 'no_team_license_found' }, { status: 400 })
             }
 
-            // Aggiungi inviti: extra_inviti_5 → +10 inviti (5 × 2)
-            const extraSlots = parseInt(product_code.split('_')[2]) || 5
-            const extraInvites = extraSlots * 2
+            // Aggiungi inviti: extra_invito_1 → +1 invito totale
+            const extraInvites = parseInt(product_code.split('_')[2]) || 1
             const newMaxInvites = (existingLicense.max_invites_total || 0) + extraInvites
 
             await supabaseAdmin
