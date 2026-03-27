@@ -41,21 +41,23 @@ export async function GET(request: NextRequest) {
         const teamsStats = []
 
         for (const lic of licenses) {
-            // Count Members
+            // Count Members (exclude admin/owner)
             const { count: memberCount, error: memErr } = await supabase
                 .from('team_members')
                 .select('*', { count: 'exact', head: true })
                 .eq('team_license_id', lic.id)
                 .is('removed_at', null)
+                .neq('user_id', user.id)
 
             if (memErr) throw memErr
 
-            // Fetch Recent Members (for list)
+            // Fetch Recent Members for list (exclude admin/owner)
             const { data: members, error: memListErr } = await supabase
                 .from('team_members')
                 .select('id, user_id, added_at')
                 .eq('team_license_id', lic.id)
                 .is('removed_at', null)
+                .neq('user_id', user.id)
                 .order('added_at', { ascending: false })
 
             if (memListErr) console.error("Error fetching members", memListErr)
