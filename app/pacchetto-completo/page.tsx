@@ -16,7 +16,7 @@ export default function PacchettoCompletoPage() {
     const [loading, setLoading] = useState(true)
     const [tosAccepted, setTosAccepted] = useState(false)
     const [tosLoading, setTosLoading] = useState(false)
-    const [hasPurchased, setHasPurchased] = useState(false)
+    const [bundleBlockReason, setBundleBlockReason] = useState<'none' | 'full_access' | 'has_single' | 'has_team'>('none')
     const [profileCompleted, setProfileCompleted] = useState(false)
 
     useEffect(() => {
@@ -42,14 +42,22 @@ export default function PacchettoCompletoPage() {
                 if (purchases) {
                     const codes = purchases.map(p => p.product_code?.toLowerCase())
                     const hasComplete = codes.some(c => c?.includes('complete'))
+                    const hasAllThree =
+                        codes.some(c => c === 'base') &&
+                        codes.some(c => c === 'intermediate') &&
+                        codes.some(c => c === 'advanced')
                     const hasAnySingle =
                         codes.some(c => c === 'base') ||
                         codes.some(c => c === 'intermediate') ||
                         codes.some(c => c === 'advanced')
                     const hasMulti = codes.some(c => c?.startsWith('multi_') || c?.startsWith('scuola_'))
 
-                    if (hasComplete || hasAnySingle || hasMulti) {
-                        setHasPurchased(true)
+                    if (hasComplete || hasAllThree) {
+                        setBundleBlockReason('full_access')
+                    } else if (hasMulti) {
+                        setBundleBlockReason('has_team')
+                    } else if (hasAnySingle) {
+                        setBundleBlockReason('has_single')
                     }
                 }
 
@@ -62,7 +70,7 @@ export default function PacchettoCompletoPage() {
                     .maybeSingle()
 
                 if (teamMember) {
-                    setHasPurchased(true)
+                    setBundleBlockReason('has_team')
                 }
             }
             setLoading(false)
@@ -245,19 +253,51 @@ export default function PacchettoCompletoPage() {
                         {/* Decorative background blob */}
                         <div className="absolute top-0 right-0 w-64 h-64 bg-amber-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 opacity-50 pointer-events-none"></div>
 
-                        {hasPurchased ? (
+                        {bundleBlockReason !== 'none' ? (
                             <div className="text-center py-8 relative z-10">
-                                <div className="p-4 bg-green-100 text-green-600 rounded-full inline-block mb-4">
-                                    <CheckCircle2 className="w-16 h-16" />
-                                </div>
-                                <h2 className="text-3xl font-bold text-gray-900 mb-2">Hai già accesso completo!</h2>
-                                <p className="text-gray-600 mb-8 text-lg">Tutti i 27 corsi sono già sbloccati nel tuo account.</p>
-                                <Link
-                                    href="/catalogo"
-                                    className="inline-flex items-center gap-2 bg-green-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-green-700 transition-all hover:shadow-lg hover:-translate-y-0.5"
-                                >
-                                    Vai ai Corsi <ArrowRight className="w-5 h-5" />
-                                </Link>
+                                {bundleBlockReason === 'full_access' ? (
+                                    <>
+                                        <div className="p-4 bg-green-100 text-green-600 rounded-full inline-block mb-4">
+                                            <CheckCircle2 className="w-16 h-16" />
+                                        </div>
+                                        <h2 className="text-3xl font-bold text-gray-900 mb-2">Hai già accesso completo!</h2>
+                                        <p className="text-gray-600 mb-8 text-lg">Tutti i 27 corsi sono già sbloccati nel tuo account.</p>
+                                        <Link
+                                            href="/catalogo"
+                                            className="inline-flex items-center gap-2 bg-green-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-green-700 transition-all hover:shadow-lg hover:-translate-y-0.5"
+                                        >
+                                            Vai ai Corsi <ArrowRight className="w-5 h-5" />
+                                        </Link>
+                                    </>
+                                ) : bundleBlockReason === 'has_team' ? (
+                                    <>
+                                        <div className="p-4 bg-blue-100 text-blue-600 rounded-full inline-block mb-4">
+                                            <CheckCircle2 className="w-16 h-16" />
+                                        </div>
+                                        <h2 className="text-3xl font-bold text-gray-900 mb-2">Hai già una licenza multi-accesso</h2>
+                                        <p className="text-gray-600 mb-8 text-lg">La tua licenza team include già tutti i corsi.</p>
+                                        <Link
+                                            href="/catalogo"
+                                            className="inline-flex items-center gap-2 bg-blue-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-blue-700 transition-all hover:shadow-lg hover:-translate-y-0.5"
+                                        >
+                                            Vai ai Corsi <ArrowRight className="w-5 h-5" />
+                                        </Link>
+                                    </>
+                                ) : (
+                                    <>
+                                        <div className="p-4 bg-amber-100 text-amber-600 rounded-full inline-block mb-4">
+                                            <Package className="w-16 h-16" />
+                                        </div>
+                                        <h2 className="text-3xl font-bold text-gray-900 mb-2">Hai già acquistato dei livelli singoli</h2>
+                                        <p className="text-gray-600 mb-8 text-lg">Il pacchetto completo è disponibile solo per chi non ha ancora acquistato livelli singoli. Puoi completare i livelli mancanti dal catalogo.</p>
+                                        <Link
+                                            href="/catalogo"
+                                            className="inline-flex items-center gap-2 bg-amber-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-amber-700 transition-all hover:shadow-lg hover:-translate-y-0.5"
+                                        >
+                                            Vai al Catalogo <ArrowRight className="w-5 h-5" />
+                                        </Link>
+                                    </>
+                                )}
                             </div>
                         ) : (
                             <div className="grid md:grid-cols-2 gap-12 relative z-10">
