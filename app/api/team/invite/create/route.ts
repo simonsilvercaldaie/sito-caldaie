@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Hai esaurito gli inviti a tua disposizione. Acquista un nuovo pacchetto.' }, { status: 409 })
         }
 
-        // Check active members (excluding the owner/admin)
+        // Count active members (excluding the owner/admin)
         const { count: memberCount } = await supabase
             .from('team_members')
             .select('*', { count: 'exact', head: true })
@@ -54,10 +54,18 @@ export async function POST(request: NextRequest) {
             .is('removed_at', null)
             .neq('user_id', user.id)
 
-        // Count pending invites too to prevent overbooking? 
-        // Better yet, just limit to employeeSlots. 
-        if ((memberCount || 0) >= employeeSlots) {
-            return NextResponse.json({ error: 'Tutti i posti attivi sono occupati. Libera un posto prima di invitare.' }, { status: 400 })
+        // Count pending active invites
+        const { count: pendingCount } = await supabase
+            .from('team_invitations')
+            .select('*', { count: 'exact', head: true })
+            .eq('team_license_id', teamLicenseId)
+            .eq('status', 'pending')
+            .gt('expires_at', new Date().toISOString())
+
+        const totalOccupied = (memberCount || 0) + (pendingCount || 0)
+
+        if (totalOccupied >= employeeSlots) {
+            return NextResponse.json({ error: 'Hai raggiunto il limite di postazioni. I posti attivi sommati agli inviti In Attesa superano la capienza della tua licenza. Revoca un invito o rimuovi un membro per poterne inviare di nuovi.' }, { status: 400 })
         }
 
         // 2. Generate Token
