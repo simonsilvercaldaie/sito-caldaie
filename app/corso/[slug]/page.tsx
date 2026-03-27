@@ -64,11 +64,38 @@ export default function CorsoPage() {
     // Device Authorization State
     const [deviceConfirmed, setDeviceConfirmed] = useState(false)
 
-    // Check if device is already known on mount
+    // Check if device is already known on mount AND VALIDATE IT
     useEffect(() => {
-        const { getSessionToken } = require('@/lib/deviceFingerprint')
-        if (getSessionToken()) {
-            setDeviceConfirmed(true)
+        const { getSessionToken, clearSessionToken } = require('@/lib/deviceFingerprint')
+        const token = getSessionToken()
+        if (token) {
+            // Validate the existing token gracefully
+            supabase.auth.getSession().then(({ data }) => {
+                if (data.session) {
+                    fetch('/api/session', {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${data.session.access_token}`
+                        },
+                        body: JSON.stringify({ sessionToken: token })
+                    }).then(res => {
+                        if (res.ok) {
+                            res.json().then(json => {
+                                if (json.valid) {
+                                    setDeviceConfirmed(true)
+                                } else {
+                                    clearSessionToken()
+                                }
+                            })
+                        } else {
+                            clearSessionToken()
+                        }
+                    }).catch(() => {
+                        // Network error: don't auto-confirm, force user to click
+                    })
+                }
+            })
         }
     }, [])
 
