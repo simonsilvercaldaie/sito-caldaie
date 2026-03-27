@@ -372,6 +372,8 @@ export async function POST(request: NextRequest) {
 
         if (isTeam || isExtraInvites) {
             emailType = 'ACQUISTO_TEAM'
+        } else if (product_code === 'complete' || product_code === 'complete_bundle') {
+            emailType = 'ACQUISTO_BASE' // Complete purchases get base welcome email
         } else if (product_code.includes('base')) {
             emailType = 'ACQUISTO_BASE'
         } else if (product_code.includes('intermedio')) {

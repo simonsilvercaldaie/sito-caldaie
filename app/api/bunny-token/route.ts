@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
 import { checkVideoAccessByBunnyId } from '@/lib/accessControl'
+import { checkRateLimit } from '@/lib/rateLimit'
 
 function getSupabaseAdmin() {
     return createClient(
@@ -34,6 +35,12 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Utente non autorizzato' }, { status: 401 })
         }
 
+        // Rate Limit: 60 token requests per hour per user
+        const limitRes = await checkRateLimit(`bunny_${user.id}`, 60, 3600, true)
+        if (!limitRes.success) {
+            return NextResponse.json({ error: 'Troppe richieste. Riprova più tardi.' }, { status: 429 })
+        }
+
         // 2. ACCESS CHECK — Verify user has purchased this content
         const accessResult = await checkVideoAccessByBunnyId(user.id, videoId)
 
@@ -52,7 +59,7 @@ export async function GET(request: NextRequest) {
         }
 
         // 4. Generate Token Authentication
-        const expires = Math.floor(Date.now() / 1000) + (6 * 60 * 60)
+        const expires = Math.floor(Date.now() / 1000) + (2 * 60 * 60) // 2 hours
         const hashString = `${securityKey}${videoId}${expires}`
         const hash = crypto.createHash('sha256').update(hashString).digest('hex')
 

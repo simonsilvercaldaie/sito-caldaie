@@ -193,19 +193,39 @@ export async function POST(request: NextRequest) {
     }
 
     // 5. Find the buyer by payer email
-    // PayPal payer email should match the Supabase user email
-    const { data: userData, error: userErr } = await supabaseAdmin.auth.admin.listUsers()
-    if (userErr) {
-        console.error('[webhook-paypal] Failed to list users:', userErr)
+    // Search profiles table (scalable — works with any number of users)
+    const { data: profileData, error: profileErr } = await supabaseAdmin
+        .from('profiles')
+        .select('id, email')
+        .eq('email', payerEmail)
+        .maybeSingle()
+
+    if (profileErr) {
+        console.error('[webhook-paypal] Profile lookup error:', profileErr)
         return NextResponse.json({ error: 'Failed to find user' }, { status: 500 })
     }
 
-    const user = userData.users.find(u => u.email === payerEmail)
-    if (!user) {
+    // Fallback: try auth admin getUserByEmail if not in profiles
+    let userId: string | null = profileData?.id || null
+    let userEmail: string | null = payerEmail || null
+
+    if (!userId && payerEmail) {
+        const { data: authData } = await supabaseAdmin.auth.admin.listUsers({ perPage: 1000 })
+        const foundUser = authData?.users?.find(u => u.email === payerEmail)
+        if (foundUser) {
+            userId = foundUser.id
+            userEmail = foundUser.email || payerEmail
+        }
+    }
+
+    if (!userId) {
         console.error(`[webhook-paypal] No user found for payer email: ${payerEmail}`)
         // Don't fail — log for manual resolution
         return NextResponse.json({ ok: true, skipped: true, reason: 'user_not_found' })
     }
+
+    // Create a user-like object for compatibility
+    const user = { id: userId, email: userEmail }
 
     // 6. Determine product details from custom_id
     const productCode = customId

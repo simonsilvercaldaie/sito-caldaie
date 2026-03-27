@@ -2,6 +2,8 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import crypto from 'crypto'
 
+const ADMIN_EMAILS = (process.env.ADMIN_EMAILS || 'simonsilvercaldaie@gmail.com').split(',').map(e => e.trim())
+
 // Use Service Role for Setup/Teardown
 function getAdmin() {
     return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!)
@@ -22,6 +24,15 @@ export async function GET(request: NextRequest) {
         }
 
         const admin = getAdmin()
+
+        // SECURITY: Admin-only endpoint
+        const authHeader = request.headers.get('authorization') || ''
+        const token = authHeader.replace(/^Bearer\s+/i, '').trim()
+        if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+        const { data: { user: adminUser }, error: adminErr } = await admin.auth.getUser(token)
+        if (adminErr || !adminUser || !ADMIN_EMAILS.includes(adminUser.email || '')) {
+            return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+        }
 
         const searchParams = request.nextUrl.searchParams
         if (searchParams.get('simulate') !== 'true') {

@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-// import { v4 as uuidv4 } from 'uuid' // Removed dependency
+import { checkRateLimit } from '@/lib/rateLimit'
+import { sanitizeInput } from '@/lib/utils'
 
 // Admin client for restricted operations if needed, but RLS should handle user scope.
 // However, using Service Role allows us to be sure about auth context or bypass if RLS is tricky with SSR tokens.
@@ -58,8 +59,15 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Invalid Token' }, { status: 401 })
         }
 
+        // Rate Limit: 10 tickets per hour
+        const limitRes = await checkRateLimit(`ticket_${user.id}`, 10, 3600, false)
+        if (!limitRes.success) {
+            return NextResponse.json({ error: 'Troppe richieste. Riprova più tardi.' }, { status: 429 })
+        }
+
         const body = await request.json()
-        const { subject, initialMessage } = body
+        const subject = sanitizeInput(body.subject, 200)
+        const initialMessage = sanitizeInput(body.initialMessage, 5000)
 
         if (!subject || !initialMessage) {
             return NextResponse.json({ error: 'Subject and message required' }, { status: 400 })
@@ -98,3 +106,4 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: e.message }, { status: 500 })
     }
 }
+
