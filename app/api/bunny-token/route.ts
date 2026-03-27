@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
         // 1. Auth check
         const authHeader = request.headers.get('authorization') || ''
-        const token = authHeader.replace(/^Bearer\\s+/i, '').trim()
+        const token = authHeader.replace(/^Bearer\s+/i, '').trim()
         
         if (!token) {
             return NextResponse.json({ error: 'Token non fornito' }, { status: 401 })
