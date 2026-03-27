@@ -269,10 +269,50 @@ export async function POST(request: NextRequest) {
 
         console.log(`[replay-purchase] Match prodotto: ${productCode} per €${amountCents / 100}`)
 
-        // Logica Differenziata (Team vs Individual)
+        // Logica Differenziata (Team vs Individual vs Extra Invito)
         const isTeam = productCode.startsWith('multi_') || productCode.startsWith('scuola_')
+        const isExtraInvite = productCode.startsWith('extra_invito_')
 
-        if (isTeam) {
+        if (isExtraInvite) {
+            // --- LOGICA EXTRA INVITO ---
+            const { data: existingLicense, error: findErr } = await supabaseAdmin
+                .from('team_licenses')
+                .select('id, max_invites_total')
+                .eq('owner_user_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single()
+
+            if (findErr || !existingLicense) {
+                return NextResponse.json({ ok: false, error: 'no_team_license_found' }, { status: 400 })
+            }
+
+            const extraInvites = parseInt(productCode.split('_')[2]) || 1
+            const newMaxInvites = (existingLicense.max_invites_total || 0) + extraInvites
+
+            await supabaseAdmin
+                .from('team_licenses')
+                .update({ max_invites_total: newMaxInvites })
+                .eq('id', existingLicense.id)
+
+            const { error: purErr } = await supabaseAdmin.from('purchases').insert({
+                user_id: user.id,
+                plan_type: 'team',
+                product_code: productCode,
+                amount_cents: amountCents,
+                paypal_order_id: orderId,
+                paypal_capture_id: captureId,
+                team_license_id: existingLicense.id,
+                validated_at: new Date().toISOString()
+            })
+            if (purErr) {
+                if (purErr.code === '23505') {
+                    return NextResponse.json({ ok: true, status: 'activated', message: 'Ordine già attivato' })
+                }
+                throw purErr
+            }
+
+        } else if (isTeam) {
             // --- LOGICA TEAM (Copiata da complete-purchase per coerenza) ---
             // Il numero nel product_code (es. multi_5) indica i posti invitabili
             // +1 per includere anche l'admin come membro
