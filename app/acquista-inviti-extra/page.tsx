@@ -271,7 +271,7 @@ export default function AcquistaInvitiExtraPage() {
                     {/* Back Link */}
                     <div className="text-center mt-12">
                         <Link href="/dashboard" className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-900 transition-colors font-medium">
-                            <ArrowRight className="w-4 h-4 rotate-180" /> Torna alla Dashboard
+                            <ArrowRight className="w-4 h-4 rotate-180" /> Torna al Mio Account
                         </Link>
                     </div>
                 </div>

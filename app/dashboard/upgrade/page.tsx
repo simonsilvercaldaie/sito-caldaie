@@ -181,7 +181,7 @@ export default function UpgradePage() {
                                 from_name: 'Simon Silver Caldaie',
                                 to_email: data.email,
                                 subject: '✅ Upgrade Licenza Completato',
-                                message: `Ciao!\n\nIl tuo upgrade a Multidipendente ${targetTeam} è stato completato con successo!\n\nOra puoi gestire i membri del tuo team dalla Dashboard.\n\nAccedi qui:\nhttps://simonsilvercaldaie.it/dashboard\n\nGrazie!\nSimon Silver`
+                                message: `Ciao!\n\nIl tuo upgrade a Multidipendente ${targetTeam} è stato completato con successo!\n\nOra puoi gestire i membri del tuo team dal tuo Account.\n\nAccedi qui:\nhttps://simonsilvercaldaie.it/dashboard\n\nGrazie!\nSimon Silver`
                             }
                         }
                         await fetch('https://api.emailjs.com/api/v1.0/email/send', {
@@ -218,7 +218,7 @@ export default function UpgradePage() {
                 <div className="max-w-4xl mx-auto flex items-center">
                     <Link href="/dashboard" className="flex items-center gap-2 text-gray-500 hover:text-primary transition-colors">
                         <ArrowLeft className="w-5 h-5" />
-                        Torna alla Dashboard
+                        Torna al Mio Account
                     </Link>
                     <h1 className="ml-auto font-bold text-xl text-primary">Upgrade Licenza</h1>
                 </div>
@@ -258,7 +258,7 @@ export default function UpgradePage() {
                         <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
                             <Users className="w-5 h-5 text-indigo-600 flex-shrink-0" />
                             <p className="text-indigo-800">
-                                <strong>Multidipendente 5</strong> - Hai già una licenza Multi-utente attiva. Gestisci i tuoi membri dalla <Link href="/dashboard" className="underline font-bold">Dashboard</Link>.
+                                <strong>Multidipendente 5</strong> - Hai già una licenza Multi-utente attiva. Gestisci i tuoi membri dal tuo <Link href="/dashboard" className="underline font-bold">Account</Link>.
                             </p>
                         </div>
                     )}
@@ -266,7 +266,7 @@ export default function UpgradePage() {
                         <div className="flex items-center gap-3 p-4 bg-indigo-50 rounded-lg border border-indigo-100">
                             <Users className="w-5 h-5 text-indigo-600 flex-shrink-0" />
                             <p className="text-indigo-800">
-                                <strong>Multidipendente 10</strong> - Hai già una licenza Multi-utente attiva. Gestisci i tuoi membri dalla <Link href="/dashboard" className="underline font-bold">Dashboard</Link>.
+                                <strong>Multidipendente 10</strong> - Hai già una licenza Multi-utente attiva. Gestisci i tuoi membri dal tuo <Link href="/dashboard" className="underline font-bold">Account</Link>.
                             </p>
                         </div>
                     )}
@@ -402,7 +402,7 @@ function UpgradeCard({ title, users, price, enabled, onSuccess, highlight = fals
                 </li>
                 <li className="flex items-center gap-2 text-gray-600">
                     <CheckCircle2 className="w-4 h-4 text-green-500" />
-                    Gestione membri da Dashboard
+                    Gestione membri dal tuo Account
                 </li>
                 <li className="flex items-center gap-2 text-gray-600">
                     <CheckCircle2 className="w-4 h-4 text-green-500" />

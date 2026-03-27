@@ -78,7 +78,7 @@ export default function AccountSettingsPage() {
             <div className="max-w-2xl mx-auto pt-10">
                 <Link href="/dashboard" className="flex items-center text-gray-500 hover:text-gray-800 mb-6 transition-colors">
                     <ArrowLeft className="w-5 h-5 mr-2" />
-                    Torna alla Dashboard
+                    Torna al Mio Account
                 </Link>
 
                 <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
@@ -171,7 +171,7 @@ export default function AccountSettingsPage() {
                                     href="/dashboard"
                                     className="px-8 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-black transition-colors"
                                 >
-                                    Torna alla Dashboard
+                                    Torna al Mio Account
                                 </Link>
                             </div>
                         )}

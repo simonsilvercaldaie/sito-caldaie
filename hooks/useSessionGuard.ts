@@ -73,7 +73,7 @@ export function useSessionGuard({ enabled }: UseSessionGuardOptions): UseSession
             if (!res.ok) {
                 if (data.errorCode === 'device_limit_reached') {
                     setStatus('device_limit')
-                    setErrorMessage(data.error || 'Hai raggiunto il limite di dispositivi (max 2). Resetta dalla Dashboard.')
+                    setErrorMessage(data.error || 'Hai raggiunto il limite di dispositivi (max 2). Resetta dal tuo Account.')
                 } else {
                     setStatus('error')
                     setErrorMessage(data.error || 'Errore nella creazione della sessione.')

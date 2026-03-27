@@ -365,7 +365,7 @@ export default function CorsoPage() {
                                 },
                                 'ACQUISTO_TEAM': {
                                     subject: '✅ Conferma Acquisto - Licenza Team',
-                                    message: `Ciao! Grazie per il tuo acquisto.\n\nHai sbloccato con successo una Licenza TEAM.\nOra puoi invitare i membri del tuo team dalla tua Dashboard.\n\nAccedi qui:\nhttps://simonsilvercaldaie.it/dashboard\n\nBuon lavoro!\nSimon Silver`
+                                    message: `Ciao! Grazie per il tuo acquisto.\n\nHai sbloccato con successo una Licenza TEAM.\nOra puoi invitare i membri del tuo team dal tuo Account.\n\nAccedi qui:\nhttps://simonsilvercaldaie.it/dashboard\n\nBuon lavoro!\nSimon Silver`
                                 }
                             }
                             const emailContent = emailMessages[data.emailType]
@@ -575,7 +575,7 @@ export default function CorsoPage() {
                                                             href="/dashboard"
                                                             className="px-6 py-3 bg-red-600 text-white font-bold rounded-xl hover:bg-red-700 transition-colors"
                                                         >
-                                                            Vai alla Dashboard per resettare
+                                                            Vai al tuo Account per resettare
                                                         </Link>
                                                     )}
                                                 </div>
@@ -840,7 +840,7 @@ export default function CorsoPage() {
                                                     href="/dashboard"
                                                     className="w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
                                                 >
-                                                    Vai alla Dashboard
+                                                    Vai al Mio Account
                                                 </Link>
                                             </div>
                                         ) : (

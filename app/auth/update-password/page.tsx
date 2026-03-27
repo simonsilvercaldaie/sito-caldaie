@@ -13,7 +13,7 @@ export default function UpdatePasswordPage() {
                 </p>
                 <Link href="/dashboard" className="flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary/90 transition-all">
                     <ArrowLeft className="w-4 h-4" />
-                    Torna alla Dashboard
+                    Torna al Mio Account
                 </Link>
             </div>
         </div>

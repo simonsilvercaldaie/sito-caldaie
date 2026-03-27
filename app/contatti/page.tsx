@@ -266,7 +266,7 @@ export default function ContactsPage() {
                                                 Come accedo ai corsi?
                                             </summary>
                                             <p className="text-sm text-gray-500 mt-2 pl-4 leading-relaxed">
-                                                Dopo l'acquisto, riceverai una mail con le credenziali. Potrai accedere alla tua Dashboard personale in qualsiasi momento.
+                                                Dopo l'acquisto, riceverai una mail con le credenziali. Potrai accedere alla tua Area Personale in qualsiasi momento.
                                             </p>
                                         </details>
                                     </li>

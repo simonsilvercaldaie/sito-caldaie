@@ -184,7 +184,7 @@ export default function OrderStatusPage() {
                                 <p className="text-sm text-blue-800 font-medium mb-1">📱 Ricorda</p>
                                 <p className="text-xs text-blue-700">
                                     Puoi accedere da massimo <strong>2 dispositivi</strong> (es. PC e telefono).
-                                    Se hai bisogno di cambiarli, vai nella tua Dashboard — è possibile 1 volta ogni 30 giorni.
+                                    Se hai bisogno di cambiarli, vai nel tuo Account — è possibile 1 volta ogni 30 giorni.
                                 </p>
                             </div>
                         </>

@@ -262,7 +262,7 @@ export default function TeamDashboard({ initialData }: { initialData?: any }) {
                                             <Check className="w-4 h-4" /> {inviteResult.message}
                                         </div>
                                         <p className="text-xs text-gray-500 mt-2">
-                                            L'invitato troverà l'invito nella propria Dashboard dopo il login.
+                                            L'invitato troverà l'invito nella propria Area Personale dopo il login.
                                         </p>
                                     </div>
                                 )}

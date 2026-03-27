@@ -115,7 +115,7 @@ export default function TeamLicensePage() {
                                 from_name: 'Simon Silver Caldaie',
                                 to_email: data.email,
                                 subject: '✅ Conferma Acquisto - Licenza Team',
-                                message: `Ciao! Grazie per il tuo acquisto.\n\nHai sbloccato con successo una Licenza TEAM.\nOra puoi invitare i membri del tuo team dalla tua Dashboard.\n\nAccedi qui:\nhttps://simonsilvercaldaie.it/dashboard\n\nBuon lavoro!\nSimon Silver`
+                                message: `Ciao! Grazie per il tuo acquisto.\n\nHai sbloccato con successo una Licenza TEAM.\nOra puoi invitare i membri del tuo team dal tuo Account.\n\nAccedi qui:\nhttps://simonsilvercaldaie.it/dashboard\n\nBuon lavoro!\nSimon Silver`
                             }
                         }
                         await fetch('https://api.emailjs.com/api/v1.0/email/send', {

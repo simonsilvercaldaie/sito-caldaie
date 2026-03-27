@@ -82,7 +82,7 @@ function AcceptInviteContent() {
                             href="/dashboard"
                             className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl hover:bg-indigo-700 transition"
                         >
-                            Vai alla Dashboard <ArrowRight className="w-4 h-4" />
+                            Vai al Mio Account <ArrowRight className="w-4 h-4" />
                         </Link>
                     </>
                 )}

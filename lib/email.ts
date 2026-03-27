@@ -119,7 +119,7 @@ Simon Silver
 Ciao! Grazie per il tuo acquisto.
 
 Hai sbloccato con successo una Licenza TEAM.
-Ora puoi invitare i membri del tuo team dalla tua Dashboard.
+Ora puoi invitare i membri del tuo team dal tuo Account.
 
 Accedi qui:
 https://simonsilvercaldaie.it/dashboard

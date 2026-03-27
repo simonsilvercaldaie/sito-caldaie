@@ -84,7 +84,7 @@ export function PayPalBtn({ amount, courseTitle, onSuccess, showDisclaimer = tru
                 </p>
             )}
             <p className="text-xs text-blue-600 text-center mt-2 font-medium">
-                📱 Max 2 dispositivi · Cambio: 1×/mese dalla Dashboard
+                📱 Max 2 dispositivi · Cambio: 1×/mese dal tuo Account
             </p>
             {PAYPAL_ENV === 'sandbox' && (
                 <p className="text-xs text-amber-600 text-center font-semibold">
