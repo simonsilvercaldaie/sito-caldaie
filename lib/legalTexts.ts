@@ -14,7 +14,7 @@ L'accesso alla piattaforma avviene esclusivamente tramite account Google. Non so
 Ogni licenza personale è valida per un singolo utilizzatore. Non è cedibile né condivisibile con terzi.
 
 **Licenza Multidipendente**
-Le licenze Multidipendente (5, 10 o 25 posti) assegnano uno slot individuale a ciascun collaboratore. Ogni membro accede con il proprio account Google personale. Le licenze Multidipendente non consentono la proiezione in aula né l'uso didattico. Ogni licenza include un numero di riassegnamenti gratuiti pari ai posti (es. Multidipendente 5 = 5 riassegnamenti gratis). Oltre la soglia, €400 per riassegnamento.
+Le licenze Multidipendente (5, 10 o 25 posti) assegnano uno slot individuale a ciascun collaboratore. Ogni membro accede con il proprio account Google personale. Le licenze Multidipendente non consentono la proiezione in aula né l'uso didattico. Ogni licenza include un numero di riassegnamenti gratuiti pari ai posti (es. Multidipendente 5 = 5 riassegnamenti gratis). Oltre la soglia, è possibile espandere la licenza acquistando singoli inviti extra al costo di €400 cadauno.
 
 **Licenza Formazione (Scuola)**
 La Licenza Formazione (Scuola) è riservata a istituti scolastici, centri di formazione e laboratori tecnici. Garantisce 10 account nominativi per il corpo docente e autorizza la proiezione in aula per la didattica senza limiti di allievi. Include 10 riassegnamenti gratuiti. Le normali licenze Multidipendente non lo consentono.
