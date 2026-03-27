@@ -113,13 +113,14 @@ Simon Silver
             }
             break
         case 'ACQUISTO_TEAM':
+            const licName = params.licenseName || 'Licenza Multidipendente/Scuola'
             specificParams = {
-                subject: '✅ Conferma Acquisto - Licenza Team',
+                subject: `✅ Conferma Acquisto - ${licName}`,
                 message: `
 Ciao! Grazie per il tuo acquisto.
 
-Hai sbloccato con successo una Licenza TEAM.
-Ora puoi invitare i membri del tuo team dal tuo Account.
+Hai sbloccato con successo: ${licName}.
+Ora puoi invitare i membri del tuo team o i tuoi studenti dal tuo Account.
 
 Accedi qui:
 https://simonsilvercaldaie.it/dashboard

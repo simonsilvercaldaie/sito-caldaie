@@ -381,8 +381,8 @@ export default function CorsoPage() {
                                     message: `Ciao! Grazie per il tuo acquisto.\n\nHai sbloccato con successo:\nPacchetto AVANZATO (9 Video)\n\nPuoi accedere subito ai tuoi corsi qui:\nhttps://simonsilvercaldaie.it/catalogo/avanzato\n\nBuono studio!\nSimon Silver`
                                 },
                                 'ACQUISTO_TEAM': {
-                                    subject: '✅ Conferma Acquisto - Licenza Team',
-                                    message: `Ciao! Grazie per il tuo acquisto.\n\nHai sbloccato con successo una Licenza TEAM.\nOra puoi invitare i membri del tuo team dal tuo Account.\n\nAccedi qui:\nhttps://simonsilvercaldaie.it/dashboard\n\nBuon lavoro!\nSimon Silver`
+                                    subject: `✅ Conferma Acquisto - ${course.title}`,
+                                    message: `Ciao! Grazie per il tuo acquisto.\n\nHai sbloccato con successo: ${course.title}.\nOra puoi invitare i membri del tuo team o i tuoi studenti dal tuo Account.\n\nAccedi qui:\nhttps://simonsilvercaldaie.it/dashboard\n\nBuon lavoro!\nSimon Silver`
                                 }
                             }
                             const emailContent = emailMessages[data.emailType]
