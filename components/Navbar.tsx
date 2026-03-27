@@ -40,7 +40,7 @@ export default function Navbar() {
             <Link href="/" className="flex items-center gap-2 md:gap-3 hover:opacity-80 transition-opacity min-w-0">
                 <div className="relative w-9 h-9 md:w-12 md:h-12 flex-shrink-0">
                     <Image
-                        src="/logo.png"
+                        src="/logo-icon.png"
                         alt="Simon Silver Logo"
                         fill
                         className="object-contain"
