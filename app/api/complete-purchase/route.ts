@@ -6,6 +6,14 @@ import { checkRateLimit } from '@/lib/rateLimit'
 import { sendEmail, EmailType } from '@/lib/email'
 import { grantAccessForProduct } from '@/lib/accessControl'
 
+// Max invites per product type
+const PRODUCT_MAX_INVITES: Record<string, number> = {
+    'multi_5': 10,
+    'multi_10': 20,
+    'multi_25': 50,
+    'scuola_10': 20,
+}
+
 // Type for billing profile
 interface BillingProfile {
     customer_type: 'private' | 'company'
@@ -317,7 +325,8 @@ export async function POST(request: NextRequest) {
             const { data: lic, error: licErr } = await supabaseAdmin.from('team_licenses').insert({
                 owner_user_id: user.id,
                 seats: seats,
-                company_name: billing?.company_name || user.email
+                company_name: billing?.company_name || user.email,
+                max_invites_total: PRODUCT_MAX_INVITES[product_code] || (seatsFromCode * 2)
             }).select().single()
 
             if (licErr || !lic) throw licErr

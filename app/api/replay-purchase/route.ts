@@ -5,6 +5,14 @@ import { getExpectedPriceCents, PRODUCT_PRICES_CENTS, ProductCode } from '@/lib/
 import { checkRateLimit } from '@/lib/rateLimit'
 import { grantAccessForProduct } from '@/lib/accessControl'
 
+// Max invites per product type
+const PRODUCT_MAX_INVITES: Record<string, number> = {
+    'multi_5': 10,
+    'multi_10': 20,
+    'multi_25': 50,
+    'scuola_10': 20,
+}
+
 function getSupabaseAdmin() {
     return createClient(
         process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -325,7 +333,8 @@ export async function POST(request: NextRequest) {
             const { data: lic, error: licErr } = await supabaseAdmin.from('team_licenses').insert({
                 owner_user_id: user.id,
                 seats: seats,
-                company_name: user.email // Fallback temporaneo, l'utente aggiornerà il profilo billing
+                company_name: user.email,
+                max_invites_total: PRODUCT_MAX_INVITES[productCode] || (seatsFromCode * 2)
             }).select().single()
 
             if (licErr || !lic) {

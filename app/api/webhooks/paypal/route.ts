@@ -5,6 +5,14 @@ import { grantAccessForProduct } from '@/lib/accessControl'
 import { sendEmail, EmailType } from '@/lib/email'
 import { getExpectedPriceCents } from '@/lib/serverPricing'
 
+// Max invites per product type
+const PRODUCT_MAX_INVITES: Record<string, number> = {
+    'multi_5': 10,
+    'multi_10': 20,
+    'multi_25': 50,
+    'scuola_10': 20,
+}
+
 // -------------------------------------------------------------------
 // PayPal Webhook Handler — Safety net for purchase flow
 //
@@ -308,7 +316,8 @@ export async function POST(request: NextRequest) {
             const { data: lic, error: licErr } = await supabaseAdmin.from('team_licenses').insert({
                 owner_user_id: user.id,
                 seats: seats,
-                company_name: billing?.company_name || user.email
+                company_name: billing?.company_name || user.email,
+                max_invites_total: PRODUCT_MAX_INVITES[productCode] || (seatsFromCode * 2)
             }).select().single()
 
             if (licErr || !lic) throw licErr
