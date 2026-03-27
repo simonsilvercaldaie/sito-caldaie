@@ -207,7 +207,7 @@ export default function AcquistaInvitiExtraPage() {
                                         </li>
                                         <li className="flex items-center gap-3 text-indigo-800">
                                             <CheckCircle2 className="w-5 h-5 text-indigo-500 flex-shrink-0" />
-                                            <span>L'invito si somma permanentemente a quelli della tua licenza</span>
+                                            <span>L'invito è <strong>monouso</strong> (valido per la formazione di 1 sola persona)</span>
                                         </li>
                                     </ul>
                                 </div>
