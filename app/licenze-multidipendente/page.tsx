@@ -16,6 +16,7 @@ export default function TeamLicensePage() {
     const [tosAccepted, setTosAccepted] = useState(false)
     const [tosLoading, setTosLoading] = useState(false)
     const [profileCompleted, setProfileCompleted] = useState(false)
+    const [eligibility, setEligibility] = useState<'loading' | 'eligible_all' | 'eligible_multi_only' | 'blocked' | 'has_team'>('loading')
 
     useEffect(() => {
         const checkUser = async () => {
@@ -28,6 +29,50 @@ export default function TeamLicensePage() {
                     .eq('id', session.user.id)
                     .maybeSingle()
                 setProfileCompleted(profile?.profile_completed ?? false)
+
+                // Check purchase eligibility
+                const { data: purchases } = await supabase
+                    .from('purchases')
+                    .select('product_code')
+                    .eq('user_id', session.user.id)
+
+                const { data: teamMember } = await supabase
+                    .from('team_members')
+                    .select('team_license_id')
+                    .eq('user_id', session.user.id)
+                    .is('removed_at', null)
+                    .maybeSingle()
+
+                const { data: ownedTeam } = await supabase
+                    .from('team_licenses')
+                    .select('id')
+                    .eq('owner_user_id', session.user.id)
+                    .maybeSingle()
+
+                if (ownedTeam || teamMember) {
+                    setEligibility('has_team')
+                } else if (purchases && purchases.length > 0) {
+                    const codes = purchases.map(p => p.product_code?.toLowerCase())
+                    const hasComplete = codes.some(c => c?.includes('complete'))
+                    const hasAllThree =
+                        codes.some(c => c === 'base') &&
+                        codes.some(c => c === 'intermediate') &&
+                        codes.some(c => c === 'advanced')
+                    const hasMulti = codes.some(c => c?.startsWith('multi_') || c?.startsWith('scuola_'))
+
+                    if (hasMulti) {
+                        setEligibility('has_team')
+                    } else if (hasComplete || hasAllThree) {
+                        setEligibility('eligible_multi_only')
+                    } else {
+                        // Has 1 or 2 single levels
+                        setEligibility('blocked')
+                    }
+                } else {
+                    setEligibility('eligible_all')
+                }
+            } else {
+                setEligibility('eligible_all')
             }
             setLoading(false)
         }
@@ -137,8 +182,8 @@ export default function TeamLicensePage() {
         }
     }
 
-    const TeamCard = ({ title, bigNumber, users, badgeText, code, amount, icon, features, highlighted = false }: { title: string, bigNumber: string, users: number, badgeText?: string, code: string, amount: number, icon?: any, features?: string[], highlighted?: boolean }) => (
-        <div className={`rounded-3xl p-8 shadow-xl transition-all duration-300 flex flex-col ${highlighted ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 hover:border-amber-400' : 'bg-white border-2 border-indigo-100 hover:border-indigo-300'}`}>
+    const TeamCard = ({ title, bigNumber, users, badgeText, code, amount, icon, features, highlighted = false, disabled = false }: { title: string, bigNumber: string, users: number, badgeText?: string, code: string, amount: number, icon?: any, features?: string[], highlighted?: boolean, disabled?: boolean }) => (
+        <div className={`rounded-3xl p-8 shadow-xl transition-all duration-300 flex flex-col ${disabled ? 'opacity-50 pointer-events-none' : ''} ${highlighted ? 'bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-200 hover:border-amber-400' : 'bg-white border-2 border-indigo-100 hover:border-indigo-300'}`}>
             <div className="mb-6 flex flex-col items-center text-center">
                 <h3 className={`text-xl font-bold mb-1 ${highlighted ? 'text-amber-900' : 'text-indigo-900'}`}>{title}</h3>
                 <div className={`text-5xl md:text-6xl font-black mb-4 ${highlighted ? 'text-amber-600' : 'text-indigo-600'}`}>
@@ -238,6 +283,26 @@ export default function TeamLicensePage() {
                         </p>
                     </div>
 
+                    {eligibility === 'has_team' ? (
+                        <div className="max-w-xl mx-auto mb-12 bg-blue-50 p-8 rounded-2xl border border-blue-200 text-center">
+                            <CheckCircle2 className="w-16 h-16 text-blue-500 mx-auto mb-4" />
+                            <h2 className="text-2xl font-bold text-gray-900 mb-2">Hai già una licenza team</h2>
+                            <p className="text-gray-600 mb-6">Gestisci i tuoi membri dal tuo account.</p>
+                            <Link href="/dashboard" className="inline-flex items-center gap-2 bg-blue-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-blue-700 transition-all">
+                                Vai al Dashboard <ArrowRight className="w-5 h-5" />
+                            </Link>
+                        </div>
+                    ) : eligibility === 'blocked' ? (
+                        <div className="max-w-xl mx-auto mb-12 bg-amber-50 p-8 rounded-2xl border border-amber-200 text-center">
+                            <Users className="w-16 h-16 text-amber-500 mx-auto mb-4" />
+                            <h2 className="text-2xl font-bold text-gray-900 mb-2">Completa prima tutti i livelli</h2>
+                            <p className="text-gray-600 mb-6">Per passare a una licenza Multidipendente devi prima acquistare tutti e 3 i livelli singoli (Base, Intermedio, Avanzato). Dopo potrai fare l'upgrade.</p>
+                            <Link href="/catalogo" className="inline-flex items-center gap-2 bg-amber-600 text-white font-bold px-8 py-4 rounded-xl hover:bg-amber-700 transition-all">
+                                Vai al Catalogo <ArrowRight className="w-5 h-5" />
+                            </Link>
+                        </div>
+                    ) : (
+                        <>
                     {user && (
                         <div className="max-w-xl mx-auto mb-12 bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
                             <label className="flex items-start gap-3 cursor-pointer">
@@ -289,6 +354,7 @@ export default function TeamLicensePage() {
                             code="scuola_10"
                             amount={5000}
                             highlighted={true}
+                            disabled={eligibility === 'eligible_multi_only'}
                             icon={<GraduationCap className="w-4 h-4" />}
                             features={[
                                 '<strong>Proiezione in aula</strong> autorizzata',
@@ -301,6 +367,8 @@ export default function TeamLicensePage() {
                             ]}
                         />
                     </div>
+                        </>
+                    )}
 
                     {/* Reassignment Info Box */}
                     <div className="max-w-3xl mx-auto mt-8 p-5 bg-amber-50 rounded-2xl border border-amber-200">
