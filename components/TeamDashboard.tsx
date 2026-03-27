@@ -224,9 +224,21 @@ export default function TeamDashboard({ initialData }: { initialData?: any }) {
                                     <UserPlus className="w-4 h-4" /> Invita Collaboratore
                                 </h4>
 
-                                {team.seatsUsed >= team.seats ? (
+                                {team.invitesRemaining <= 0 ? (
+                                    <div className="p-4 bg-amber-50 text-amber-900 rounded-xl border border-amber-200 text-center">
+                                        <p className="mb-4 text-sm font-medium">
+                                            Hai esaurito gli inviti a tua disposizione. Per continuare ad invitare collaboratori devi acquistare un nuovo pacchetto licenze.
+                                        </p>
+                                        <a 
+                                            href="/pacchetto-completo" 
+                                            className="inline-block w-full py-2.5 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition shadow-lg shadow-amber-200"
+                                        >
+                                            Acquista Nuovi Posti / Inviti
+                                        </a>
+                                    </div>
+                                ) : team.seatsUsed >= team.seats ? (
                                     <div className="p-3 bg-yellow-50 text-yellow-800 text-sm rounded-lg border border-yellow-100">
-                                        Hai raggiunto il limite di posti. Contattaci per ampliare la licenza.
+                                        Tutti i posti attivi sono occupati. Per invitare un nuovo collaboratore devi prima rimuoverne uno esistente.
                                     </div>
                                 ) : (
                                     <form onSubmit={(e) => handleInvite(e, team.licenseId)} className="space-y-3">

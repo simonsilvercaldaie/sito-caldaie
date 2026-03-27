@@ -28,15 +28,23 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Missing teamLicenseId or email' }, { status: 400 })
         }
 
-        // 1. Verify Ownership & Seat "Soft" Check
+        // 1. Verify Ownership & Invite Limits
         const { data: license, error: licErr } = await supabase
             .from('team_licenses')
-            .select('seats, owner_user_id')
+            .select('seats, owner_user_id, max_invites_total, invites_used')
             .eq('id', teamLicenseId)
             .single()
 
         if (licErr || !license) return NextResponse.json({ error: 'License not found' }, { status: 404 })
         if (license.owner_user_id !== user.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+
+        const employeeSlots = license.seats - 1
+        const maxInvites = license.max_invites_total || (employeeSlots * 2)
+        const invitesUsed = license.invites_used || 0
+
+        if (invitesUsed >= maxInvites) {
+            return NextResponse.json({ error: 'Hai esaurito gli inviti a tua disposizione. Acquista un nuovo pacchetto.' }, { status: 409 })
+        }
 
         // Check active members
         const { count: memberCount } = await supabase
@@ -45,8 +53,10 @@ export async function POST(request: NextRequest) {
             .eq('team_license_id', teamLicenseId)
             .is('removed_at', null)
 
-        if ((memberCount || 0) >= license.seats) {
-            return NextResponse.json({ error: 'Tutti i posti sono occupati' }, { status: 400 })
+        // Count pending invites too to prevent overbooking? 
+        // Better yet, just limit to employeeSlots. 
+        if ((memberCount || 0) >= employeeSlots) {
+            return NextResponse.json({ error: 'Tutti i posti attivi sono occupati. Libera un posto prima di invitare.' }, { status: 400 })
         }
 
         // 2. Generate Token
