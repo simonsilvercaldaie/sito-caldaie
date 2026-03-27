@@ -42,12 +42,13 @@ export default function PacchettoCompletoPage() {
                 if (purchases) {
                     const codes = purchases.map(p => p.product_code?.toLowerCase())
                     const hasComplete = codes.some(c => c?.includes('complete'))
-                    const hasAllThree =
-                        codes.some(c => c?.includes('base')) &&
-                        codes.some(c => c?.includes('intermediate')) &&
-                        codes.some(c => c?.includes('advanced'))
+                    const hasAnySingle =
+                        codes.some(c => c === 'base') ||
+                        codes.some(c => c === 'intermediate') ||
+                        codes.some(c => c === 'advanced')
+                    const hasMulti = codes.some(c => c?.startsWith('multi_') || c?.startsWith('scuola_'))
 
-                    if (hasComplete || hasAllThree) {
+                    if (hasComplete || hasAnySingle || hasMulti) {
                         setHasPurchased(true)
                     }
                 }

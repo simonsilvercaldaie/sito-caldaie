@@ -236,6 +236,26 @@ export async function POST(request: NextRequest) {
         const isTeam = product_code.startsWith('multi_') || product_code.startsWith('scuola_')
         const isExtraInvites = product_code.startsWith('extra_invito_')
 
+        // 8b. BUNDLE GUARD: block complete_bundle if user already has any access
+        if (product_code === 'complete_bundle' || product_code === 'complete') {
+            const { data: existingPurchases } = await supabaseAdmin
+                .from('purchases')
+                .select('product_code')
+                .eq('user_id', user.id)
+            
+            if (existingPurchases && existingPurchases.length > 0) {
+                const codes = existingPurchases.map(p => p.product_code?.toLowerCase())
+                const hasAnySingle = codes.some(c => c === 'base' || c === 'intermediate' || c === 'advanced')
+                const hasComplete = codes.some(c => c?.includes('complete'))
+                const hasMulti = codes.some(c => c?.startsWith('multi_') || c?.startsWith('scuola_'))
+                
+                if (hasAnySingle || hasComplete || hasMulti) {
+                    console.log(`[complete-purchase] BLOCKED: bundle not allowed, user already has: ${codes.join(', ')}`)
+                    return NextResponse.json({ ok: false, error: 'bundle_not_allowed' }, { status: 400 })
+                }
+            }
+        }
+
         // Common snapshot data
         const snapshotData = {
             snapshot_company_name: billing?.company_name || null,
