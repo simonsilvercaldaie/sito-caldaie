@@ -19,6 +19,14 @@ function ConfirmDeleteContent() {
         setStatus('processing')
 
         try {
+            // Effettuiamo il logout PRIMA di cancellare l'account via server.
+            // Se lo facessimo dopo, Supabase restituirebbe un errore al tentativo di logout 
+            // per "utente non trovato", lasciando così i cookie auth sporchi nel browser.
+            await supabase.auth.signOut()
+            if (typeof window !== 'undefined') {
+                localStorage.removeItem('ssc_session_token')
+            }
+
             const res = await fetch('/api/delete-account/confirm', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -30,12 +38,6 @@ function ConfirmDeleteContent() {
             if (!res.ok) {
                 throw new Error(data.error || 'Errore sconosciuto')
             }
-
-            // Clear the local session now that the backend account is deleted
-            if (typeof window !== 'undefined') {
-                localStorage.removeItem('ssc_session_token')
-            }
-            await supabase.auth.signOut()
 
             setStatus('success')
             // Redirect to home after 3 seconds
