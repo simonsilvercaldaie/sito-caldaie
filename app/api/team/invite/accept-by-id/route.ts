@@ -54,7 +54,7 @@ export async function POST(request: NextRequest) {
         // 2. Check license seat availability and invite limits
         const { data: license, error: licErr } = await supabase
             .from('team_licenses')
-            .select('id, seats, max_invites_total, invites_used')
+            .select('id, seats, max_invites_total, invites_used, owner_user_id')
             .eq('id', invite.team_license_id)
             .single()
 
@@ -71,12 +71,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Limite inviti raggiunto. Contatta l\'amministratore.' }, { status: 409 })
         }
 
-        // Count current active members
+        // Count current active members (excluding the admin)
         const { count: activeMembers } = await supabase
             .from('team_members')
             .select('*', { count: 'exact', head: true })
             .eq('team_license_id', license.id)
             .is('removed_at', null)
+            .neq('user_id', license.owner_user_id)
 
         if ((activeMembers || 0) >= employeeSlots) {
             return NextResponse.json({ error: 'Il gruppo è pieno. Non ci sono posti disponibili al momento.', code: 'seats_full' }, { status: 409 })

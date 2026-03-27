@@ -46,12 +46,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Hai esaurito gli inviti a tua disposizione. Acquista un nuovo pacchetto.' }, { status: 409 })
         }
 
-        // Check active members
+        // Check active members (excluding the owner/admin)
         const { count: memberCount } = await supabase
             .from('team_members')
             .select('*', { count: 'exact', head: true })
             .eq('team_license_id', teamLicenseId)
             .is('removed_at', null)
+            .neq('user_id', user.id)
 
         // Count pending invites too to prevent overbooking? 
         // Better yet, just limit to employeeSlots. 
