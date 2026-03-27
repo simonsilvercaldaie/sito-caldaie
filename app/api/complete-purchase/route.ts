@@ -234,6 +234,7 @@ export async function POST(request: NextRequest) {
 
         const billing = billingData as BillingProfile | null
         const isTeam = product_code.startsWith('multi_') || product_code.startsWith('scuola_')
+        const isExtraInvites = product_code.startsWith('extra_inviti_')
 
         // Common snapshot data
         const snapshotData = {
@@ -246,7 +247,45 @@ export async function POST(request: NextRequest) {
             snapshot_postal_code: billing?.postal_code || null
         }
 
-        if (isTeam) {
+        if (isExtraInvites) {
+            // --- RAMO EXTRA INVITI ---
+            // Trova la licenza team esistente dell'utente
+            const { data: existingLicense, error: findErr } = await supabaseAdmin
+                .from('team_licenses')
+                .select('id, max_invites_total, invites_used')
+                .eq('owner_user_id', user.id)
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .single()
+
+            if (findErr || !existingLicense) {
+                return NextResponse.json({ ok: false, error: 'no_team_license_found' }, { status: 400 })
+            }
+
+            // Aggiungi inviti: extra_inviti_5 → +10 inviti (5 × 2)
+            const extraSlots = parseInt(product_code.split('_')[2]) || 5
+            const extraInvites = extraSlots * 2
+            const newMaxInvites = (existingLicense.max_invites_total || 0) + extraInvites
+
+            await supabaseAdmin
+                .from('team_licenses')
+                .update({ max_invites_total: newMaxInvites })
+                .eq('id', existingLicense.id)
+
+            // Registra acquisto
+            const { error: purErr } = await supabaseAdmin.from('purchases').insert({
+                user_id: user.id,
+                plan_type: 'team',
+                product_code: product_code,
+                amount_cents: truthPrice,
+                paypal_order_id: orderId,
+                paypal_capture_id: captureId,
+                team_license_id: existingLicense.id,
+                ...snapshotData
+            })
+            if (purErr) throw purErr
+
+        } else if (isTeam) {
             // --- RAMO TEAM ---
             // Il numero nel product_code (es. multi_5) indica i posti invitabili
             // +1 per includere anche l'admin come membro

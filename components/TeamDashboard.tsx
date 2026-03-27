@@ -209,14 +209,6 @@ export default function TeamDashboard({ initialData }: { initialData?: any }) {
                             </div>
                         </div>
 
-                        {/* Invite limit warning if exhausted */}
-                        {team.invitesRemaining <= 0 && (
-                            <div className="p-3 bg-amber-50 text-amber-800 text-sm rounded-lg border border-amber-200 flex items-center gap-2">
-                                <RefreshCw className="w-4 h-4 flex-shrink-0" />
-                                <span>Inviti esauriti ({team.invitesUsed}/{team.maxInvites} utilizzati). Contatta <strong>simonsilvercaldaie@gmail.com</strong> per acquistare inviti aggiuntivi.</span>
-                            </div>
-                        )}
-
                         <div className="grid md:grid-cols-2 gap-8">
                             {/* Invite Form */}
                             <div className="space-y-4">
@@ -227,13 +219,13 @@ export default function TeamDashboard({ initialData }: { initialData?: any }) {
                                 {team.invitesRemaining <= 0 ? (
                                     <div className="p-4 bg-amber-50 text-amber-900 rounded-xl border border-amber-200 text-center">
                                         <p className="mb-4 text-sm font-medium">
-                                            Hai esaurito gli inviti a tua disposizione. Per continuare ad invitare collaboratori devi acquistare un nuovo pacchetto licenze.
+                                            Hai esaurito gli inviti a tua disposizione. Per continuare ad invitare collaboratori devi acquistare un nuovo pacchetto inviti.
                                         </p>
                                         <a 
-                                            href="/pacchetto-completo" 
+                                            href="/acquista-inviti-extra" 
                                             className="inline-block w-full py-2.5 bg-amber-500 text-white font-bold rounded-xl hover:bg-amber-600 transition shadow-lg shadow-amber-200"
                                         >
-                                            Acquista Nuovi Posti / Inviti
+                                            Acquista Nuovi Inviti — €400
                                         </a>
                                     </div>
                                 ) : team.seatsUsed >= team.seats ? (

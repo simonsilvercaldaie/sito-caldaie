@@ -14,7 +14,10 @@ export const PRODUCT_PRICES_CENTS = {
     'multi_25': 500000,   // 5000 EUR
 
     // Scuola/Formazione
-    'scuola_10': 500000   // 5000 EUR
+    'scuola_10': 500000,   // 5000 EUR
+
+    // Pacchetto inviti extra
+    'extra_inviti_5': 40000  // 400 EUR (aggiunge 5 inviti alla licenza esistente)
 } as const
 
 export type ProductCode = keyof typeof PRODUCT_PRICES_CENTS
