@@ -71,8 +71,8 @@ async function verifyPayPalOrder(orderId: string, expectedAmountCents: number): 
         const paidAmountCents = Math.round(parseFloat(capture.amount.value) * 100)
         console.log(`[upgrade-license] Paid: ${paidAmountCents} cents, Expected: ${expectedAmountCents} cents`)
 
-        // Allow small variance (€2)
-        if (Math.abs(paidAmountCents - expectedAmountCents) > 200) {
+        // Strict tolerance: 1 cent (matches complete-purchase)
+        if (Math.abs(paidAmountCents - expectedAmountCents) > 1) {
             console.error(`[upgrade-license] Price mismatch: paid ${paidAmountCents}, expected ${expectedAmountCents}`)
             return { valid: false }
         }
@@ -212,6 +212,7 @@ export async function POST(request: NextRequest) {
                 product_code: `upgrade_to_multi_${target_team_size}`,
                 plan_type: 'team_upgrade',
                 amount_cents: expectedPrice,
+                paypal_order_id: orderId,
                 paypal_capture_id: captureId
             })
 

@@ -244,6 +244,33 @@ export async function checkCourseAccess(userId: string, courseId: string): Promi
 }
 
 // -------------------------------------------------------------------
+// CHECK VIDEO ACCESS BY BUNNY ID (for /api/bunny-token)
+// -------------------------------------------------------------------
+
+/**
+ * Verifies if a user has access to a video identified by its Bunny Stream UUID.
+ * Maps bunnyVideoId → courseId → checkCourseAccess.
+ * Returns { authorized, courseId, error? }
+ */
+export async function checkVideoAccessByBunnyId(userId: string, bunnyVideoId: string): Promise<{
+    authorized: boolean
+    courseId: string | null
+    error?: string
+}> {
+    // Find the course matching this Bunny video ID
+    const course = courses.find(c => c.bunnyVideoId === bunnyVideoId)
+    if (!course) {
+        return { authorized: false, courseId: null, error: 'video_not_found' }
+    }
+
+    const result = await checkCourseAccess(userId, course.id)
+    return {
+        authorized: result.authorized,
+        courseId: course.id
+    }
+}
+
+// -------------------------------------------------------------------
 // REVOKE ACCESS
 // -------------------------------------------------------------------
 

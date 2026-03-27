@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL, INVOICE_NOTIFICATION_EMAIL } from '@/lib/constants'
 import { getExpectedPriceCents } from '@/lib/serverPricing'
 import { checkRateLimit } from '@/lib/rateLimit'
-import { sendEmail } from '@/lib/email'
+import { sendEmail, EmailType } from '@/lib/email'
 import { grantAccessForProduct } from '@/lib/accessControl'
 
 // Type for billing profile
@@ -282,7 +282,10 @@ export async function POST(request: NextRequest) {
                 team_license_id: existingLicense.id,
                 ...snapshotData
             })
-            if (purErr) throw purErr
+            if (purErr) {
+                if (purErr.code === '23505') return NextResponse.json({ ok: true, alreadyProcessed: true })
+                throw purErr
+            }
 
         } else if (isTeam) {
             // --- RAMO TEAM ---
@@ -315,7 +318,10 @@ export async function POST(request: NextRequest) {
                 team_license_id: lic.id,
                 ...snapshotData
             }).select('id').single()
-            if (purErr) throw purErr
+            if (purErr) {
+                if (purErr.code === '23505') return NextResponse.json({ ok: true, alreadyProcessed: true })
+                throw purErr
+            }
 
             // Grant access levels for team owner
             await grantAccessForProduct(user.id, product_code, 'team', purchaseRow.id, lic.id)
@@ -332,16 +338,19 @@ export async function POST(request: NextRequest) {
                 team_license_id: null,
                 ...snapshotData
             }).select('id').single()
-            if (purErr) throw purErr
+            if (purErr) {
+                if (purErr.code === '23505') return NextResponse.json({ ok: true, alreadyProcessed: true })
+                throw purErr
+            }
 
             // Grant access levels for individual purchase
             await grantAccessForProduct(user.id, product_code, 'purchase', purchaseRow.id)
         }
 
-        // 8.1 Determine Email Type for client-side sending
-        let emailType: 'ACQUISTO_BASE' | 'ACQUISTO_INTERMEDIO' | 'ACQUISTO_AVANZATO' | 'ACQUISTO_TEAM' | null = null
+        // 8.1 Send Confirmation Email SERVER-SIDE
+        let emailType: EmailType | null = null
 
-        if (isTeam) {
+        if (isTeam || isExtraInvites) {
             emailType = 'ACQUISTO_TEAM'
         } else if (product_code.includes('base')) {
             emailType = 'ACQUISTO_BASE'
@@ -351,21 +360,18 @@ export async function POST(request: NextRequest) {
             emailType = 'ACQUISTO_AVANZATO'
         }
 
+        // Send confirmation email server-side (non-blocking)
+        if (emailType && user.email) {
+            sendEmail(emailType, { to_email: user.email })
+                .catch(e => console.error('[complete-purchase] Confirmation Email Error:', e));
+        }
+
         // 9. Async Invoice Notification (FIRE AND FORGET)
-        // Do NOT await this. Let it run in background.
-        // On Vercel Serverless, wrapping in waitUntil is ideal if available, 
-        // otherwise simply not awaiting works but unstable if lambda dies immediately.
-        // For reliability, we log error inside.
         if (billing && billing.customer_type === 'company' && billing.vat_number) {
-            // Use setImmediate or similar to detach if needed, but in NextJS route handlers
-            // simply calling without await continues execution until response flush.
-            // However, Vercel might freeze execution after response.
-            // Best effort: Log start, try send, log end.
             sendInvoiceNotificationClean(billing, user.email, product_code, truthPrice, captureId)
                 .catch(e => console.error('[complete-purchase] Invoice Send Background Error:', e));
         }
 
-        // Return with email info for client-side email sending
         return NextResponse.json({
             ok: true,
             emailType,

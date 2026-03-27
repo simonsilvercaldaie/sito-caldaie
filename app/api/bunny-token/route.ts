@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
+import { checkVideoAccessByBunnyId } from '@/lib/accessControl'
 
 function getSupabaseAdmin() {
     return createClient(
@@ -20,7 +21,7 @@ export async function GET(request: NextRequest) {
 
         // 1. Auth check
         const authHeader = request.headers.get('authorization') || ''
-        const token = authHeader.replace(/^Bearer\s+/i, '').trim()
+        const token = authHeader.replace(/^Bearer\\s+/i, '').trim()
         
         if (!token) {
             return NextResponse.json({ error: 'Token non fornito' }, { status: 401 })
@@ -33,9 +34,16 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Utente non autorizzato' }, { status: 401 })
         }
 
-        // 2. Load Bunny Stream configuration
+        // 2. ACCESS CHECK — Verify user has purchased this content
+        const accessResult = await checkVideoAccessByBunnyId(user.id, videoId)
+
+        if (!accessResult.authorized) {
+            console.warn(`[bunny-token] ACCESS DENIED: user=${user.email}, videoId=${videoId}, courseId=${accessResult.courseId || 'unknown'}`)
+            return NextResponse.json({ error: 'Accesso al contenuto non autorizzato' }, { status: 403 })
+        }
+
+        // 3. Load Bunny Stream configuration
         const securityKey = process.env.BUNNY_STREAM_TOKEN_KEY
-        // Using the Library ID provided by the user
         const libraryId = process.env.BUNNY_LIBRARY_ID || '625781'
 
         if (!securityKey) {
@@ -43,11 +51,8 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Configurazione server mancante' }, { status: 500 })
         }
 
-        // 3. Generate Token Authentication
-        // Expire in 6 hours
+        // 4. Generate Token Authentication
         const expires = Math.floor(Date.now() / 1000) + (6 * 60 * 60)
-        
-        // Formula: sha256(securityKey + videoId + expires)
         const hashString = `${securityKey}${videoId}${expires}`
         const hash = crypto.createHash('sha256').update(hashString).digest('hex')
 

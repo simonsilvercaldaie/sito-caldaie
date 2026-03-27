@@ -70,6 +70,13 @@ export async function middleware(request: NextRequest) {
     // Profile completion is no longer enforced by middleware.
     // It is checked at purchase time in the purchase pages and API.
 
+    // SECURITY: If user is not authenticated and path is not public, redirect to login
+    if (!user && !isPublicPath) {
+        const loginUrl = new URL('/login', request.url)
+        loginUrl.searchParams.set('redirect', pathname)
+        return NextResponse.redirect(loginUrl)
+    }
+
     // If user is on profile completion page but already completed, redirect home
     if (user && pathname === PROFILE_COMPLETION_PATH) {
         const { data: profile } = await supabase
