@@ -282,6 +282,11 @@ export async function createInvoice(
                 notes: `Pagamento PayPal — Rif: ${captureId}\nEmail: ${userEmail}`,
                 // Electronic invoicing
                 e_invoice: true,
+                // ei_data: mandatory for e-invoices
+                // MP05 = Bonifico (standard code for PayPal/electronic payments in FatturaPA)
+                ei_data: {
+                    payment_method: 'MP05',
+                },
             }
         }
 
