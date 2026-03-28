@@ -331,7 +331,7 @@ export async function createInvoice(
                         sender_id: 0, // Uses default account sender
                         recipient_email: userEmail,
                         subject: `Fattura acquisto - Simon Silver Caldaie`,
-                        body: `Gentile ${billing.first_name},\n\nTi ringraziamo per l'acquisto!\n\nIn allegato a questa email trovi la copia di cortesia in PDF della tua fattura.\nTi ricordiamo che la fattura elettronica originale è stata regolarmente emessa e trasmessa al tuo Cassetto Fiscale o P.IVA tramite lo SDI.\n\nPer accedere subito ai tuoi video corsi, clicca qui:\nhttps://simonsilvercaldaie.it/dashboard\n\nBuono studio e buon lavoro,\nSimon Silver Caldaie`,
+                        body: `Gentile ${billing.first_name},\n\nTi ringraziamo per l'acquisto!\n\nIn allegato a questa email trovi la copia di cortesia in PDF della tua fattura.\nTi ricordiamo che la fattura elettronica originale è stata regolarmente emessa e trasmessa al tuo Cassetto Fiscale o P.IVA tramite lo SDI.\n\nPer accedere subito ai tuoi video corsi, clicca qui:\nhttps://simonsilvercaldaie.it\n\nBuono studio e buon lavoro,\nSimon Silver Caldaie`,
                         include: {
                             document: true,
                             delivery_note: false,
