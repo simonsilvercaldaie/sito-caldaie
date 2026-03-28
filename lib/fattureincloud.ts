@@ -86,7 +86,7 @@ const PRODUCT_DESCRIPTIONS: Record<string, string> = {
 }
 
 function getProductDescription(productCode: string): string {
-    return PRODUCT_DESCRIPTIONS[productCode] || `Corso Metodo UKT — ${productCode}`
+    return PRODUCT_DESCRIPTIONS[productCode] || `Video Corso Formazione Tecnica — ${productCode}`
 }
 
 // -------------------------------------------------------------------

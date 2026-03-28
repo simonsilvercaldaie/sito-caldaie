@@ -397,30 +397,44 @@ export async function POST(request: NextRequest) {
             emailType = 'ACQUISTO_AVANZATO'
         }
 
-        // Send confirmation email server-side (non-blocking)
+        // Send confirmation email server-side (AWAIT — must complete before response)
         if (emailType && user.email) {
-            sendEmail(emailType, { to_email: user.email })
-                .catch(e => console.error('[complete-purchase] Confirmation Email Error:', e));
+            try {
+                await sendEmail(emailType, { to_email: user.email })
+                console.log(`[complete-purchase] Confirmation email sent: ${emailType} to ${user.email}`)
+            } catch (e) {
+                console.error('[complete-purchase] Confirmation Email Error:', e)
+            }
         }
 
-        // 9. Async Invoice via Fatture in Cloud (FIRE AND FORGET)
-        // Creates invoice for ALL customers (private + company)
+        // 9. Invoice via Fatture in Cloud (AWAIT — must complete before response)
+        // On Vercel serverless, fire-and-forget gets killed when the response is sent.
+        // We MUST await this call to ensure the invoice is actually created.
+        let ficResult: any = null
         if (billing) {
             const billingForFic = billing as BillingData
-            createInvoiceIfEnabled(
-                billingForFic,
-                user.email!,
-                product_code,
-                truthPrice,
-                captureId,
-                purchaseIdForInvoice
-            ).catch(e => console.error('[complete-purchase] FIC Invoice Error:', e));
+            try {
+                ficResult = await createInvoiceIfEnabled(
+                    billingForFic,
+                    user.email!,
+                    product_code,
+                    truthPrice,
+                    captureId,
+                    purchaseIdForInvoice
+                )
+                console.log(`[complete-purchase] FIC result:`, JSON.stringify(ficResult))
+            } catch (e) {
+                console.error('[complete-purchase] FIC Invoice Error:', e)
+            }
+        } else {
+            console.warn(`[complete-purchase] No billing profile found for user ${user.id} — skipping invoice`)
         }
 
         return NextResponse.json({
             ok: true,
             emailType,
-            email: user.email
+            email: user.email,
+            invoiceCreated: ficResult?.success || false
         })
 
     } catch (e) {

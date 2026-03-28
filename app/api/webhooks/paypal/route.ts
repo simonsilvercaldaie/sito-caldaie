@@ -373,25 +373,35 @@ export async function POST(request: NextRequest) {
             webhookPurchaseId = purchaseRow.id
         }
 
-        // 10. Send confirmation email (non-blocking)
+        // 10. Send confirmation email (AWAIT — serverless dies after response)
         const emailType = getEmailType(productCode)
         if (emailType && user.email) {
-            sendEmail(emailType, { to_email: user.email })
-                .catch(e => console.error('[webhook-paypal] Email error:', e))
+            try {
+                await sendEmail(emailType, { to_email: user.email })
+                console.log(`[webhook-paypal] Confirmation email sent: ${emailType} to ${user.email}`)
+            } catch (e) {
+                console.error('[webhook-paypal] Email error:', e)
+            }
         }
 
-        // 11. Async Invoice via Fatture in Cloud (FIRE AND FORGET)
-        // Creates invoice for ALL customers (private + company)
+        // 11. Invoice via Fatture in Cloud (AWAIT — must complete before response)
         if (billing) {
             const billingForFic = billing as unknown as BillingData
-            createInvoiceIfEnabled(
-                billingForFic,
-                user.email!,
-                productCode,
-                paidAmountCents,
-                captureId,
-                webhookPurchaseId
-            ).catch(e => console.error('[webhook-paypal] FIC Invoice Error:', e));
+            try {
+                const ficResult = await createInvoiceIfEnabled(
+                    billingForFic,
+                    user.email!,
+                    productCode,
+                    paidAmountCents,
+                    captureId,
+                    webhookPurchaseId
+                )
+                console.log(`[webhook-paypal] FIC result:`, JSON.stringify(ficResult))
+            } catch (e) {
+                console.error('[webhook-paypal] FIC Invoice Error:', e)
+            }
+        } else {
+            console.warn(`[webhook-paypal] No billing profile found for user ${user.email} — skipping invoice`)
         }
 
         console.log(`[webhook-paypal] SUCCESS: user=${user.email}, product=${productCode}, capture=${captureId}`)
