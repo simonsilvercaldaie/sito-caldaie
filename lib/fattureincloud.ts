@@ -329,7 +329,12 @@ export async function createInvoice(
 
         // 6. Send Courtesy Email if enabled
         if (config.sendCourtesyEmail && invoiceId) {
-            console.log(`[FIC] Scheduling courtesy email for invoice ${invoiceId} to ${userEmail}...`)
+            // Wait for FIC to generate the PDF before sending the email.
+            // Without this delay, the PDF attachment arrives corrupted.
+            console.log(`[FIC] Waiting 5s for PDF generation before sending email...`)
+            await new Promise(resolve => setTimeout(resolve, 5000))
+            
+            console.log(`[FIC] Sending courtesy email for invoice ${invoiceId} to ${userEmail}...`)
             try {
                 const emailPayload = {
                     data: {
@@ -349,9 +354,9 @@ export async function createInvoice(
                 }
                 const emailRes = await ficFetch(`/c/${config.companyId}/issued_documents/${invoiceId}/email`, 'POST', emailPayload)
                 if (emailRes.ok) {
-                    console.log(`[FIC] ✅ Courtesy email scheduled successfully for ${userEmail}`)
+                    console.log(`[FIC] ✅ Courtesy email sent successfully for ${userEmail}`)
                 } else {
-                    console.error(`[FIC] Failed to schedule courtesy email: ${emailRes.status}`, JSON.stringify(emailRes.data))
+                    console.error(`[FIC] Failed to send courtesy email: ${emailRes.status}`, JSON.stringify(emailRes.data))
                 }
             } catch (err) {
                 console.error('[FIC] Exception sending courtesy email:', err)
