@@ -83,6 +83,7 @@ export async function POST(request: NextRequest) {
         if (action === 'reset_devices_by_email') return await resetDevicesByEmail(body.email, adminEmail)
         if (action === 'update_team_seats') return await updateTeamSeats(body.teamId, body.seats, body.maxInvites, adminEmail)
         if (action === 'delete_team') return await deleteTeam(body.teamId, adminEmail)
+        if (action === 'get_active_users_list') return await getActiveUsersList()
 
         // New actions
         if (action === 'get_user_card') return await getUserCard(body.email)
@@ -326,6 +327,54 @@ async function grantAccess(email: string, products: string[], adminEmail: string
     })
 
     return NextResponse.json({ success: true, message: `Accesso garantito a ${email}` })
+}
+
+// -------------------------------------------------------------------
+// GET ACTIVE USERS LIST — Tutti quelli con un accesso
+// -------------------------------------------------------------------
+async function getActiveUsersList() {
+    // 1. Get all access rows
+    const { data: accesses, error: accErr } = await supabaseAdmin.from('user_access').select('*')
+    if (accErr) return NextResponse.json({ error: accErr.message }, { status: 500 })
+
+    // 2. Get all users
+    const { data: { users } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 10000 })
+    const userMap = new Map(users.map((u: any) => [u.id, u.email]))
+
+    // 3. Get profiles
+    const { data: profiles } = await supabaseAdmin.from('profiles').select('id, full_name, company_name')
+    const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]))
+
+    // 4. Group accesses by user ID
+    const grouped = new Map()
+    for (const acc of (accesses || [])) {
+        if (!grouped.has(acc.user_id)) {
+            const email = userMap.get(acc.user_id) || 'Unknown User'
+            const profile: any = profileMap.get(acc.user_id)
+            grouped.set(acc.user_id, {
+                user_id: acc.user_id,
+                email,
+                name: profile?.full_name || profile?.company_name || 'N/A',
+                access_levels: new Set(),
+                sources: new Set()
+            })
+        }
+        const userRec = grouped.get(acc.user_id)
+        userRec.access_levels.add(acc.access_level)
+        userRec.sources.add(acc.source)
+    }
+
+    // Convert sets to arrays for JSON
+    const result = Array.from(grouped.values()).map(r => ({
+        ...r,
+        access_levels: Array.from(r.access_levels),
+        sources: Array.from(r.sources)
+    }))
+
+    // Ordinati per email
+    result.sort((a, b) => a.email.localeCompare(b.email))
+
+    return NextResponse.json(result)
 }
 
 async function getStats() {

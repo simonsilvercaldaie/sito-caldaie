@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import { Loader2, AlertTriangle, UserX, ShieldAlert, RefreshCw, MonitorX, Search, X, ChevronDown, ChevronUp, FileText, Shield, Clock } from 'lucide-react'
+import { Loader2, AlertTriangle, UserX, ShieldAlert, RefreshCw, MonitorX, Search, X, ChevronDown, ChevronUp, FileText, Shield, Clock, Users } from 'lucide-react'
 
 export default function AdminPage() {
     const [loading, setLoading] = useState(true)
@@ -259,8 +259,11 @@ export default function AdminPage() {
                 </div>
             </div>
 
-            {/* USER CARD SEARCH — New Feature */}
+            {/* USER CARD SEARCH */}
             <UserCardSearch />
+
+            {/* DIRECTORY TUTTI GLI UTENTI ATTIVI */}
+            <UserDirectory />
 
             <div className="grid lg:grid-cols-3 gap-8">
                 {/* LEFT COLUMN: TICKETS & GRANT ACCESS */}
@@ -463,7 +466,7 @@ export default function AdminPage() {
                                                         type="number"
                                                         defaultValue={team.seats}
                                                         min={1}
-                                                        id={`seats-${team.id}`}
+                                                        name={`seats-${team.id}`}
                                                         aria-label="Posti Totali"
                                                         className="w-16 p-1 border border-slate-300 rounded text-center text-xs font-bold text-slate-700 focus:ring-1 focus:ring-indigo-500 outline-none"
                                                     />
@@ -474,7 +477,7 @@ export default function AdminPage() {
                                                         type="number"
                                                         defaultValue={team.max_invites_total || 0}
                                                         min={1}
-                                                        id={`invites-${team.id}`}
+                                                        name={`invites-${team.id}`}
                                                         aria-label="Max Inviti Totali"
                                                         className="w-16 p-1 border border-slate-300 rounded text-center text-xs font-bold text-slate-700 focus:ring-1 focus:ring-indigo-500 outline-none"
                                                     />
@@ -484,8 +487,8 @@ export default function AdminPage() {
                                                 <button
                                                     disabled={actionLoading}
                                                     onClick={() => {
-                                                        const seatsVal = (document.getElementById(`seats-${team.id}`) as HTMLInputElement).value;
-                                                        const invitesVal = (document.getElementById(`invites-${team.id}`) as HTMLInputElement).value;
+                                                        const seatsVal = (document.querySelector(`input[name="seats-${team.id}"]`) as HTMLInputElement).value;
+                                                        const invitesVal = (document.querySelector(`input[name="invites-${team.id}"]`) as HTMLInputElement).value;
                                                         handleUpdateTeamLimits(team.id, parseInt(seatsVal, 10), parseInt(invitesVal, 10));
                                                     }}
                                                     className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold rounded shadow-sm transition-colors disabled:opacity-50"
@@ -515,6 +518,93 @@ export default function AdminPage() {
                 </div>
             </div>
 
+        </div>
+    )
+}
+
+// ===================================================================
+// USER DIRECTORY — List all active users
+// ===================================================================
+function UserDirectory() {
+    const [users, setUsers] = useState<any[]>([])
+    const [loading, setLoading] = useState(false)
+    const [expanded, setExpanded] = useState(false)
+
+    const fetchDirectory = async () => {
+        if (users.length > 0) {
+            setExpanded(!expanded)
+            return
+        }
+        setExpanded(true)
+        setLoading(true)
+        const { data: { session } } = await supabase.auth.getSession()
+        try {
+            const res = await fetch('/api/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+                body: JSON.stringify({ action: 'get_active_users_list' })
+            })
+            if (res.ok) setUsers(await res.json())
+        } catch { 
+            alert('Errore caricamento lista utenti')
+        } finally { setLoading(false) }
+    }
+
+    return (
+        <div className="mb-8">
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <div className="p-6 border-b border-slate-100 flex justify-between items-center cursor-pointer" onClick={fetchDirectory}>
+                    <h2 className="font-bold text-lg text-slate-800 flex items-center gap-2">
+                        <Users className="w-5 h-5 text-indigo-600" />
+                        Directory Utenti Attivi ({users.length > 0 ? users.length : 'Clicca per caricare'})
+                    </h2>
+                    {loading ? <Loader2 className="w-5 h-5 animate-spin text-indigo-600" /> : expanded ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+                </div>
+
+                {expanded && users.length > 0 && (
+                    <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-slate-50 text-slate-500 font-semibold sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th className="p-4">Email / Nome</th>
+                                    <th className="p-4">ID Formato</th>
+                                    <th className="p-4">Livelli Sbloccati</th>
+                                    <th className="p-4 flex-wrap">Fonti</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {users.map(u => (
+                                    <tr key={u.user_id} className="hover:bg-slate-50/50">
+                                        <td className="p-4">
+                                            <div className="font-bold text-slate-800">{u.email}</div>
+                                            <div className="text-xs text-slate-500">{u.name}</div>
+                                        </td>
+                                        <td className="p-4 font-mono text-xs text-slate-400">{u.user_id.slice(0, 12)}...</td>
+                                        <td className="p-4">
+                                            <div className="flex gap-1 flex-wrap">
+                                                {u.access_levels.map((l: string) => (
+                                                    <span key={l} className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                                                        {l}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="flex gap-1 flex-wrap">
+                                                {u.sources.map((s: string) => (
+                                                    <span key={s} className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-slate-100 text-slate-600 border border-slate-200">
+                                                        {s}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+            </div>
         </div>
     )
 }
