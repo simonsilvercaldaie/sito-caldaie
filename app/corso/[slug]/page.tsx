@@ -902,7 +902,13 @@ export default function CorsoPage() {
                                                     </p>
 
                                                     <button
-                                                        onClick={() => setShowBundleWarning(true)}
+                                                        onClick={() => {
+                                                            if (user && profileCompleted) {
+                                                                setShowBundleWarning(true)
+                                                            } else {
+                                                                setViewMode('individual')
+                                                            }
+                                                        }}
                                                         className={`w-full py-4 ${colors.button} text-white font-bold text-lg rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5`}
                                                     >
                                                         Acquista questo livello
