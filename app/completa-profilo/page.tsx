@@ -40,6 +40,7 @@ function CompletaProfiloContent() {
     const [address, setAddress] = useState('')
     const [city, setCity] = useState('')
     const [postalCode, setPostalCode] = useState('')
+    const [phone, setPhone] = useState('')
 
     useEffect(() => {
         const checkSession = async () => {
@@ -103,6 +104,14 @@ function CompletaProfiloContent() {
         const capClean = postalCode.trim()
         if (!/^\d{5}$/.test(capClean)) {
             setError('Il CAP deve essere di 5 cifre (es. "20100")')
+            setSaving(false)
+            return
+        }
+
+        // Telefono: obbligatorio, minimo 8 cifre/caratteri
+        const phoneClean = phone.trim()
+        if (!phoneClean || phoneClean.length < 8) {
+            setError('Inserisci un numero di telefono valido (minimo 8 caratteri)')
             setSaving(false)
             return
         }
@@ -175,7 +184,8 @@ function CompletaProfiloContent() {
                     fiscal_code: customerType === 'private' ? fiscalCode.trim() : null,
                     address: address.trim(),
                     city: city.trim(),
-                    postal_code: postalCode.trim()
+                    postal_code: postalCode.trim(),
+                    phone: phoneClean
                 })
             })
 
@@ -426,11 +436,26 @@ Simon Silver
                             </div>
                         )}
 
-                        {/* Indirizzo */}
+                        {/* Indirizzo e Contatti */}
                         <div className="pt-4 border-t border-gray-100">
-                            <h3 className="font-bold text-gray-800 mb-4">Indirizzo di Fatturazione</h3>
+                            <h3 className="font-bold text-gray-800 mb-4">Indirizzo e Contatti</h3>
 
                             <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Telefono (WhatsApp / Chiamata) <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        required
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value)}
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-gray-900 placeholder:text-gray-400"
+                                        placeholder="+39 333 1234567"
+                                    />
+                                    <p className="text-xs text-gray-500 mt-1">Usato esclusivamente per assistenza sulla fatturazione.</p>
+                                </div>
+
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">
                                         Indirizzo <span className="text-red-500">*</span>

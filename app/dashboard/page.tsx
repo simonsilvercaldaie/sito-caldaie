@@ -24,6 +24,7 @@ export default function DashboardPage() {
     const [piva, setPiva] = useState('')
     const [sdi, setSdi] = useState('')
     const [pec, setPec] = useState('')
+    const [phone, setPhone] = useState('')
 
     const [updatingProfile, setUpdatingProfile] = useState(false)
 
@@ -82,6 +83,7 @@ export default function DashboardPage() {
                 setCf(billing.fiscal_code || '')
                 setPiva(billing.vat_number || '')
                 setSdi(billing.sdi_code || '')
+                setPhone(billing.phone || '')
                 // PEC handling if separate column exists, otherwise reuse SDI logic or ignore
             } else {
                 // Fallback to metadata only if no billing profile exists (legacy)
@@ -206,6 +208,7 @@ export default function DashboardPage() {
                 city,
                 postal_code: cap,
                 fiscal_code: cf,
+                phone: phone.trim() || null,
                 updated_at: new Date().toISOString()
             }
 
@@ -423,6 +426,18 @@ export default function DashboardPage() {
                                         value={cf}
                                         onChange={(e) => setCf(e.target.value)}
                                         className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none uppercase text-black"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="phone" className="block text-sm font-medium text-gray-800 mb-1">Telefono</label>
+                                    <input
+                                        id="phone"
+                                        type="tel"
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value)}
+                                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary outline-none text-black"
+                                        placeholder='+39 333 1234567'
                                     />
                                 </div>
 

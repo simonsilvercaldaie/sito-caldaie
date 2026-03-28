@@ -49,13 +49,6 @@ export const SESSION_TTL_DAYS = 7
 export const DEVICE_RESET_COOLDOWN_DAYS = 30
 
 // ============================================
-// EMAIL NOTIFICHE
-// ============================================
-
-// Email per notifiche fatturazione (acquisti aziendali)
-export const INVOICE_NOTIFICATION_EMAIL = 'fatture@simonsilvercaldaie.it'
-
-// ============================================
 // FATTURE IN CLOUD
 // ============================================
 

@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { INVOICE_NOTIFICATION_EMAIL } from '@/lib/constants'
+// constants import removed (INVOICE_NOTIFICATION_EMAIL no longer exists)
 import { grantAccessForProduct, revokeAllAccess } from '@/lib/accessControl'
 
 // Initialize Admin Client safely (prevent build error if env missing)

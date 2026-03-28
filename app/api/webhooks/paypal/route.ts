@@ -381,7 +381,8 @@ export async function POST(request: NextRequest) {
         }
 
         // 11. Async Invoice via Fatture in Cloud (FIRE AND FORGET)
-        if (billing && billing.customer_type === 'company' && billing.vat_number) {
+        // Creates invoice for ALL customers (private + company)
+        if (billing) {
             const billingForFic = billing as unknown as BillingData
             createInvoiceIfEnabled(
                 billingForFic,

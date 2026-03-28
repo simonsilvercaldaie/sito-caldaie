@@ -52,6 +52,7 @@ export default function CorsoPage() {
     const [profileCompleted, setProfileCompleted] = useState(false)
 
     const [viewMode, setViewMode] = useState<'individual' | 'team' | null>(null)
+    const [showBundleWarning, setShowBundleWarning] = useState(false)
     const [teamAccess, setTeamAccess] = useState<'none' | 'multi' | 'scuola'>('none')
     const [secureVideoUrl, setSecureVideoUrl] = useState<string>("")
     const youtubeRef = useRef<HTMLIFrameElement>(null)
@@ -901,7 +902,7 @@ export default function CorsoPage() {
                                                     </p>
 
                                                     <button
-                                                        onClick={() => setViewMode('individual')}
+                                                        onClick={() => setShowBundleWarning(true)}
                                                         className={`w-full py-4 ${colors.button} text-white font-bold text-lg rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5`}
                                                     >
                                                         Acquista questo livello
@@ -1042,6 +1043,52 @@ export default function CorsoPage() {
                         </div>
                     </div>
                 </div>
+
+                {/* MODAL DI UPSELL (BUNDLE WARNING) */}
+                {showBundleWarning && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowBundleWarning(false)}></div>
+                        <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full relative z-10 overflow-hidden flex flex-col items-center text-center p-8 animate-in fade-in zoom-in duration-300">
+                            <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-6">
+                                <AlertTriangle className="w-8 h-8 text-red-600" />
+                            </div>
+                            <h3 className="text-2xl font-extrabold text-gray-900 mb-4">
+                                Aspetta! Sicuro di voler comprare solo questo livello a prezzo pieno?
+                            </h3>
+                            <p className="text-gray-600 font-medium mb-6 leading-relaxed">
+                                Se acquisti i 3 livelli separatamente finirai per spendere <strong>1.200€</strong>. 
+                                Acquistando ora il Pacchetto Completo, li sblocchi tutti e 3 subito a <strong>soli 1.000€</strong> 
+                                (<span className="text-green-600 font-bold">risparmi 200€ netti!</span>).
+                            </p>
+                            <div className="p-4 bg-amber-50 border border-amber-200 rounded-xl mb-8">
+                                <p className="text-sm text-amber-800">
+                                    <strong>Attenzione:</strong> se acquisti questo singolo livello ora, in futuro non potrai più attivare il pacchetto intero a prezzo scontato.
+                                </p>
+                            </div>
+                            
+                            <div className="w-full space-y-3">
+                                <Link 
+                                    href="/pacchetto-completo"
+                                    className="block w-full py-4 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold text-lg rounded-xl hover:shadow-lg hover:-translate-y-0.5 transition-all shadow-amber-500/30"
+                                >
+                                    🔥 Voglio risparmiare 200€<br/><span className="text-sm font-normal opacity-90">(Bundle Completo a 1.000€)</span>
+                                </Link>
+                                <button
+                                    onClick={() => {
+                                        setShowBundleWarning(false)
+                                        setViewMode('individual')
+                                        setTimeout(() => {
+                                            document.getElementById('purchase-card')?.scrollIntoView({ behavior: 'smooth' })
+                                        }, 100)
+                                    }}
+                                    className="block w-full py-3 text-gray-500 text-sm font-medium hover:bg-gray-100 rounded-xl transition-colors"
+                                >
+                                    Ho capito, procedi con l'acquisto singolo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </main>
 
             <footer className="bg-slate-900 text-slate-400 py-12 px-4 border-t border-slate-800">

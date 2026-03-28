@@ -38,7 +38,8 @@ export async function POST(request: NextRequest) {
             fiscal_code,
             address,
             city,
-            postal_code
+            postal_code,
+            phone
         } = body
 
         // 3. Validazioni
@@ -57,6 +58,9 @@ export async function POST(request: NextRequest) {
         }
         if (!/^\d{5}$/.test(postal_code?.trim() || '')) {
             return NextResponse.json({ error: 'CAP non valido (5 cifre)' }, { status: 400 })
+        }
+        if (!phone?.trim() || phone.trim().length < 8) {
+            return NextResponse.json({ error: 'Telefono non valido (minimo 8 caratteri)' }, { status: 400 })
         }
 
         if (!['private', 'company'].includes(customer_type)) {
@@ -105,6 +109,7 @@ export async function POST(request: NextRequest) {
             address: address.trim(),
             city: city.trim(),
             postal_code: postal_code.trim(),
+            phone: phone.trim(),
             updated_at: new Date().toISOString()
         }
 

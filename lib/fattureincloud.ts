@@ -7,8 +7,9 @@
  * DESIGN:
  * - Non-blocking: never throws, always returns a result
  * - Idempotent: checks fic_invoice_id before creating
+ * - All customers: both private (codice fiscale) and company (P.IVA)
  * - Configurable: FIC_ENABLED kill switch, VAT regime via FIC_VAT_RATE
- * - Fallback: caller can fall back to email notification on failure
+ * - Future-ready: easy switch from forfettario (0%) to ordinario (22%)
  */
 
 import { createClient } from '@supabase/supabase-js'
@@ -24,11 +25,11 @@ function getFicConfig() {
         accessToken: process.env.FIC_ACCESS_TOKEN || '',
         companyId: process.env.FIC_COMPANY_ID || '',
         enabled: process.env.FIC_ENABLED === 'true',
-        // VAT: 22 for regime ordinario, 0 for forfettario
-        vatRate: parseInt(process.env.FIC_VAT_RATE || '22', 10),
-        // For forfettario regime, the exemption text
+        // VAT: 0 for regime forfettario (current), 22 for ordinario (future)
+        vatRate: parseInt(process.env.FIC_VAT_RATE || '0', 10),
+        // For forfettario regime, the exemption text on every invoice
         vatExemptionText: process.env.FIC_VAT_EXEMPTION_TEXT || 
-            'Operazione non soggetta a IVA ai sensi dell\'art. 1, commi da 54 a 89, della Legge n. 190/2014',
+            'Operazione in franchigia da IVA ai sensi dell\'art. 1, commi da 54 a 89, della Legge n. 190/2014 e ss.mm.ii.',
     }
 }
 
@@ -54,6 +55,7 @@ export interface BillingData {
     address: string
     city: string
     postal_code: string
+    phone?: string // Aggiunto telefono opzionale per retrocompatibilità
 }
 
 export interface InvoiceResult {
@@ -121,54 +123,37 @@ async function ficFetch(
 }
 
 // -------------------------------------------------------------------
-// CLIENT (ENTITY) MANAGEMENT
+// BUILD ENTITY (Customer) FOR INVOICE
 // -------------------------------------------------------------------
 
 /**
- * Finds or creates a client entity in FIC by VAT number.
- * Returns the entity object to embed in the invoice.
+ * Builds the entity object for the FIC invoice.
+ * Handles both private customers (codice fiscale) and companies (P.IVA + SDI).
  */
-async function findOrCreateClient(
-    billing: BillingData
-): Promise<{ id?: number; name: string; vat_number?: string; tax_code?: string; 
-    address_street?: string; address_city?: string; address_postal_code?: string;
-    country?: string; ei_code?: string }> {
-    
-    const config = getFicConfig()
-    const companyId = config.companyId
-
-    // Try to find existing client by VAT number
-    if (billing.vat_number) {
-        try {
-            const searchRes = await ficFetch(
-                `/c/${companyId}/entities/clients?q=${encodeURIComponent(billing.vat_number)}`
-            )
-            if (searchRes.ok && searchRes.data?.data?.length > 0) {
-                const existing = searchRes.data.data[0]
-                console.log(`[FIC] Found existing client: id=${existing.id}, name=${existing.name}`)
-                return existing
-            }
-        } catch (e) {
-            console.warn('[FIC] Client search failed, will create inline:', e)
-        }
-    }
-
-    // Build entity for inline creation (FIC will create the client automatically 
-    // when creating the invoice with entity data)
+function buildEntityFromBilling(billing: BillingData): any {
     const entity: any = {
-        name: billing.company_name || `${billing.first_name} ${billing.last_name}`,
-        vat_number: billing.vat_number || undefined,
-        tax_code: billing.fiscal_code || undefined,
+        name: billing.customer_type === 'company' && billing.company_name
+            ? billing.company_name
+            : `${billing.first_name} ${billing.last_name}`,
+        first_name: billing.first_name,
+        last_name: billing.last_name,
         address_street: billing.address || undefined,
         address_city: billing.city || undefined,
         address_postal_code: billing.postal_code || undefined,
         country: 'Italia',
         country_iso: 'IT',
+        phone: billing.phone || undefined, // Aggiunto telefono all'anagrafica
     }
 
-    // SDI code for electronic invoicing
-    if (billing.sdi_code) {
-        entity.ei_code = billing.sdi_code
+    if (billing.customer_type === 'company') {
+        // Azienda: P.IVA + Codice SDI/PEC obbligatori per fattura elettronica
+        if (billing.vat_number) entity.vat_number = billing.vat_number
+        if (billing.sdi_code) entity.ei_code = billing.sdi_code
+    } else {
+        // Privato: Codice Fiscale
+        if (billing.fiscal_code) entity.tax_code = billing.fiscal_code
+        // Privati: codice destinatario = "0000000" per fattura elettronica
+        entity.ei_code = '0000000'
     }
 
     return entity
@@ -180,6 +165,7 @@ async function findOrCreateClient(
 
 /**
  * Creates an invoice on Fatture in Cloud.
+ * Works for BOTH private and company customers.
  * 
  * @param billing - Customer billing data from billing_profiles table
  * @param userEmail - Customer email
@@ -209,11 +195,6 @@ export async function createInvoice(
         return { success: false, error: 'Missing FIC credentials' }
     }
 
-    // Guard: only for companies with VAT
-    if (billing.customer_type !== 'company' || !billing.vat_number) {
-        return { success: false, skipped: true, skipReason: 'Not a company or no VAT number' }
-    }
-
     // Idempotency: check if invoice already created for this purchase
     if (purchaseId) {
         try {
@@ -234,8 +215,8 @@ export async function createInvoice(
     }
 
     try {
-        // 1. Find or create the client entity
-        const entity = await findOrCreateClient(billing)
+        // 1. Build the entity (customer)
+        const entity = buildEntityFromBilling(billing)
 
         // 2. Calculate amounts
         const grossAmount = amountCents / 100
@@ -243,7 +224,7 @@ export async function createInvoice(
         let vatValue: number
 
         if (config.vatRate === 0) {
-            // Regime forfettario: no VAT
+            // Regime forfettario: no VAT, the gross IS the net
             netPrice = grossAmount
             vatValue = 0
         } else {
@@ -255,13 +236,18 @@ export async function createInvoice(
         // 3. Build the invoice payload
         const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
 
+        // Build VAT object
+        const vatObj: any = { value: vatValue }
+        if (vatValue === 0) {
+            vatObj.description = config.vatExemptionText
+            vatObj.is_disabled = true
+        }
+
         const invoicePayload: any = {
             data: {
                 type: 'invoice',
                 date: today,
-                entity: {
-                    ...entity,
-                },
+                entity: entity,
                 items_list: [
                     {
                         product_id: null,
@@ -269,10 +255,7 @@ export async function createInvoice(
                         name: getProductDescription(productCode),
                         net_price: parseFloat(netPrice.toFixed(2)),
                         qty: 1,
-                        vat: {
-                            value: vatValue,
-                            ...(vatValue === 0 ? { description: config.vatExemptionText, is_disabled: true } : {}),
-                        },
+                        vat: vatObj,
                         discount: 0,
                     }
                 ],
@@ -292,16 +275,18 @@ export async function createInvoice(
                     code: 'it',
                     name: 'Italiano',
                 },
-                notes: `Rif. PayPal: ${captureId}\nEmail cliente: ${userEmail}`,
-                // Electronic invoicing (fattura elettronica)
+                notes: `Pagamento PayPal — Rif: ${captureId}\nEmail: ${userEmail}`,
+                // Electronic invoicing
                 e_invoice: true,
-                // Let FIC handle numbering automatically
-                numeration: '/FE', // Common convention: invoice_number/FE
             }
         }
 
         // 4. Create the invoice
-        console.log(`[FIC] Creating invoice for ${billing.company_name} (${billing.vat_number}), product=${productCode}, amount=€${grossAmount}`)
+        const customerLabel = billing.customer_type === 'company' 
+            ? `${billing.company_name} (P.IVA: ${billing.vat_number})`
+            : `${billing.first_name} ${billing.last_name} (CF: ${billing.fiscal_code})`
+        
+        console.log(`[FIC] Creating invoice for ${customerLabel}, product=${productCode}, amount=€${grossAmount}`)
         
         const result = await ficFetch(
             `/c/${config.companyId}/issued_documents`,
@@ -315,7 +300,8 @@ export async function createInvoice(
         }
 
         const invoiceId = result.data?.data?.id
-        console.log(`[FIC] ✅ Invoice created successfully: id=${invoiceId}`)
+        const invoiceNumber = result.data?.data?.number
+        console.log(`[FIC] ✅ Invoice created: id=${invoiceId}, number=${invoiceNumber}`)
 
         // 5. Save invoice ID back to purchase record
         if (purchaseId && invoiceId) {
@@ -347,8 +333,6 @@ export async function createInvoice(
 /**
  * Fire-and-forget wrapper that creates an invoice if FIC is enabled.
  * Never throws — logs errors and returns the result.
- * 
- * @param sendFallbackEmail - Optional callback to send email notification as fallback
  */
 export async function createInvoiceIfEnabled(
     billing: BillingData,
@@ -356,26 +340,16 @@ export async function createInvoiceIfEnabled(
     productCode: string,
     amountCents: number,
     captureId: string,
-    purchaseId?: string,
-    sendFallbackEmail?: () => Promise<void>
+    purchaseId?: string
 ): Promise<InvoiceResult> {
     const result = await createInvoice(billing, userEmail, productCode, amountCents, captureId, purchaseId)
 
-    if (result.skipped) {
-        // FIC disabled or not applicable — fall back to email
-        if (result.skipReason === 'FIC_ENABLED=false' && sendFallbackEmail) {
-            console.log('[FIC] Disabled, sending fallback email notification')
-            await sendFallbackEmail().catch(e => console.error('[FIC] Fallback email error:', e))
-        }
-        return result
+    if (result.skipped && result.skipReason !== 'already_created') {
+        console.log(`[FIC] Skipped: ${result.skipReason}`)
     }
 
-    if (!result.success) {
-        // FIC failed — fall back to email
-        console.error(`[FIC] Invoice creation failed: ${result.error}. Sending fallback email.`)
-        if (sendFallbackEmail) {
-            await sendFallbackEmail().catch(e => console.error('[FIC] Fallback email error:', e))
-        }
+    if (!result.success && !result.skipped) {
+        console.error(`[FIC] Invoice creation failed for ${userEmail}: ${result.error}`)
     }
 
     return result

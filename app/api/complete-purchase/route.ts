@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL, INVOICE_NOTIFICATION_EMAIL } from '@/lib/constants'
+import { TOS_VERSION, SERVER_PAYMENTS_ENABLED, PAYPAL_API_URL } from '@/lib/constants'
 import { getExpectedPriceCents } from '@/lib/serverPricing'
 import { checkRateLimit } from '@/lib/rateLimit'
 import { sendEmail, EmailType } from '@/lib/email'
@@ -403,8 +403,8 @@ export async function POST(request: NextRequest) {
         }
 
         // 9. Async Invoice via Fatture in Cloud (FIRE AND FORGET)
-        // Falls back to email notification if FIC is disabled or fails
-        if (billing && billing.customer_type === 'company' && billing.vat_number) {
+        // Creates invoice for ALL customers (private + company)
+        if (billing) {
             const billingForFic = billing as BillingData
             createInvoiceIfEnabled(
                 billingForFic,
@@ -412,8 +412,7 @@ export async function POST(request: NextRequest) {
                 product_code,
                 truthPrice,
                 captureId,
-                purchaseIdForInvoice,
-                () => sendInvoiceNotificationClean(billing as BillingProfile, user.email!, product_code, truthPrice, captureId)
+                purchaseIdForInvoice
             ).catch(e => console.error('[complete-purchase] FIC Invoice Error:', e));
         }
 
@@ -426,65 +425,5 @@ export async function POST(request: NextRequest) {
     } catch (e) {
         console.error('Internal Error', e)
         return NextResponse.json({ ok: false, error: 'internal_server_error' }, { status: 500 })
-    }
-}
-
-async function sendInvoiceNotificationClean(
-    billing: BillingProfile,
-    userEmail: string,
-    productCode: string,
-    amountCents: number,
-    captureId: string
-): Promise<void> {
-    // 5 Second Timeout for Email Service
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), 5000);
-
-    try {
-        const emailData = {
-            service_id: 'service_fwvybtr',
-            template_id: 'template_b8p58ci',
-            user_id: 'NcJg5-hiu3gVJiJZ-',
-            template_params: {
-                from_name: 'FATTURAZIONE AUTOMATICA',
-                from_email: INVOICE_NOTIFICATION_EMAIL,
-                subject: `NUOVA FATTURA DA EMETTERE - ${billing.company_name || 'Azienda'}`,
-                message: `
-DATI FATTURAZIONE:
-------------------
-Nome: ${billing.first_name} ${billing.last_name}
-Ragione Sociale: ${billing.company_name}
-Partita IVA: ${billing.vat_number}
-Codice SDI/PEC: ${billing.sdi_code || 'N/A'}
-Email: ${userEmail}
-Indirizzo: ${billing.address}, ${billing.postal_code} ${billing.city}
-
-DETTAGLI ORDINE:
-----------------
-Prodotto: ${productCode}
-Importo: €${(amountCents / 100).toFixed(2)}
-ID PayPal: ${captureId}
-Data: ${new Date().toLocaleString('it-IT', { timeZone: 'Europe/Rome' })}
-                `.trim()
-            }
-        }
-
-        const response = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(emailData),
-            signal: controller.signal
-        })
-        clearTimeout(id);
-
-        if (response.ok) {
-            console.log(`[complete-purchase] Invoice notification sent for ${userEmail}`)
-        } else {
-            console.error(`[complete-purchase] Invoice notification failed: ${response.status}`)
-        }
-    } catch (err) {
-        clearTimeout(id);
-        console.error('[complete-purchase] Invoice notification error:', err)
-        // Non-blocking for user, but we log strictly.
     }
 }
