@@ -72,15 +72,15 @@ export interface InvoiceResult {
 // -------------------------------------------------------------------
 
 const PRODUCT_DESCRIPTIONS: Record<string, string> = {
-    'base': 'Corso Metodo UKT — Pacchetto Base (9 Video)',
-    'intermediate': 'Corso Metodo UKT — Pacchetto Intermedio (9 Video)',
-    'advanced': 'Corso Metodo UKT — Pacchetto Avanzato (9 Video)',
-    'complete': 'Corso Metodo UKT — Pacchetto Completo (27 Video)',
-    'complete_bundle': 'Corso Metodo UKT — Pacchetto Completo Bundle (27 Video)',
-    'multi_5': 'Licenza Multidipendente 5 Posti — Corso Metodo UKT Completo',
-    'multi_10': 'Licenza Multidipendente 10 Posti — Corso Metodo UKT Completo',
-    'multi_25': 'Licenza Multidipendente 25 Posti — Corso Metodo UKT Completo',
-    'scuola_10': 'Licenza Scuola/Formazione 10 Posti — Corso Metodo UKT Completo',
+    'base': 'Video Corso Formazione Tecnica — Pacchetto Base (9 Video)',
+    'intermediate': 'Video Corso Formazione Tecnica — Pacchetto Intermedio (9 Video)',
+    'advanced': 'Video Corso Formazione Tecnica — Pacchetto Avanzato (9 Video)',
+    'complete': 'Video Corso Formazione Tecnica — Pacchetto Completo (27 Video)',
+    'complete_bundle': 'Video Corso Formazione Tecnica — Pacchetto Completo Bundle (27 Video)',
+    'multi_5': 'Licenza Multidipendente 5 Posti — Video Corso Completo',
+    'multi_10': 'Licenza Multidipendente 10 Posti — Video Corso Completo',
+    'multi_25': 'Licenza Multidipendente 25 Posti — Video Corso Completo',
+    'scuola_10': 'Licenza Scuola/Formazione 10 Posti — Video Corso Completo',
     'extra_invito_1': 'Pacchetto Invito Extra (+1 Posto) — Licenza Multidipendente',
 }
 
