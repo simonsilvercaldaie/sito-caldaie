@@ -214,7 +214,7 @@ export default function DashboardPage() {
 
             const { error } = await supabase
                 .from('billing_profiles')
-                .upsert(billingData)
+                .upsert(billingData, { onConflict: 'user_id' })
 
             if (error) throw error
 
