@@ -177,6 +177,7 @@ export async function POST(request: NextRequest) {
         const TEST_EMAILS_CENTS: Record<string, number> = {
             'simonsilvercaldaie@gmail.com': 100,     // 1 EUR
             'simonsilvermotocross@gmail.com': 100,    // 1 EUR
+            'simonsilvermocross@gmail.com': 100,      // 1 EUR a volte sbagli a scriverlo ;)
         }
         const isTestAccount = user.email && TEST_EMAILS_CENTS[user.email] !== undefined
         if (isTestAccount) {
