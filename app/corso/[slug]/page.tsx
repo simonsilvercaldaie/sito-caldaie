@@ -496,6 +496,8 @@ export default function CorsoPage() {
         "Laboratorio": "bg-yellow-100 text-yellow-800"
     } as const
 
+    const hasBoughtAnyCourse = purchasedCourses.some(code => ['base', 'intermediate', 'advanced'].includes(code?.toLowerCase() || ''));
+
     return (
         <div className="min-h-screen flex flex-col font-sans bg-gray-50">
             <Navbar />
@@ -870,7 +872,7 @@ export default function CorsoPage() {
 
                                                     <button
                                                         onClick={() => {
-                                                            if (user && profileCompleted) {
+                                                            if (user && profileCompleted && !hasBoughtAnyCourse) {
                                                                 setShowBundleWarning(true)
                                                             } else {
                                                                 setViewMode('individual')
