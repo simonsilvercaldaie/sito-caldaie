@@ -2,11 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { checkRateLimit } from '@/lib/rateLimit'
 import { PAYPAL_API_URL } from '@/lib/constants'
-
-// Service Role Client
-// Service Role Client
-// Removed top level init
-
+import { createInvoiceIfEnabled, BillingData } from '@/lib/fattureincloud'
 
 // PayPal Config — uses PAYPAL_API_URL from constants.ts for consistency
 
@@ -205,23 +201,53 @@ export async function POST(request: NextRequest) {
         }
 
         // 8. Record upgrade purchase
-        await supabaseAdmin
+        const productCode = `upgrade_to_multi_${target_team_size}`
+        const { data: purchaseRow } = await supabaseAdmin
             .from('purchases')
             .insert({
                 user_id: user.id,
-                product_code: `upgrade_to_multi_${target_team_size}`,
+                product_code: productCode,
                 plan_type: 'team_upgrade',
                 amount_cents: expectedPrice,
                 paypal_order_id: orderId,
                 paypal_capture_id: captureId
             })
+            .select('id')
+            .single()
 
         console.log(`[upgrade-license] User ${user.email} upgraded from ${from_status} to team_${target_team_size}`)
+
+        // 9. Create FIC invoice (AWAIT to prevent serverless termination)
+        let ficResult: any = null
+        const { data: billing } = await supabaseAdmin
+            .from('billing_profiles')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle()
+
+        if (billing) {
+            try {
+                ficResult = await createInvoiceIfEnabled(
+                    billing as unknown as BillingData,
+                    user.email || '',
+                    productCode,
+                    expectedPrice,
+                    captureId || orderId,
+                    purchaseRow?.id
+                )
+                console.log(`[upgrade-license] FIC result:`, JSON.stringify(ficResult))
+            } catch (e) {
+                console.error('[upgrade-license] FIC Invoice Error:', e)
+            }
+        } else {
+            console.warn(`[upgrade-license] No billing profile for user ${user.id} — skipping invoice`)
+        }
 
         return NextResponse.json({
             ok: true,
             email: user.email,
-            target_team_size
+            target_team_size,
+            invoiceCreated: ficResult?.success || false
         })
 
     } catch (e: any) {
