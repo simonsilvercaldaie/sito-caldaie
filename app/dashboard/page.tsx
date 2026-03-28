@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import { LogOut, User, Smartphone, Save, Loader2, RefreshCw, Shield } from 'lucide-react'
+import { validateCodiceFiscale, validatePartitaIVA } from '@/lib/italianFiscalValidation'
 import Link from 'next/link'
 import Image from 'next/image'
 import TeamDashboard from '@/components/TeamDashboard'
@@ -186,14 +187,38 @@ export default function DashboardPage() {
 
     const handleUpdateProfile = async (e: React.FormEvent) => {
         e.preventDefault()
+
+        // Validazioni frontend (per impedire di "svuotare" il profilo abusivamente)
+        const first_name = fullName.split(' ')[0]?.trim() || ''
+        const last_name = fullName.substring(first_name.length).trim() || ''
+        
+        if (!first_name || first_name.length < 2) return alert('Nome non valido (minimo 2 caratteri)')
+        if (!last_name || last_name.length < 2) return alert('Cognome non valido (minimo 2 caratteri)')
+        if (!address.trim() || address.trim().length < 5) return alert('Indirizzo non valido (minimo 5 caratteri)')
+        if (!city.trim() || city.trim().length < 2) return alert('Città non valida')
+        if (!/^\d{5}$/.test(cap.trim())) return alert('Il CAP deve essere di 5 cifre (es. "20100")')
+        if (!phone.trim() || phone.trim().length < 8) return alert('Inserisci un numero di telefono valido (minimo 8 caratteri)')
+        
+        if (!piva) {
+            // Privato
+            const cfResult = validateCodiceFiscale(cf, first_name, last_name)
+            if (!cfResult.valid) return alert(cfResult.error)
+        } else {
+            // Azienda
+            if (fullName.length < 3) return alert('La Ragione Sociale deve avere almeno 3 caratteri')
+            const pivaResult = validatePartitaIVA(piva)
+            if (!pivaResult.valid) return alert(pivaResult.error)
+            const sdiClean = sdi.trim()
+            if (!sdiClean) return alert('Il Codice SDI o la PEC sono obbligatori')
+            const isSdi = /^[A-Za-z0-9]{7}$/.test(sdiClean)
+            const isPec = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sdiClean)
+            if (!isSdi && !isPec) return alert('Codice SDI (7 caratteri) o Indirizzo PEC non valido')
+        }
+
         setUpdatingProfile(true)
         try {
             const { data: { session } } = await supabase.auth.getSession()
             if (!session) throw new Error("Sessione scaduta")
-
-            // Determine names
-            let first_name = fullName.split(' ')[0] || ''
-            let last_name = fullName.substring(first_name.length).trim() || ''
 
             // Upsert Billing Profile (Bug 2.2 Fix)
             const billingData = {
