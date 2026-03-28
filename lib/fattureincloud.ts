@@ -31,6 +31,7 @@ function getFicConfig() {
         // For forfettario regime, the exemption text on every invoice
         vatExemptionText: process.env.FIC_VAT_EXEMPTION_TEXT || 
             'Operazione in franchigia da IVA ai sensi dell\'art. 1, commi da 54 a 89, della Legge n. 190/2014 e ss.mm.ii.',
+        sendCourtesyEmail: process.env.FIC_SEND_COURTESY_EMAIL !== 'false' // Enable by default
     }
 }
 
@@ -318,6 +319,37 @@ export async function createInvoice(
             } catch (e) {
                 console.warn('[FIC] Failed to update purchase with invoice ID:', e)
                 // Non-fatal: the invoice was still created
+            }
+        }
+
+        // 6. Send Courtesy Email if enabled
+        if (config.sendCourtesyEmail && invoiceId) {
+            console.log(`[FIC] Scheduling courtesy email for invoice ${invoiceId} to ${userEmail}...`)
+            try {
+                const emailPayload = {
+                    data: {
+                        sender_id: 0, // Uses default account sender
+                        recipient_email: userEmail,
+                        subject: `Fattura acquisto - Simon Silver Caldaie`,
+                        body: `Gentile ${billing.first_name},\n\nTi ringraziamo per l'acquisto!\n\nIn allegato a questa email trovi la copia di cortesia in PDF della tua fattura.\nTi ricordiamo che la fattura elettronica originale è stata regolarmente emessa e trasmessa al tuo Cassetto Fiscale o P.IVA tramite lo SDI.\n\nPer accedere subito ai tuoi video corsi, clicca qui:\nhttps://simonsilvercaldaie.it/dashboard\n\nBuono studio e buon lavoro,\nSimon Silver Caldaie`,
+                        include: {
+                            document: true,
+                            delivery_note: false,
+                            attachment: false,
+                            accompanying_invoice: false
+                        },
+                        attach_pdf: true,
+                        send_copy: false
+                    }
+                }
+                const emailRes = await ficFetch(`/c/${config.companyId}/issued_documents/${invoiceId}/email`, 'POST', emailPayload)
+                if (emailRes.ok) {
+                    console.log(`[FIC] ✅ Courtesy email scheduled successfully for ${userEmail}`)
+                } else {
+                    console.error(`[FIC] Failed to schedule courtesy email: ${emailRes.status}`, JSON.stringify(emailRes.data))
+                }
+            } catch (err) {
+                console.error('[FIC] Exception sending courtesy email:', err)
             }
         }
 
