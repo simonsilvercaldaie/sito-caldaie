@@ -391,9 +391,9 @@ export async function POST(request: NextRequest) {
             emailType = 'ACQUISTO_BASE' // Complete purchases get base welcome email
         } else if (product_code.includes('base')) {
             emailType = 'ACQUISTO_BASE'
-        } else if (product_code.includes('intermedio')) {
+        } else if (product_code === 'intermediate' || product_code.includes('intermedio')) {
             emailType = 'ACQUISTO_INTERMEDIO'
-        } else if (product_code.includes('avanzato')) {
+        } else if (product_code === 'advanced' || product_code.includes('avanzato')) {
             emailType = 'ACQUISTO_AVANZATO'
         }
 
