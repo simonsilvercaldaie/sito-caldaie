@@ -132,19 +132,42 @@ export default function AdminPage() {
         }
     }
 
-    const handleUpdateSeats = async (teamId: string, seats: number) => {
+    const handleUpdateTeamLimits = async (teamId: string, seats: number, maxInvites: number) => {
         setActionLoading(true)
         const { data: { session } } = await supabase.auth.getSession()
         try {
             const res = await fetch('/api/admin', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
-                body: JSON.stringify({ action: 'update_team_seats', teamId, seats })
+                body: JSON.stringify({ action: 'update_team_seats', teamId, seats, maxInvites })
             })
             if (res.ok) {
-                alert('Posti aggiornati.')
+                alert('Limiti Team aggiornati.')
                 fetchTeams(session!.access_token)
-            } else alert('Errore aggiornamento.')
+            } else {
+                alert('Errore aggiornamento limiti.')
+            }
+        } finally {
+            setActionLoading(false)
+        }
+    }
+
+    const handleDeleteTeam = async (teamId: string, companyName: string) => {
+        if (!confirm(`SEI SICURO? Vuoi davvero ELIMINARE la licenza Team "${companyName}"? Questa azione revocherà l'accesso a tutti i membri.`)) return
+        setActionLoading(true)
+        const { data: { session } } = await supabase.auth.getSession()
+        try {
+            const res = await fetch('/api/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+                body: JSON.stringify({ action: 'delete_team', teamId })
+            })
+            if (res.ok) {
+                alert('Licenza Team eliminata con successo.')
+                fetchTeams(session!.access_token)
+            } else {
+                alert('Errore eliminazione Team.')
+            }
         } finally {
             setActionLoading(false)
         }
@@ -407,8 +430,9 @@ export default function AdminPage() {
                                 <tr>
                                     <th className="p-4">Data Creazione</th>
                                     <th className="p-4">Azienda (Proprietario)</th>
-                                    <th className="p-4 text-center">Posti Occupati / Max</th>
-                                    <th className="p-4">Azioni (Modifica Slot Max)</th>
+                                    <th className="p-4 text-center">Posti (Occupati/Max)</th>
+                                    <th className="p-4 text-center">Inviti (Usati/Max)</th>
+                                    <th className="p-4 text-right">Azioni</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
@@ -426,27 +450,57 @@ export default function AdminPage() {
                                                 {team.active_members_count} / {team.seats}
                                             </span>
                                         </td>
-                                        <td className="p-4 flex items-center gap-3">
-                                            <div className="flex items-center">
-                                                <input
-                                                    type="number"
-                                                    defaultValue={team.seats}
-                                                    min={1}
-                                                    id={`seats-${team.id}`}
-                                                    aria-label="Posti Totali"
-                                                    className="w-16 p-1.5 border border-slate-300 rounded-lg text-center font-bold text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none"
-                                                />
+                                        <td className="p-4 text-center">
+                                            <span className={`px-2 py-1 rounded-full text-xs font-bold border ${(team.invites_used || 0) >= (team.max_invites_total || 0) ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-green-50 text-green-700 border-green-200'}`}>
+                                                {team.invites_used || 0} / {team.max_invites_total || 0}
+                                            </span>
+                                        </td>
+                                        <td className="p-4 flex items-center justify-end gap-3">
+                                            <div className="flex flex-col gap-2">
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-[10px] text-slate-400 w-12 text-right">Posti:</span>
+                                                    <input
+                                                        type="number"
+                                                        defaultValue={team.seats}
+                                                        min={1}
+                                                        id={`seats-${team.id}`}
+                                                        aria-label="Posti Totali"
+                                                        className="w-16 p-1 border border-slate-300 rounded text-center text-xs font-bold text-slate-700 focus:ring-1 focus:ring-indigo-500 outline-none"
+                                                    />
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-[10px] text-slate-400 w-12 text-right">Inviti:</span>
+                                                    <input
+                                                        type="number"
+                                                        defaultValue={team.max_invites_total || 0}
+                                                        min={1}
+                                                        id={`invites-${team.id}`}
+                                                        aria-label="Max Inviti Totali"
+                                                        className="w-16 p-1 border border-slate-300 rounded text-center text-xs font-bold text-slate-700 focus:ring-1 focus:ring-indigo-500 outline-none"
+                                                    />
+                                                </div>
                                             </div>
-                                            <button
-                                                disabled={actionLoading}
-                                                onClick={() => {
-                                                    const val = (document.getElementById(`seats-${team.id}`) as HTMLInputElement).value;
-                                                    handleUpdateSeats(team.id, parseInt(val, 10));
-                                                }}
-                                                className="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors disabled:opacity-50"
-                                            >
-                                                Salva
-                                            </button>
+                                            <div className="flex flex-col gap-2">
+                                                <button
+                                                    disabled={actionLoading}
+                                                    onClick={() => {
+                                                        const seatsVal = (document.getElementById(`seats-${team.id}`) as HTMLInputElement).value;
+                                                        const invitesVal = (document.getElementById(`invites-${team.id}`) as HTMLInputElement).value;
+                                                        handleUpdateTeamLimits(team.id, parseInt(seatsVal, 10), parseInt(invitesVal, 10));
+                                                    }}
+                                                    className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold rounded shadow-sm transition-colors disabled:opacity-50"
+                                                >
+                                                    Salva
+                                                </button>
+                                                <button
+                                                    disabled={actionLoading}
+                                                    onClick={() => handleDeleteTeam(team.id, team.company_name || 'Sconosciuta')}
+                                                    className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-[10px] font-bold rounded shadow-sm transition-colors disabled:opacity-50"
+                                                    title="Elimina Licenza Team"
+                                                >
+                                                    Elimina
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 ))}

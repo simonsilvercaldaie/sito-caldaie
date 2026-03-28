@@ -81,7 +81,8 @@ export async function POST(request: NextRequest) {
         if (action === 'grant_access') return await grantAccess(body.email, body.products, adminEmail)
         if (action === 'reset_devices') return await resetUserDevices(body.userId, adminEmail)
         if (action === 'reset_devices_by_email') return await resetDevicesByEmail(body.email, adminEmail)
-        if (action === 'update_team_seats') return await updateTeamSeats(body.teamId, body.seats, adminEmail)
+        if (action === 'update_team_seats') return await updateTeamSeats(body.teamId, body.seats, body.maxInvites, adminEmail)
+        if (action === 'delete_team') return await deleteTeam(body.teamId, adminEmail)
 
         // New actions
         if (action === 'get_user_card') return await getUserCard(body.email)
@@ -538,17 +539,25 @@ async function getTeams() {
     return NextResponse.json({ teams: enrichedTeams })
 }
 
-async function updateTeamSeats(teamId: string, seats: number, adminEmail: string) {
-    if (!teamId || typeof seats !== 'number' || seats < 1) {
-        return NextResponse.json({ error: 'Dati validi necessari' }, { status: 400 })
+async function updateTeamSeats(teamId: string, seats: number | undefined, maxInvites: number | undefined, adminEmail: string) {
+    if (!teamId) {
+        return NextResponse.json({ error: 'Team ID necessario' }, { status: 400 })
     }
 
     // Get before state
-    const { data: before } = await supabaseAdmin.from('team_licenses').select('seats, owner_user_id').eq('id', teamId).maybeSingle()
+    const { data: before } = await supabaseAdmin.from('team_licenses').select('seats, max_invites_total, owner_user_id').eq('id', teamId).maybeSingle()
+
+    const updateData: any = {}
+    if (seats !== undefined) updateData.seats = seats
+    if (maxInvites !== undefined) updateData.max_invites_total = maxInvites
+
+    if (Object.keys(updateData).length === 0) {
+        return NextResponse.json({ error: 'Nessun dato da aggiornare' }, { status: 400 })
+    }
 
     const { error } = await supabaseAdmin
         .from('team_licenses')
-        .update({ seats })
+        .update(updateData)
         .eq('id', teamId)
 
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -561,11 +570,43 @@ async function updateTeamSeats(teamId: string, seats: number, adminEmail: string
         ownerEmail = owner?.email || null
     }
 
-    await logAdminAction(adminEmail, before?.owner_user_id || null, ownerEmail, 'update_team_seats', {
+    await logAdminAction(adminEmail, before?.owner_user_id || null, ownerEmail, 'update_team_limits', {
         team_id: teamId,
         before_seats: before?.seats,
-        after_seats: seats
+        after_seats: seats,
+        before_invites: before?.max_invites_total,
+        after_invites: maxInvites
     })
 
-    return NextResponse.json({ success: true, message: 'Posti aggiornati con successo.' })
+    return NextResponse.json({ success: true, message: 'Limiti team aggiornati con successo.' })
+}
+
+async function deleteTeam(teamId: string, adminEmail: string) {
+    if (!teamId) return NextResponse.json({ error: 'Team ID necessario' }, { status: 400 })
+
+    const { data: team } = await supabaseAdmin.from('team_licenses').select('owner_user_id, company_name').eq('id', teamId).maybeSingle()
+    if (!team) return NextResponse.json({ error: 'Team non trovato' }, { status: 404 })
+
+    // Step 1: Resolve owner email for logs
+    let ownerEmail: string | null = null
+    if (team.owner_user_id) {
+        const { data: { users } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 10000 })
+        const owner = users.find((u: any) => u.id === team.owner_user_id)
+        ownerEmail = owner?.email || null
+    }
+
+    // Step 2: Delete team members manually to be safe (if no ON DELETE CASCADE exists)
+    await supabaseAdmin.from('team_members').delete().eq('team_license_id', teamId)
+    await supabaseAdmin.from('team_invitations').delete().eq('team_license_id', teamId)
+
+    // Step 3: Delete the team license
+    const { error } = await supabaseAdmin.from('team_licenses').delete().eq('id', teamId)
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    await logAdminAction(adminEmail, team.owner_user_id, ownerEmail, 'delete_team_license', {
+        team_id: teamId,
+        company_name: team.company_name
+    })
+
+    return NextResponse.json({ success: true, message: 'Licenza Team eliminata con successo.' })
 }
