@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Users, CheckCircle2, ArrowRight, GraduationCap } from "lucide-react"
 import { PayPalBtn } from "@/components/PayPalBtn"
+import PurchaseProcessingOverlay from "@/components/PurchaseProcessingOverlay"
 import { supabase } from "@/lib/supabaseClient"
 import { LEGAL_TEXT_CHECKOUT } from "@/lib/legalTexts"
 import { getTestPrice } from "@/lib/pricingLogic"
@@ -125,11 +126,14 @@ export default function TeamLicensePage() {
         }
     }
 
+    const [purchaseProcessing, setPurchaseProcessing] = useState(false)
+
     const handlePurchaseSuccess = async (orderId: string, params: { product_code: string, amount_cents: number }) => {
         const { data: { session } } = await supabase.auth.getSession()
         const accessToken = session?.access_token
 
         if (!accessToken) return
+        setPurchaseProcessing(true)
 
         try {
             const res = await fetch('/api/complete-purchase', {
@@ -260,6 +264,7 @@ export default function TeamLicensePage() {
 
     return (
         <div className="min-h-screen flex flex-col font-sans bg-slate-50">
+            <PurchaseProcessingOverlay visible={purchaseProcessing} />
             <Navbar />
 
             <main className="flex-grow py-12 px-4">

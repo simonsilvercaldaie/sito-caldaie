@@ -11,6 +11,7 @@ import Link from "next/link"
 import Navbar from "@/components/Navbar"
 import VideoPlayerSecured from "@/components/VideoPlayerSecured"
 import FullScreenLoader from "@/components/FullScreenLoader"
+import PurchaseProcessingOverlay from "@/components/PurchaseProcessingOverlay"
 import {
     PlayCircle,
     Clock,
@@ -343,8 +344,11 @@ export default function CorsoPage() {
         }
     }
 
+    const [purchaseProcessing, setPurchaseProcessing] = useState(false)
+
     const handlePurchaseSuccess = async (orderId: string, params: { product_code?: string, amount_cents?: number, plan_type?: string }) => {
         if (!user || !course || !pricingInfo) return
+        setPurchaseProcessing(true)
 
         const { data: { session } } = await supabase.auth.getSession()
         const accessToken = session?.access_token
@@ -465,6 +469,7 @@ export default function CorsoPage() {
         if (success) {
             window.location.href = `/ordine/${orderId}`
         } else {
+            setPurchaseProcessing(false)
             localStorage.setItem('pendingOrderId', orderId)
             window.location.href = `/ordine/${orderId}`
         }
@@ -500,6 +505,7 @@ export default function CorsoPage() {
 
     return (
         <div className="min-h-screen flex flex-col font-sans bg-gray-50">
+            <PurchaseProcessingOverlay visible={purchaseProcessing} />
             <Navbar />
             <CourseJsonLd course={course} />
             <BreadcrumbJsonLd items={[

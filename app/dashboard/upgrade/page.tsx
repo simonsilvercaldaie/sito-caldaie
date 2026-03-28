@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Loader2, ArrowLeft, Users, CheckCircle2, ArrowUpCircle, AlertCircle } from 'lucide-react'
 import { PayPalBtn } from '@/components/PayPalBtn'
+import PurchaseProcessingOverlay from '@/components/PurchaseProcessingOverlay'
 import { LEGAL_TEXT_CHECKOUT } from '@/lib/legalTexts'
 
 // Upgrade pricing (differenziale)
@@ -148,9 +149,12 @@ export default function UpgradePage() {
         }
     }
 
+    const [purchaseProcessing, setPurchaseProcessing] = useState(false)
+
     const handleUpgradeSuccess = async (orderId: string, targetTeam: number, upgradePrice: number) => {
         const { data: { session } } = await supabase.auth.getSession()
         if (!session) return
+        setPurchaseProcessing(true)
 
         try {
             const res = await fetch('/api/upgrade-license', {
@@ -213,6 +217,7 @@ export default function UpgradePage() {
 
     return (
         <div className="min-h-screen bg-gray-50 font-sans pb-20">
+            <PurchaseProcessingOverlay visible={purchaseProcessing} />
             {/* Header */}
             <header className="bg-white shadow-sm px-4 py-4 mb-8">
                 <div className="max-w-4xl mx-auto flex items-center">

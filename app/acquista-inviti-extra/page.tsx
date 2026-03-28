@@ -6,6 +6,7 @@ import { UserPlus, CheckCircle2, ArrowRight, ShieldCheck } from "lucide-react"
 import { supabase } from "@/lib/supabaseClient"
 import { LEGAL_TEXT_CHECKOUT } from "@/lib/legalTexts"
 import { PayPalBtn } from "@/components/PayPalBtn"
+import PurchaseProcessingOverlay from "@/components/PurchaseProcessingOverlay"
 import { getTestPrice } from "@/lib/pricingLogic"
 
 const EXTRA_PRICE = 400 // €400
@@ -93,8 +94,11 @@ export default function AcquistaInvitiExtraPage() {
         }
     }
 
+    const [purchaseProcessing, setPurchaseProcessing] = useState(false)
+
     const handlePurchaseSuccess = async (orderId: string) => {
         if (!user) return
+        setPurchaseProcessing(true)
 
         const { data: { session } } = await supabase.auth.getSession()
         const accessToken = session?.access_token
@@ -149,6 +153,7 @@ export default function AcquistaInvitiExtraPage() {
 
     return (
         <div className="min-h-screen flex flex-col font-sans bg-gray-50">
+            <PurchaseProcessingOverlay visible={purchaseProcessing} />
             <Navbar />
 
             <main className="flex-grow py-12 px-4">

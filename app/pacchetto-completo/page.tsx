@@ -6,6 +6,7 @@ import { Package, CheckCircle2, Sparkles, ArrowRight } from "lucide-react"
 import { supabase } from "@/lib/supabaseClient"
 import { LEGAL_TEXT_CHECKOUT } from "@/lib/legalTexts"
 import { PayPalBtn } from "@/components/PayPalBtn"
+import PurchaseProcessingOverlay from "@/components/PurchaseProcessingOverlay"
 import { getTestPrice } from "@/lib/pricingLogic"
 
 const BUNDLE_PRICE = 1000 // €1000 (Sconto €200 da €1200)
@@ -124,8 +125,11 @@ export default function PacchettoCompletoPage() {
         }
     }
 
+    const [purchaseProcessing, setPurchaseProcessing] = useState(false)
+
     const handlePurchaseSuccess = async (orderId: string) => {
         if (!user) return
+        setPurchaseProcessing(true)
 
         const { data: { session } } = await supabase.auth.getSession()
         const accessToken = session?.access_token
@@ -229,6 +233,7 @@ export default function PacchettoCompletoPage() {
 
     return (
         <div className="min-h-screen flex flex-col font-sans bg-gray-50">
+            <PurchaseProcessingOverlay visible={purchaseProcessing} />
             <Navbar />
 
             <main className="flex-grow py-12 px-4">
