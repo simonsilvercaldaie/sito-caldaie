@@ -67,30 +67,8 @@ export default function CorsoPage() {
 
     // Check if device is already known on mount AND VALIDATE IT
     useEffect(() => {
-        const { getSessionToken, clearSessionToken, saveSessionToken, generateDeviceId, getDeviceName } = require('@/lib/deviceFingerprint')
+        const { getSessionToken, clearSessionToken } = require('@/lib/deviceFingerprint')
         const token = getSessionToken()
-        
-        const autoCreateSession = async (accessToken: string) => {
-            try {
-                const deviceId = await generateDeviceId()
-                const deviceName = getDeviceName()
-                const res = await fetch('/api/session', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${accessToken}`
-                    },
-                    body: JSON.stringify({ deviceId, deviceName })
-                })
-                if (res.ok) {
-                    const json = await res.json()
-                    if (json.success && json.sessionToken) {
-                        saveSessionToken(json.sessionToken)
-                        setDeviceConfirmed(true)
-                    }
-                }
-            } catch {}
-        }
 
         if (token) {
             // Validate the existing token gracefully
@@ -110,25 +88,14 @@ export default function CorsoPage() {
                                     setDeviceConfirmed(true)
                                 } else {
                                     clearSessionToken()
-                                    // Auto-create new session — device is already known
-                                    autoCreateSession(data.session!.access_token)
                                 }
                             })
                         } else {
                             clearSessionToken()
-                            // Auto-create new session — device is already known
-                            autoCreateSession(data.session!.access_token)
                         }
                     }).catch(() => {
                         // Network error: don't auto-confirm, force user to click
                     })
-                }
-            })
-        } else {
-            // No token at all — check if device is already trusted and auto-create
-            supabase.auth.getSession().then(({ data }) => {
-                if (data.session) {
-                    autoCreateSession(data.session.access_token)
                 }
             })
         }
