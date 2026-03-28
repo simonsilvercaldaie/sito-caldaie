@@ -27,6 +27,7 @@ function getFicConfig() {
         enabled: process.env.FIC_ENABLED === 'true',
         // VAT: 0 for regime forfettario (current), 22 for ordinario (future)
         vatRate: parseInt(process.env.FIC_VAT_RATE || '0', 10),
+        vatId: process.env.FIC_VAT_ID ? parseInt(process.env.FIC_VAT_ID, 10) : 66, // Default to 66 for Simon's forfettario
         // For forfettario regime, the exemption text on every invoice
         vatExemptionText: process.env.FIC_VAT_EXEMPTION_TEXT || 
             'Operazione in franchigia da IVA ai sensi dell\'art. 1, commi da 54 a 89, della Legge n. 190/2014 e ss.mm.ii.',
@@ -237,10 +238,14 @@ export async function createInvoice(
         const today = new Date().toISOString().split('T')[0] // YYYY-MM-DD
 
         // Build VAT object
-        const vatObj: any = { value: vatValue }
-        if (vatValue === 0) {
-            vatObj.description = config.vatExemptionText
-            vatObj.is_disabled = true
+        const vatObj: any = {}
+        if (config.vatId) {
+            vatObj.id = config.vatId
+        } else {
+            vatObj.value = vatValue
+            if (vatValue === 0) {
+                vatObj.description = config.vatExemptionText
+            }
         }
 
         const invoicePayload: any = {
@@ -263,9 +268,7 @@ export async function createInvoice(
                     {
                         amount: grossAmount,
                         due_date: today,
-                        paid_date: today,
-                        status: 'paid',
-                        payment_account: null, // Will use FIC default
+                        status: 'not_paid',
                     }
                 ],
                 currency: {
