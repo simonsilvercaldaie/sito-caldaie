@@ -383,6 +383,7 @@ export default function PacchettoCompletoPage() {
                                                     amount={String(getTestPrice(BUNDLE_PRICE, user?.email))}
                                                     courseTitle="Pacchetto Completo (27 Video)"
                                                     onSuccess={handlePurchaseSuccess}
+                                                    onProcessing={() => setPurchaseProcessing(true)}
                                                     productCode="complete_bundle"
                                                 />
                                             ) : (

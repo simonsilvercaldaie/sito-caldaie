@@ -261,6 +261,7 @@ export default function AcquistaInvitiExtraPage() {
                                                 amount={String(getTestPrice(EXTRA_PRICE, user?.email))}
                                                 courseTitle="Acquisto 1 Invito Extra"
                                                 onSuccess={handlePurchaseSuccess}
+                                                onProcessing={() => setPurchaseProcessing(true)}
                                                 productCode="extra_invito_1"
                                             />
                                         ) : (

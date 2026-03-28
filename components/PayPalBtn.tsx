@@ -6,15 +6,12 @@ interface PayPalBtnProps {
     amount: string;
     courseTitle: string;
     onSuccess: (orderId: string) => void;
-    showDisclaimer?: boolean;   // New prop
-    productCode?: string;       // For webhook: embedded as custom_id in PayPal order
+    onProcessing?: () => void;     // Called immediately when PayPal approves (before capture)
+    showDisclaimer?: boolean;
+    productCode?: string;
 }
 
-export function PayPalBtn({ amount, courseTitle, onSuccess, showDisclaimer = true, productCode }: PayPalBtnProps) {
-
-    // DEBUG: Verifica stato variabile
-    console.log('[PayPalBtn] UI_PAYMENTS_ENABLED:', UI_PAYMENTS_ENABLED);
-    console.log('[PayPalBtn] Raw ENV:', process.env.NEXT_PUBLIC_PAYMENTS_ENABLED);
+export function PayPalBtn({ amount, courseTitle, onSuccess, onProcessing, showDisclaimer = true, productCode }: PayPalBtnProps) {
 
     // Pagamenti disabilitati: mostra messaggio
     if (!UI_PAYMENTS_ENABLED) {
@@ -55,10 +52,12 @@ export function PayPalBtn({ amount, courseTitle, onSuccess, showDisclaimer = tru
                         });
                     }}
                     onApprove={async (data, actions) => {
+                        // Show processing overlay IMMEDIATELY when PayPal approves
+                        if (onProcessing) onProcessing();
+                        
                         if (actions.order) {
                             const order = await actions.order.capture();
                             console.log("Order Successful:", order);
-                            // Passa l'orderId al callback per verifica server-side
                             if (order.id) {
                                 onSuccess(order.id);
                             } else {

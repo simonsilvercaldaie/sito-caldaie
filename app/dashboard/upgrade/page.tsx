@@ -320,6 +320,7 @@ export default function UpgradePage() {
                                 price={user?.email === 'simonsilvercaldaie@gmail.com' || user?.email === 'simonsilvermotocross@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_5}
                                 enabled={tosAccepted}
                                 onSuccess={(id) => handleUpgradeSuccess(id, 5, user?.email === 'simonsilvercaldaie@gmail.com' || user?.email === 'simonsilvermotocross@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_5)}
+                                onProcessing={() => setPurchaseProcessing(true)}
                             />
 
                             {/* Team 10 */}
@@ -329,6 +330,7 @@ export default function UpgradePage() {
                                 price={user?.email === 'simonsilvercaldaie@gmail.com' || user?.email === 'simonsilvermotocross@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_10}
                                 enabled={tosAccepted}
                                 onSuccess={(id) => handleUpgradeSuccess(id, 10, user?.email === 'simonsilvercaldaie@gmail.com' || user?.email === 'simonsilvermotocross@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_10)}
+                                onProcessing={() => setPurchaseProcessing(true)}
                             />
 
                             {/* Team 25 */}
@@ -338,6 +340,7 @@ export default function UpgradePage() {
                                 price={user?.email === 'simonsilvercaldaie@gmail.com' || user?.email === 'simonsilvermotocross@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_25}
                                 enabled={tosAccepted}
                                 onSuccess={(id) => handleUpgradeSuccess(id, 25, user?.email === 'simonsilvercaldaie@gmail.com' || user?.email === 'simonsilvermotocross@gmail.com' ? 1 : UPGRADE_PRICES.individual_to_multi_25)}
+                                onProcessing={() => setPurchaseProcessing(true)}
                                 highlight
                             />
                         </div>
@@ -374,12 +377,13 @@ export default function UpgradePage() {
     )
 }
 
-function UpgradeCard({ title, users, price, enabled, onSuccess, highlight = false }: {
+function UpgradeCard({ title, users, price, enabled, onSuccess, onProcessing, highlight = false }: {
     title: string
     users: number
     price: number
     enabled: boolean
     onSuccess: (orderId: string) => void
+    onProcessing?: () => void
     highlight?: boolean
 }) {
     return (
@@ -421,6 +425,7 @@ function UpgradeCard({ title, users, price, enabled, onSuccess, highlight = fals
                         amount={String(price)}
                         courseTitle={`Upgrade a ${title}`}
                         onSuccess={onSuccess}
+                        onProcessing={onProcessing}
                         productCode={`upgrade_to_multi_${users}`}
                     />
                 ) : (
