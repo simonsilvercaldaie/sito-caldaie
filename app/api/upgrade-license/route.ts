@@ -160,7 +160,8 @@ export async function POST(request: NextRequest) {
                 .insert({
                     owner_user_id: user.id,
                     seats: maxMembers,
-                    company_name: user.email
+                    company_name: user.email,
+                    max_invites_total: target_team_size * 2
                 })
                 .select('id')
                 .single()
@@ -191,7 +192,7 @@ export async function POST(request: NextRequest) {
             const maxMembers = target_team_size + 1
             const { error: updateError } = await supabaseAdmin
                 .from('team_licenses')
-                .update({ seats: maxMembers })
+                .update({ seats: maxMembers, max_invites_total: target_team_size * 2 })
                 .eq('owner_user_id', user.id)
 
             if (updateError) {
