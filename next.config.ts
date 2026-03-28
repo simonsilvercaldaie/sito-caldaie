@@ -35,7 +35,7 @@ const nextConfig: NextConfig = {
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: https: blob:",
-              "frame-src https://www.paypal.com https://www.sandbox.paypal.com https://iframe.mediadelivery.net https://accounts.google.com",
+              "frame-src https://www.paypal.com https://www.sandbox.paypal.com https://iframe.mediadelivery.net https://accounts.google.com https://www.youtube.com https://www.youtube-nocookie.com",
               "connect-src 'self' https://*.supabase.co https://www.paypal.com https://www.sandbox.paypal.com https://api.emailjs.com https://*.sentry.io https://*.ingest.sentry.io",
               "worker-src 'self' blob:",
             ].join('; '),

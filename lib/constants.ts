@@ -54,3 +54,11 @@ export const DEVICE_RESET_COOLDOWN_DAYS = 30
 
 // Email per notifiche fatturazione (acquisti aziendali)
 export const INVOICE_NOTIFICATION_EMAIL = 'fatture@simonsilvercaldaie.it'
+
+// ============================================
+// FATTURE IN CLOUD
+// ============================================
+
+// Kill switch per integrazione Fatture in Cloud
+// DEFAULT: DISATTIVO — per attivare, impostare FIC_ENABLED=true su Vercel
+export const FIC_ENABLED = process.env.FIC_ENABLED === 'true'

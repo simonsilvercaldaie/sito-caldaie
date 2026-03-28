@@ -5,6 +5,7 @@ import { getExpectedPriceCents } from '@/lib/serverPricing'
 import { checkRateLimit } from '@/lib/rateLimit'
 import { sendEmail, EmailType } from '@/lib/email'
 import { grantAccessForProduct } from '@/lib/accessControl'
+import { createInvoiceIfEnabled, BillingData } from '@/lib/fattureincloud'
 
 // Max invites per product type
 const PRODUCT_MAX_INVITES: Record<string, number> = {
@@ -243,6 +244,7 @@ export async function POST(request: NextRequest) {
         const billing = billingData as BillingProfile | null
         const isTeam = product_code.startsWith('multi_') || product_code.startsWith('scuola_')
         const isExtraInvites = product_code.startsWith('extra_invito_')
+        let purchaseIdForInvoice: string | undefined = undefined
 
         // 8b. BUNDLE GUARD: block complete_bundle if user already has any access
         if (product_code === 'complete_bundle' || product_code === 'complete') {
@@ -300,7 +302,7 @@ export async function POST(request: NextRequest) {
                 .eq('id', existingLicense.id)
 
             // Registra acquisto
-            const { error: purErr } = await supabaseAdmin.from('purchases').insert({
+            const { data: extraPurchaseRow, error: purErr } = await supabaseAdmin.from('purchases').insert({
                 user_id: user.id,
                 plan_type: 'team',
                 product_code: product_code,
@@ -309,11 +311,12 @@ export async function POST(request: NextRequest) {
                 paypal_capture_id: captureId,
                 team_license_id: existingLicense.id,
                 ...snapshotData
-            })
+            }).select('id').single()
             if (purErr) {
                 if (purErr.code === '23505') return NextResponse.json({ ok: true, alreadyProcessed: true })
                 throw purErr
             }
+            purchaseIdForInvoice = extraPurchaseRow?.id
 
         } else if (isTeam) {
             // --- RAMO TEAM ---
@@ -354,6 +357,7 @@ export async function POST(request: NextRequest) {
 
             // Grant access levels for team owner
             await grantAccessForProduct(user.id, product_code, 'team', purchaseRow.id, lic.id)
+            purchaseIdForInvoice = purchaseRow.id
 
         } else {
             // --- RAMO INDIVIDUAL ---
@@ -374,6 +378,7 @@ export async function POST(request: NextRequest) {
 
             // Grant access levels for individual purchase
             await grantAccessForProduct(user.id, product_code, 'purchase', purchaseRow.id)
+            purchaseIdForInvoice = purchaseRow.id
         }
 
         // 8.1 Send Confirmation Email SERVER-SIDE
@@ -397,10 +402,19 @@ export async function POST(request: NextRequest) {
                 .catch(e => console.error('[complete-purchase] Confirmation Email Error:', e));
         }
 
-        // 9. Async Invoice Notification (FIRE AND FORGET)
+        // 9. Async Invoice via Fatture in Cloud (FIRE AND FORGET)
+        // Falls back to email notification if FIC is disabled or fails
         if (billing && billing.customer_type === 'company' && billing.vat_number) {
-            sendInvoiceNotificationClean(billing, user.email, product_code, truthPrice, captureId)
-                .catch(e => console.error('[complete-purchase] Invoice Send Background Error:', e));
+            const billingForFic = billing as BillingData
+            createInvoiceIfEnabled(
+                billingForFic,
+                user.email!,
+                product_code,
+                truthPrice,
+                captureId,
+                purchaseIdForInvoice,
+                () => sendInvoiceNotificationClean(billing as BillingProfile, user.email!, product_code, truthPrice, captureId)
+            ).catch(e => console.error('[complete-purchase] FIC Invoice Error:', e));
         }
 
         return NextResponse.json({

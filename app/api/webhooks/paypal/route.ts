@@ -4,6 +4,7 @@ import { PAYPAL_API_URL } from '@/lib/constants'
 import { grantAccessForProduct } from '@/lib/accessControl'
 import { sendEmail, EmailType } from '@/lib/email'
 import { getExpectedPriceCents } from '@/lib/serverPricing'
+import { createInvoiceIfEnabled, BillingData } from '@/lib/fattureincloud'
 
 // Max invites per product type
 const PRODUCT_MAX_INVITES: Record<string, number> = {
@@ -270,6 +271,8 @@ export async function POST(request: NextRequest) {
 
     try {
         // 9. Process based on product type
+        let webhookPurchaseId: string | undefined = undefined
+
         if (isExtraInvites) {
             // Find existing team license
             const { data: existingLicense } = await supabaseAdmin
@@ -293,7 +296,7 @@ export async function POST(request: NextRequest) {
                 .update({ max_invites_total: newMaxInvites })
                 .eq('id', existingLicense.id)
 
-            const { error: purErr } = await supabaseAdmin.from('purchases').insert({
+            const { data: extraPurchaseRow, error: purErr } = await supabaseAdmin.from('purchases').insert({
                 user_id: user.id,
                 plan_type: 'team',
                 product_code: productCode,
@@ -302,11 +305,12 @@ export async function POST(request: NextRequest) {
                 paypal_capture_id: captureId,
                 team_license_id: existingLicense.id,
                 ...snapshotData
-            })
+            }).select('id').single()
             if (purErr) {
                 if (purErr.code === '23505') return NextResponse.json({ ok: true, alreadyProcessed: true })
                 throw purErr
             }
+            webhookPurchaseId = extraPurchaseRow?.id
 
         } else if (isTeam) {
             // Create team license
@@ -345,6 +349,7 @@ export async function POST(request: NextRequest) {
             }
 
             await grantAccessForProduct(user.id, productCode, 'team', purchaseRow.id, lic.id)
+            webhookPurchaseId = purchaseRow.id
 
         } else {
             // Individual purchase
@@ -365,6 +370,7 @@ export async function POST(request: NextRequest) {
             }
 
             await grantAccessForProduct(user.id, productCode, 'purchase', purchaseRow.id)
+            webhookPurchaseId = purchaseRow.id
         }
 
         // 10. Send confirmation email (non-blocking)
@@ -372,6 +378,19 @@ export async function POST(request: NextRequest) {
         if (emailType && user.email) {
             sendEmail(emailType, { to_email: user.email })
                 .catch(e => console.error('[webhook-paypal] Email error:', e))
+        }
+
+        // 11. Async Invoice via Fatture in Cloud (FIRE AND FORGET)
+        if (billing && billing.customer_type === 'company' && billing.vat_number) {
+            const billingForFic = billing as unknown as BillingData
+            createInvoiceIfEnabled(
+                billingForFic,
+                user.email!,
+                productCode,
+                paidAmountCents,
+                captureId,
+                webhookPurchaseId
+            ).catch(e => console.error('[webhook-paypal] FIC Invoice Error:', e));
         }
 
         console.log(`[webhook-paypal] SUCCESS: user=${user.email}, product=${productCode}, capture=${captureId}`)
