@@ -24,7 +24,7 @@ function getFicConfig() {
     return {
         accessToken: process.env.FIC_ACCESS_TOKEN || '',
         companyId: process.env.FIC_COMPANY_ID || '',
-        enabled: process.env.FIC_ENABLED === 'true',
+        enabled: (process.env.FIC_ENABLED || '').trim().toLowerCase() === 'true',
         // VAT: 0 for regime forfettario (current), 22 for ordinario (future)
         vatRate: parseInt(process.env.FIC_VAT_RATE || '0', 10),
         vatId: process.env.FIC_VAT_ID ? parseInt(process.env.FIC_VAT_ID, 10) : 66, // Default to 66 for Simon's forfettario
