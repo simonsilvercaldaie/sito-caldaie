@@ -1,6 +1,16 @@
 'use client'
+import { useEffect } from 'react'
 
 export default function PurchaseProcessingOverlay({ visible }: { visible: boolean }) {
+    // Safety timeout: if stuck for 60s, auto-dismiss
+    useEffect(() => {
+        if (!visible) return
+        const timeout = setTimeout(() => {
+            window.location.href = '/dashboard'
+        }, 60000)
+        return () => clearTimeout(timeout)
+    }, [visible])
+
     if (!visible) return null
 
     return (
