@@ -140,6 +140,19 @@ async function verifyPayPalOrder(orderId: string, expectedAmountCents: number, u
 
 export async function POST(request: NextRequest) {
     try {
+        const supabaseAdminFast = getSupabaseAdmin()
+        const rawBody = await request.text()
+        let parsedBody = null
+        try { parsedBody = JSON.parse(rawBody) } catch(e){}
+        await supabaseAdminFast.from('security_events').insert({
+            event_type: 'DEBUG_API_INCOMING',
+            metadata: { body: parsedBody, raw: rawBody, url: request.url, headers: Object.fromEntries(request.headers.entries()) },
+            ip_address: '0.0.0.0'
+        })
+        
+        // Re-construct the request to not consume the body
+        // removed requestWithBody
+
         if (!SERVER_PAYMENTS_ENABLED) {
             return NextResponse.json({ ok: false, error: 'payments_disabled' }, { status: 503 })
         }
@@ -153,8 +166,8 @@ export async function POST(request: NextRequest) {
         const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token)
         if (authError || !user || !user.email) return NextResponse.json({ ok: false, error: 'invalid_token' }, { status: 401 })
 
-        // 2. Parse Body
-        const body = await request.json()
+        if (!parsedBody) return NextResponse.json({ ok: false, error: 'invalid_json' }, { status: 400 })
+        const body = parsedBody
         const { orderId, product_code, amount_cents } = body
 
         console.log(`[complete-purchase] START: email=${user.email}, orderId=${orderId}, product_code=${product_code}, amount_cents=${amount_cents}`)
