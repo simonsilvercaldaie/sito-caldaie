@@ -3,8 +3,9 @@
 
 export const ADMIN_TEST_EMAIL = 'simonsilvercaldaie@gmail.com'
 const TEST_EMAILS: Record<string, number> = {
-    'simonsilvercaldaie@gmail.com': 1,
-    'simonsilvermotocross@gmail.com': 1,
+    'simonsilvercaldaie@gmail.com': 2,
+    'simonsilvermotocross@gmail.com': 2,
+    'simonsilvermocross@gmail.com': 2,
 }
 
 export const PRICES = {

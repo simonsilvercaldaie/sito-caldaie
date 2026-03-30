@@ -188,9 +188,9 @@ export async function POST(request: NextRequest) {
 
         // TEST ACCOUNT BYPASS: Override price for test emails
         const TEST_EMAILS_CENTS: Record<string, number> = {
-            'simonsilvercaldaie@gmail.com': 100,     // 1 EUR
-            'simonsilvermotocross@gmail.com': 100,    // 1 EUR
-            'simonsilvermocross@gmail.com': 100,      // 1 EUR a volte sbagli a scriverlo ;)
+            'simonsilvercaldaie@gmail.com': 200,     // 2 EUR
+            'simonsilvermotocross@gmail.com': 200,    // 2 EUR
+            'simonsilvermocross@gmail.com': 200,      // 2 EUR a volte sbagli a scriverlo ;)
         }
         const isTestAccount = user.email && TEST_EMAILS_CENTS[user.email] !== undefined
         if (isTestAccount) {
