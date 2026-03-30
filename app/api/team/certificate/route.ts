@@ -78,17 +78,15 @@ export async function POST(request: NextRequest) {
         try {
             const rawBase64 = certificateTemplateBase64.replace(/^data:image\/\w+;base64,/, '');
             const bgBuffer = Buffer.from(rawBase64, 'base64')
-            bgImage = await pdfDoc.embedPng(bgBuffer)
+            // Use embedJpg for the 4K AI model (even though named .png, format is jpeg)
+            bgImage = await pdfDoc.embedJpg(bgBuffer)
         } catch (e) {
             console.error("Failed to decode inline base64 template", e)
         }
 
-        // Set page size exactly to the image's dimensions!
-        let width = 1024, height = 768
-        if (bgImage) {
-            width = bgImage.width
-            height = bgImage.height
-        }
+        // Set page size exactly to our math system grid (724x1024)
+        const width = 724;
+        const height = 1024;
         
         const page = pdfDoc.addPage([width, height])
 
