@@ -291,6 +291,17 @@ async function grantAccess(email: string, products: string[], adminEmail: string
         'base': 'base',
         'intermedio': 'intermediate',
         'avanzato': 'advanced',
+        'multi_5': 'multi_5',
+        'multi_10': 'multi_10',
+        'multi_25': 'multi_25',
+        'scuola_10': 'scuola_10'
+    }
+
+    const PRODUCT_MAX_INVITES: Record<string, number> = {
+        'multi_5': 10,
+        'multi_10': 20,
+        'multi_25': 50,
+        'scuola_10': 20,
     }
 
     for (const level of products) {
@@ -305,14 +316,40 @@ async function grantAccess(email: string, products: string[], adminEmail: string
             .maybeSingle()
 
         let purchaseId: string | undefined
+        const isTeam = productCode.startsWith('multi_') || productCode.startsWith('scuola_')
+
         if (!existing) {
+            let teamLicenseId = null
+
+            if (isTeam) {
+                const seatsFromCode = parseInt(productCode.split('_')[1]) || 5
+                const seats = seatsFromCode + 1
+                const maxInvites = PRODUCT_MAX_INVITES[productCode] || (seatsFromCode * 2)
+
+                const { data: lic } = await supabaseAdmin.from('team_licenses').insert({
+                    owner_user_id: userId,
+                    seats: seats,
+                    company_name: targetUser.email || 'La mia azienda',
+                    max_invites_total: maxInvites
+                }).select().single()
+
+                if (lic) {
+                    teamLicenseId = lic.id
+                    await supabaseAdmin.from('team_members').insert({
+                        team_license_id: lic.id,
+                        user_id: userId
+                    })
+                }
+            }
+
             const { data: newPurchase, error: insertError } = await supabaseAdmin.from('purchases').insert({
                 user_id: userId,
                 product_code: productCode,
                 amount_cents: 0,
-                plan_type: 'individual',
+                plan_type: isTeam ? 'team' : 'individual',
                 paypal_order_id: captureId,
                 paypal_capture_id: captureId,
+                team_license_id: teamLicenseId,
                 snapshot_company_name: 'REGALO ADMIN'
             }).select('id').single()
             if (insertError) console.error('[Admin grantAccess] Insert error:', insertError)

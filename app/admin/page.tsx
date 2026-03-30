@@ -1069,7 +1069,7 @@ function GrantAccessForm() {
                 <div>
                     <label className="block text-xs font-bold text-slate-500 uppercase mb-2">Livelli da Sbloccare</label>
                     <div className="space-y-2">
-                        {['base', 'intermedio', 'avanzato'].map(l => (
+                        {['base', 'intermedio', 'avanzato', 'multi_5', 'multi_10', 'multi_25', 'scuola_10'].map(l => (
                             <label key={l} className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
                                 <input
                                     type="checkbox"
@@ -1077,7 +1077,9 @@ function GrantAccessForm() {
                                     onChange={() => toggle(l)}
                                     className="w-4 h-4 rounded text-indigo-600 focus:ring-indigo-500"
                                 />
-                                <span className="capitalize">{l}</span>
+                                <span className={l.includes('multi') || l.includes('scuola') ? "uppercase font-bold text-indigo-700" : "capitalize"}>
+                                    {l.replace('_', ' ')}
+                                </span>
                             </label>
                         ))}
                     </div>
