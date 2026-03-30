@@ -117,22 +117,27 @@ export async function POST(request: NextRequest) {
 
         // --- EMBED LOGO ---
         let yPos = height - 160
-        const logoPath = join(process.cwd(), 'public', 'logo.png')
-        if (existsSync(logoPath)) {
-            const logoBytes = readFileSync(logoPath)
-            try {
-                const logoImage = await pdfDoc.embedPng(logoBytes)
-                const logoDims = logoImage.scale(0.35) // Adjust scale as needed
-                page.drawImage(logoImage, {
-                    x: width / 2 - logoDims.width / 2,
-                    y: yPos,
-                    width: logoDims.width,
-                    height: logoDims.height,
-                })
-                yPos -= 20
-            } catch (err) {
-                console.error("Failed to embed logo", err)
+        let logoImage;
+        try {
+            const logoUrl = new URL('/logo.png', request.url).href;
+            const logoResponse = await fetch(logoUrl);
+            if (logoResponse.ok) {
+                const logoArrayBuffer = await logoResponse.arrayBuffer();
+                logoImage = await pdfDoc.embedPng(logoArrayBuffer);
             }
+        } catch (err) {
+            console.error("Failed to embed logo from URL", err);
+        }
+
+        if (logoImage) {
+            const logoDims = logoImage.scale(0.35) // Adjust scale as needed
+            page.drawImage(logoImage, {
+                x: width / 2 - logoDims.width / 2,
+                y: yPos,
+                width: logoDims.width,
+                height: logoDims.height,
+            })
+            yPos -= 20
         } else {
             // Fallback Text if logo.png fails
             const brandText = 'SIMON SILVER CALDAIE'
@@ -191,13 +196,35 @@ export async function POST(request: NextRequest) {
             size: 14, font: timesItalic, color: gray
         })
 
-        // --- COMPANY NAME ---
+        // --- COMPANY NAME (Word Wrapped) ---
         yPos -= 35
-        const companyWidth = timesBold.widthOfTextAtSize(finalCompanyName, 24)
-        page.drawText(finalCompanyName, {
-            x: (width - companyWidth) / 2, y: yPos,
-            size: 24, font: timesBold, color: navy
-        })
+        const maxCompanyWidth = width - 160
+        const words = finalCompanyName.split(' ')
+        let currentLine = words[0] || ''
+        const companyLines = []
+
+        for (let i = 1; i < words.length; i++) {
+            const word = words[i]
+            const cw = timesBold.widthOfTextAtSize(currentLine + ' ' + word, 24)
+            if (cw < maxCompanyWidth) {
+                currentLine += ' ' + word
+            } else {
+                companyLines.push(currentLine)
+                currentLine = word
+            }
+        }
+        if (currentLine) companyLines.push(currentLine)
+
+        for (const line of companyLines) {
+            const lineWidth = timesBold.widthOfTextAtSize(line, 24)
+            page.drawText(line, {
+                x: (width - lineWidth) / 2, y: yPos,
+                size: 24, font: timesBold, color: navy
+            })
+            yPos -= 30
+        }
+        // yPos is now at the line underneath the company name
+        yPos -= 20
 
         // --- DIVIDER ---
         yPos -= 50
