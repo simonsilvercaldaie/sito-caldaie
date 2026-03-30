@@ -182,7 +182,7 @@ export async function POST(request: NextRequest) {
         })
 
         yPos -= 35
-        const courseName = 'SIMON SILVER CALDAIE — Metodo UKT'
+        const courseName = 'SIMON SILVER CALDAIE'
         const courseWidth = timesBold.widthOfTextAtSize(courseName, 20)
         page.drawText(courseName, {
             x: (width - courseWidth) / 2, y: yPos,
