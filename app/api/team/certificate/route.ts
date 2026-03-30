@@ -99,55 +99,52 @@ export async function POST(request: NextRequest) {
         const gray = rgb(0.3, 0.3, 0.3)
 
         if (bgImage) {
-            // Draw background spanning entire page
+            // Draw background spanning entire page (it will be 1024x1448 inherently)
             page.drawImage(bgImage, { x: 0, y: 0, width, height })
 
             // 1. MASK THE OLD AI TEXT
-            // The parchment color: 
             const parchment = rgb(0.992, 0.984, 0.965)
             
-            // Mask "Marco Bianchi" all the way down to course name
-            // Y grows from bottom to top. 
-            // In a landscape image (e.g. 1024x768), names are around Y=50% to Y=25%
+            // Mask "Marco Bianchi" down to company name
             page.drawRectangle({
                 x: width * 0.15,
-                y: height * 0.23, // from above the date/signature line
+                y: 430, // from above the date/signature line in 1448 height
                 width: width * 0.70,
-                height: height * 0.33, // up to below "Si certifica che"
+                height: 380, // up to below "Si certifica che"
                 color: parchment
             })
 
             // Mask the Date at bottom left
             page.drawRectangle({
                 x: width * 0.15,
-                y: height * 0.15, // around 15% from bottom
-                width: width * 0.40, // up to middle
-                height: height * 0.08,
+                y: 190, 
+                width: 350, 
+                height: 70,
                 color: parchment
             })
         } else {
-            // Fallback (if image absolutely fails)
+            // Fallback (if somehow it fails)
             page.drawText("CERTIFICATO DI COMPLETAMENTO", { x: 100, y: height - 100, size: 30, font: timesBold })
         }
 
         // 2. WRITE DYNAMIC TEXT
-        // In PDF coordinates, 0 is at bottom!
-        const nameY = height * 0.48
+        // In PDF coordinates, 0 is at bottom! Height is essentially 1448.
+        const nameY = 698
         const nameText = member.display_name || 'Nome Cognome'
         const nameWidth = timesBold.widthOfTextAtSize(nameText, 48)
         page.drawText(nameText, {
             x: (width - nameWidth) / 2, y: nameY, size: 48, font: timesBold, color: navy
         })
 
-        const dipendenteY = height * 0.40
+        const dipendenteY = 648
         const ofText = 'dipendente di'
         const ofWidth = timesItalic.widthOfTextAtSize(ofText, 18)
         page.drawText(ofText, {
             x: (width - ofWidth) / 2, y: dipendenteY, size: 18, font: timesItalic, color: gray
         })
 
-        const companyY = height * 0.34
-        // Wrap logic
+        const companyY = 598
+        // Wrap logic for company name
         const maxCompanyWidth = width * 0.7
         const words = finalCompanyName.split(' ')
         let currentLine = words[0] || ''
@@ -180,12 +177,12 @@ export async function POST(request: NextRequest) {
             x: (width - courseWidth) / 2, y: courseY, size: 22, font: timesBold, color: navy
         })
 
-        const dateY = height * 0.18
+        const dateY = 224
         const today = new Date()
         const months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
         const dateStr = `Data di conseguimento: ${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`
         page.drawText(dateStr, {
-            x: width * 0.18, y: dateY, size: 16, font: timesRoman, color: gray
+            x: 180, y: dateY, size: 16, font: timesRoman, color: gray
         })
 
         // Serialize and return
