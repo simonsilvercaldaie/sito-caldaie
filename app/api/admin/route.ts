@@ -93,6 +93,7 @@ export async function POST(request: NextRequest) {
         if (action === 'get_user_video_progress') return await getUserVideoProgress(body.userId)
         if (action === 'get_team_members_progress') return await getTeamMembersProgress(body.teamId)
         if (action === 'get_all_video_stats') return await getAllVideoStats()
+        if (action === 'admin_reset_video_progress') return await adminResetVideoProgress(body.userId, adminEmail)
 
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
 
@@ -862,4 +863,21 @@ async function getAllVideoStats() {
         },
         users: activeUsers
     })
+}
+
+// -------------------------------------------------------------------
+// ADMIN RESET VIDEO PROGRESS
+// -------------------------------------------------------------------
+async function adminResetVideoProgress(userId: string, adminEmail: string) {
+    if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
+
+    const { error } = await supabaseAdmin.from('video_watch_progress')
+        .delete()
+        .eq('user_id', userId)
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    await logAdminAction(adminEmail, userId, null, 'reset_video_progress', {})
+
+    return NextResponse.json({ success: true, message: 'Progresso video azzerato.' })
 }

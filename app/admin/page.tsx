@@ -683,6 +683,20 @@ function UserCardSearch() {
         else alert('Errore reset')
     }
 
+    const handleResetVideo = async (userId: string) => {
+        if (!confirm('Sei sicuro? Questo cancellerà tutti i minuti di visualizzazione video e i completamenti di questo utente. IRREVERSIBILE.')) return
+        setLoading(true)
+        const { data: { session } } = await supabase.auth.getSession()
+        const res = await fetch('/api/admin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+            body: JSON.stringify({ action: 'admin_reset_video_progress', userId })
+        })
+        if (res.ok) { alert('Statistiche Video Azzerate!'); handleSearch() }
+        else alert('Errore reset video')
+        setLoading(false)
+    }
+
     const handleAddNote = async () => {
         if (!noteText || !card) return
         setNoteLoading(true)
@@ -782,6 +796,9 @@ function UserCardSearch() {
                                             </button>
                                             <button onClick={() => handleResetDevices(card.user.id)} className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
                                                 <MonitorX className="w-4 h-4" /> Reset Dispositivi
+                                            </button>
+                                            <button onClick={() => handleResetVideo(card.user.id)} className="w-full py-2.5 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
+                                                <Clock className="w-4 h-4" /> Azzera Minuti Video
                                             </button>
                                         </div>
 
