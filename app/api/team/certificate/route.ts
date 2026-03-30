@@ -116,96 +116,88 @@ export async function POST(request: NextRequest) {
         })
 
         // --- EMBED LOGO ---
-        let yPos = height - 160
         let logoImage;
         try {
-            const logoUrl = new URL('/logo.png', request.url).href;
-            const logoResponse = await fetch(logoUrl);
+            // Force fetch from live domain to avoid Vercel edge/local filesystem bugs with public folder
+            const logoResponse = await fetch('https://www.simonsilvercaldaie.it/logo.png')
             if (logoResponse.ok) {
-                const logoArrayBuffer = await logoResponse.arrayBuffer();
-                logoImage = await pdfDoc.embedPng(logoArrayBuffer);
+                const logoArrayBuffer = await logoResponse.arrayBuffer()
+                logoImage = await pdfDoc.embedPng(logoArrayBuffer)
             }
         } catch (err) {
-            console.error("Failed to embed logo from URL", err);
+            console.error("Failed to embed logo from URL", err)
         }
 
+        const logoY = height - 120
         if (logoImage) {
-            const logoDims = logoImage.scale(0.35) // Adjust scale as needed
+            const logoDims = logoImage.scale(0.40)
             page.drawImage(logoImage, {
                 x: width / 2 - logoDims.width / 2,
-                y: yPos,
+                y: logoY - logoDims.height / 2,
                 width: logoDims.width,
                 height: logoDims.height,
             })
-            yPos -= 20
         } else {
-            // Fallback Text if logo.png fails
             const brandText = 'SIMON SILVER CALDAIE'
-            const brandWidth = helveticaBold.widthOfTextAtSize(brandText, 22)
+            const brandWidth = helveticaBold.widthOfTextAtSize(brandText, 24)
             page.drawText(brandText, {
-                x: (width - brandWidth) / 2, y: yPos + 60,
-                size: 22, font: helveticaBold, color: navy
+                x: (width - brandWidth) / 2, y: logoY, size: 24, font: helveticaBold, color: navy
             })
         }
 
         // --- CERTIFICATE TITLE ---
-        yPos -= 80
+        const titleY = logoY - 110
         const titleText = 'CERTIFICATO DI COMPLETAMENTO'
-        const titleWidth = timesBold.widthOfTextAtSize(titleText, 26)
+        const titleWidth = timesBold.widthOfTextAtSize(titleText, 28)
         page.drawText(titleText, {
-            x: (width - titleWidth) / 2, y: yPos,
-            size: 26, font: timesBold, color: navy
+            x: (width - titleWidth) / 2, y: titleY, size: 28, font: timesBold, color: navy
         })
 
-        // Subtle underline
+        // Subtle underline centered
         page.drawLine({
-            start: { x: width / 2 - 140, y: yPos - 12 },
-            end: { x: width / 2 + 140, y: yPos - 12 },
-            thickness: 1.5, color: gold, opacity: 0.8
+            start: { x: width / 2 - 160, y: titleY - 15 },
+            end: { x: width / 2 + 160, y: titleY - 15 },
+            thickness: 1.5, color: gold, opacity: 0.9
         })
 
         // --- "Si certifica che" ---
-        yPos -= 50
+        const certifyY = titleY - 60
         const certifyText = 'Si certifica che'
-        const certifyWidth = timesItalic.widthOfTextAtSize(certifyText, 18)
+        const certifyWidth = timesItalic.widthOfTextAtSize(certifyText, 20)
         page.drawText(certifyText, {
-            x: (width - certifyWidth) / 2, y: yPos,
-            size: 18, font: timesItalic, color: gray
+            x: (width - certifyWidth) / 2, y: certifyY, size: 20, font: timesItalic, color: gray
         })
 
         // --- EMPLOYEE NAME ---
-        yPos -= 65
-        const nameText = member.display_name
-        const nameWidth = timesBold.widthOfTextAtSize(nameText, 38)
+        const nameY = certifyY - 70
+        const nameText = member.display_name || 'Nome Cognome'
+        const nameWidth = timesBold.widthOfTextAtSize(nameText, 42)
         page.drawText(nameText, {
-            x: (width - nameWidth) / 2, y: yPos,
-            size: 38, font: timesBold, color: navy
+            x: (width - nameWidth) / 2, y: nameY, size: 42, font: timesBold, color: navy
         })
 
-        // Decorative dot underneath name
-        page.drawCircle({
-            x: width / 2, y: yPos - 20, size: 3, color: orange
-        })
+        // Decorative ornament underneath name
+        page.drawCircle({ x: width / 2 - 12, y: nameY - 25, size: 2, color: orange })
+        page.drawCircle({ x: width / 2, y: nameY - 25, size: 4, color: orange })
+        page.drawCircle({ x: width / 2 + 12, y: nameY - 25, size: 2, color: orange })
 
         // --- "dipendente di" ---
-        yPos -= 55
+        const dipendenteY = nameY - 60
         const ofText = 'dipendente di'
-        const ofWidth = timesItalic.widthOfTextAtSize(ofText, 14)
+        const ofWidth = timesItalic.widthOfTextAtSize(ofText, 16)
         page.drawText(ofText, {
-            x: (width - ofWidth) / 2, y: yPos,
-            size: 14, font: timesItalic, color: gray
+            x: (width - ofWidth) / 2, y: dipendenteY, size: 16, font: timesItalic, color: gray
         })
 
         // --- COMPANY NAME (Word Wrapped) ---
-        yPos -= 35
-        const maxCompanyWidth = width - 160
+        const maxCompanyWidth = width - 140
         const words = finalCompanyName.split(' ')
         let currentLine = words[0] || ''
         const companyLines = []
 
         for (let i = 1; i < words.length; i++) {
             const word = words[i]
-            const cw = timesBold.widthOfTextAtSize(currentLine + ' ' + word, 24)
+            const cw = timesBold.widthOfTextAtSize(currentLine + ' ' + word, 26)
             if (cw < maxCompanyWidth) {
                 currentLine += ' ' + word
             } else {
@@ -215,78 +207,86 @@ export async function POST(request: NextRequest) {
         }
         if (currentLine) companyLines.push(currentLine)
 
+        let companyYPos = dipendenteY - 45
         for (const line of companyLines) {
-            const lineWidth = timesBold.widthOfTextAtSize(line, 24)
+            const lineWidth = timesBold.widthOfTextAtSize(line, 26)
             page.drawText(line, {
-                x: (width - lineWidth) / 2, y: yPos,
-                size: 24, font: timesBold, color: navy
+                x: (width - lineWidth) / 2, y: companyYPos, size: 26, font: timesBold, color: navy
             })
-            yPos -= 30
+            companyYPos -= 32
         }
-        // yPos is now at the line underneath the company name
-        yPos -= 20
 
         // --- DIVIDER ---
-        yPos -= 50
+        const dividerY = companyYPos - 10
         page.drawLine({
-            start: { x: 120, y: yPos },
-            end: { x: width - 120, y: yPos },
+            start: { x: 140, y: dividerY },
+            end: { x: width - 140, y: dividerY },
             thickness: 1, color: lightGray
         })
 
         // --- COURSE DETAILS ---
-        yPos -= 40
+        const descY = dividerY - 45
         const line1 = 'ha completato con successo l\'intero percorso di formazione professionale:'
-        const line1Width = timesRoman.widthOfTextAtSize(line1, 14)
+        const line1Width = timesRoman.widthOfTextAtSize(line1, 16)
         page.drawText(line1, {
-            x: (width - line1Width) / 2, y: yPos,
-            size: 14, font: timesRoman, color: navy
+            x: (width - line1Width) / 2, y: descY, size: 16, font: timesRoman, color: navy
         })
 
-        yPos -= 35
+        const descCourseY = descY - 35
         const courseName = 'CORSO TECNICO DIAGNOSTICA CALDAIE'
-        const courseWidth = timesBold.widthOfTextAtSize(courseName, 18)
+        const courseWidth = timesBold.widthOfTextAtSize(courseName, 20)
         page.drawText(courseName, {
-            x: (width - courseWidth) / 2, y: yPos,
-            size: 18, font: timesBold, color: navy
+            x: (width - courseWidth) / 2, y: descCourseY, size: 20, font: timesBold, color: navy
         })
 
-        yPos -= 30
+        const descResY = descCourseY - 30
         const durationText = 'Esito Positivo • 27 Moduli Completati'
-        const durWidth = helveticaBold.widthOfTextAtSize(durationText, 12)
+        const durWidth = helveticaBold.widthOfTextAtSize(durationText, 14)
         page.drawText(durationText, {
-            x: (width - durWidth) / 2, y: yPos,
-            size: 12, font: helveticaBold, color: gold
+            x: (width - durWidth) / 2, y: descResY, size: 14, font: helveticaBold, color: gold
         })
 
         // --- BOTTOM SECTION (Date & Signature) ---
-        const bottomY = 120
+        const bottomY = 100
         const today = new Date()
         const months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
             'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
-        const dateStr = `Data: ${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`
+        const dateStr = `Data di conseguimento: ${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`
         
         // Date Block (Left)
         page.drawText(dateStr, {
-            x: 90, y: bottomY + 20, size: 12, font: timesRoman, color: navy
+            x: 80, y: bottomY + 15, size: 12, font: timesRoman, color: gray
         })
+
+        // Signature cursive fetching
+        let signatureFont = timesItalic
+        try {
+            const fontUrl = 'https://github.com/google/fonts/raw/main/ofl/greatvibes/GreatVibes-Regular.ttf'
+            const fontRes = await fetch(fontUrl)
+            if (fontRes.ok) {
+                const fontBuffer = await fontRes.arrayBuffer()
+                signatureFont = await pdfDoc.embedFont(fontBuffer)
+            }
+        } catch (e) {
+            console.log("Could not load cursive font, falling back to TimesItalic")
+        }
 
         // Signature Block (Right)
         const sigLine = '_________________________'
         page.drawText(sigLine, {
-            x: width - 240, y: bottomY + 25, size: 12, font: helvetica, color: gray
+            x: width - 260, y: bottomY + 35, size: 12, font: helvetica, color: lightGray
         })
 
         const sigName = 'Simon Silver'
-        const sigNameWidth = timesBold.widthOfTextAtSize(sigName, 18)
+        const sigNameWidth = signatureFont.widthOfTextAtSize(sigName, 32)
         page.drawText(sigName, {
-            x: width - 180 - sigNameWidth / 2, y: bottomY, size: 18, font: timesBold, color: navy
+            x: width - 135 - sigNameWidth / 2, y: bottomY + 5, size: 32, font: signatureFont, color: navy
         })
 
         const sigRole = 'Docente e Fondatore'
-        const sigRoleWidth = timesItalic.widthOfTextAtSize(sigRole, 12)
+        const sigRoleWidth = timesRoman.widthOfTextAtSize(sigRole, 11)
         page.drawText(sigRole, {
-            x: width - 180 - sigRoleWidth / 2, y: bottomY - 15, size: 12, font: timesItalic, color: gray
+            x: width - 135 - sigRoleWidth / 2, y: bottomY - 15, size: 11, font: timesRoman, color: gray
         })
 
         // Serialize and return
