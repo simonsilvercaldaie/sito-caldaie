@@ -1,8 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
-import { readFileSync, existsSync } from 'fs'
-import { join } from 'path'
+import { certificateTemplateB64 } from '@/lib/certificateTemplate'
 
 function getSupabaseAdmin() {
     return createClient(
@@ -77,15 +76,10 @@ export async function POST(request: NextRequest) {
         // Fetch the EXACT AI mockup
         let bgImage;
         try {
-            const imagePath = join(process.cwd(), 'public', 'certificate_template.png')
-            if (existsSync(imagePath)) {
-                const bgBuffer = readFileSync(imagePath)
-                bgImage = await pdfDoc.embedPng(bgBuffer)
-            } else {
-                console.error("Local template image not found at", imagePath)
-            }
+            const bgBuffer = Buffer.from(certificateTemplateB64, 'base64')
+            bgImage = await pdfDoc.embedPng(bgBuffer)
         } catch (e) {
-            console.error("Failed to load background template", e)
+            console.error("Failed to decode inline base64 template", e)
         }
 
         // Set page size exactly to the image's dimensions!
