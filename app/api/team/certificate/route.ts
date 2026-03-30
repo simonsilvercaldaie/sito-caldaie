@@ -77,10 +77,12 @@ export async function POST(request: NextRequest) {
         // Fetch the EXACT AI mockup
         let bgImage;
         try {
-            const bgResponse = await fetch('https://www.simonsilvercaldaie.it/certificate_template.png')
-            if (bgResponse.ok) {
-                const bgBuffer = await bgResponse.arrayBuffer()
+            const imagePath = join(process.cwd(), 'public', 'certificate_template.png')
+            if (existsSync(imagePath)) {
+                const bgBuffer = readFileSync(imagePath)
                 bgImage = await pdfDoc.embedPng(bgBuffer)
+            } else {
+                console.error("Local template image not found at", imagePath)
             }
         } catch (e) {
             console.error("Failed to load background template", e)
