@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
-import { certificateTemplateB64 } from '@/lib/certificateTemplate'
+import { certificateTemplateBase64 } from '@/lib/certificateTemplate'
 
 function getSupabaseAdmin() {
     return createClient(
@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
         // Fetch the EXACT AI mockup
         let bgImage;
         try {
-            const bgBuffer = Buffer.from(certificateTemplateB64, 'base64')
+            const bgBuffer = Buffer.from(certificateTemplateBase64, 'base64')
             bgImage = await pdfDoc.embedPng(bgBuffer)
         } catch (e) {
             console.error("Failed to decode inline base64 template", e)
@@ -99,59 +99,31 @@ export async function POST(request: NextRequest) {
         const gray = rgb(0.3, 0.3, 0.3)
 
         if (bgImage) {
-            // Draw background spanning entire page (it will be 1024x1448 inherently)
+            // Draw background spanning entire page (it will be 724x1024 inherently)
             page.drawImage(bgImage, { x: 0, y: 0, width, height })
-
-            // 1. MASK THE OLD AI TEXT
-            const parchment = rgb(0.992, 0.984, 0.965)
-            
-            // Mask "Marco Bianchi" down to company name
-            page.drawRectangle({
-                x: width * 0.15,
-                y: 430, // from above the date/signature line in 1448 height
-                width: width * 0.70,
-                height: 380, // up to below "Si certifica che"
-                color: parchment
-            })
-
-            // Mask the Date at bottom left
-            page.drawRectangle({
-                x: width * 0.15,
-                y: 190, 
-                width: 350, 
-                height: 70,
-                color: parchment
-            })
         } else {
             // Fallback (if somehow it fails)
             page.drawText("CERTIFICATO DI COMPLETAMENTO", { x: 100, y: height - 100, size: 30, font: timesBold })
         }
 
         // 2. WRITE DYNAMIC TEXT
-        // In PDF coordinates, 0 is at bottom! Height is essentially 1448.
-        const nameY = 698
+        // In PDF coordinates, 0 is at bottom! Height is 1024. Width is 724.
+        const nameY = 680 // Top white block (img_y ~ 340)
         const nameText = member.display_name || 'Nome Cognome'
-        const nameWidth = timesBold.widthOfTextAtSize(nameText, 48)
+        const nameWidth = timesBold.widthOfTextAtSize(nameText, 36)
         page.drawText(nameText, {
-            x: (width - nameWidth) / 2, y: nameY, size: 48, font: timesBold, color: navy
+            x: (width - nameWidth) / 2, y: nameY, size: 36, font: timesBold, color: navy
         })
 
-        const dipendenteY = 648
-        const ofText = 'dipendente di'
-        const ofWidth = timesItalic.widthOfTextAtSize(ofText, 18)
-        page.drawText(ofText, {
-            x: (width - ofWidth) / 2, y: dipendenteY, size: 18, font: timesItalic, color: gray
-        })
-
-        const companyY = 598
+        const companyY = 500 // Bottom white block (img_y ~ 520)
         // Wrap logic for company name
-        const maxCompanyWidth = width * 0.7
+        const maxCompanyWidth = width * 0.8
         const words = finalCompanyName.split(' ')
         let currentLine = words[0] || ''
         const companyLines = []
         for (let i = 1; i < words.length; i++) {
             const word = words[i]
-            const cw = timesBold.widthOfTextAtSize(currentLine + ' ' + word, 26)
+            const cw = timesBold.widthOfTextAtSize(currentLine + ' ' + word, 22)
             if (cw < maxCompanyWidth) {
                 currentLine += ' ' + word
             } else {
@@ -161,28 +133,21 @@ export async function POST(request: NextRequest) {
         }
         if (currentLine) companyLines.push(currentLine)
 
-        let currY = companyY
+        let currY = companyY + ((companyLines.length - 1) * 12) // Center vertically if multiline
         for (const line of companyLines) {
-            const lineWidth = timesBold.widthOfTextAtSize(line, 26)
+            const lineWidth = timesBold.widthOfTextAtSize(line, 22)
             page.drawText(line, {
-                x: (width - lineWidth) / 2, y: currY, size: 26, font: timesBold, color: navy
+                x: (width - lineWidth) / 2, y: currY, size: 22, font: timesBold, color: navy
             })
-            currY -= 32
+            currY -= 28
         }
 
-        const courseY = currY - 20
-        const courseName = 'CORSO TECNICO DIAGNOSTICA CALDAIE'
-        const courseWidth = timesBold.widthOfTextAtSize(courseName, 22)
-        page.drawText(courseName, {
-            x: (width - courseWidth) / 2, y: courseY, size: 22, font: timesBold, color: navy
-        })
-
-        const dateY = 224
+        const dateY = 175 // Baseline for Date text
         const today = new Date()
         const months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
-        const dateStr = `Data di conseguimento: ${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`
+        const dateStr = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`
         page.drawText(dateStr, {
-            x: 180, y: dateY, size: 16, font: timesRoman, color: gray
+            x: 275, y: dateY, size: 15, font: timesRoman, color: navy
         })
 
         // Serialize and return
