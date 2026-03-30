@@ -1,13 +1,18 @@
 'use client'
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
-import { Users, UserPlus, X, Copy, Check, Loader2, Shield, UserMinus, RefreshCw } from 'lucide-react'
+import { Users, UserPlus, X, Check, Loader2, Shield, UserMinus, RefreshCw, Edit2, Save, Award, BarChart3, Download } from 'lucide-react'
 
 interface TeamMember {
     id: string
     user_id: string
     added_at: string
     email: string
+    display_name: string | null
+    completedCount: number
+    totalCourses: number
+    totalMinutes: number
+    completedAll: boolean
 }
 
 interface TeamInvite {
@@ -20,6 +25,7 @@ interface TeamInvite {
 
 interface TeamStats {
     licenseId: string
+    companyName: string
     seats: number
     seatsUsed: number
     members: TeamMember[]
@@ -37,6 +43,10 @@ export default function TeamDashboard({ initialData }: { initialData?: any }) {
     const [inviteResult, setInviteResult] = useState<{ url: string, message: string } | null>(null)
     const [error, setError] = useState('')
     const [removingMember, setRemovingMember] = useState<string | null>(null)
+    const [editingName, setEditingName] = useState<string | null>(null)
+    const [editNameValue, setEditNameValue] = useState('')
+    const [savingName, setSavingName] = useState(false)
+    const [downloadingCert, setDownloadingCert] = useState<string | null>(null)
 
     const fetchTeams = async () => {
         try {
@@ -167,6 +177,74 @@ export default function TeamDashboard({ initialData }: { initialData?: any }) {
         }
     }
 
+    const handleSaveName = async (memberId: string, licenseId: string) => {
+        setSavingName(true)
+        try {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (!session) throw new Error("No session")
+
+            const res = await fetch('/api/team/dashboard', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({
+                    action: 'update_member_name',
+                    memberId,
+                    displayName: editNameValue.trim(),
+                    teamLicenseId: licenseId
+                })
+            })
+
+            if (!res.ok) {
+                const data = await res.json()
+                throw new Error(data.error)
+            }
+
+            setEditingName(null)
+            fetchTeams()
+        } catch (e: any) {
+            alert('Errore: ' + e.message)
+        } finally {
+            setSavingName(false)
+        }
+    }
+
+    const handleDownloadCertificate = async (memberId: string, licenseId: string, memberName: string) => {
+        setDownloadingCert(memberId)
+        try {
+            const { data: { session } } = await supabase.auth.getSession()
+            if (!session) throw new Error("No session")
+
+            const res = await fetch('/api/team/certificate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`
+                },
+                body: JSON.stringify({ memberId, teamLicenseId: licenseId })
+            })
+
+            if (!res.ok) {
+                const data = await res.json()
+                throw new Error(data.error)
+            }
+
+            const blob = await res.blob()
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = `Certificato_${memberName.replace(/\s+/g, '_')}.pdf`
+            a.click()
+            URL.revokeObjectURL(url)
+        } catch (e: any) {
+            alert('Errore: ' + e.message)
+        } finally {
+            setDownloadingCert(null)
+        }
+    }
+
     if (loading) return null
     if (!teams || teams.length === 0) return null
 
@@ -182,7 +260,7 @@ export default function TeamDashboard({ initialData }: { initialData?: any }) {
                 </div>
                 <div>
                     <h2 className="text-xl font-bold text-gray-900">Gestione Licenza Aziendale (Multidipendente)</h2>
-                    <p className="text-sm text-gray-600">Gestisci i membri e gli accessi della tua azienda</p>
+                    <p className="text-sm text-gray-600">Gestisci i membri e monitora i progressi di formazione</p>
                 </div>
             </div>
 
@@ -262,7 +340,7 @@ export default function TeamDashboard({ initialData }: { initialData?: any }) {
                                             <Check className="w-4 h-4" /> {inviteResult.message}
                                         </div>
                                         <p className="text-xs text-gray-500 mt-2">
-                                            L'invitato troverà l'invito nella propria Area Personale dopo il login.
+                                            L&apos;invitato troverà l&apos;invito nella propria Area Personale dopo il login.
                                         </p>
                                     </div>
                                 )}
@@ -274,30 +352,108 @@ export default function TeamDashboard({ initialData }: { initialData?: any }) {
                                     <Users className="w-4 h-4" /> Membri Autorizzati
                                 </h4>
 
-                                <div className="space-y-2 max-h-[300px] overflow-y-auto pr-2">
-                                    {/* Active Members */}
+                                <div className="space-y-3 max-h-[500px] overflow-y-auto pr-2">
+                                    {/* Active Members with Progress */}
                                     {team.members.map(m => (
-                                        <div key={m.user_id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-xs font-bold">
-                                                    {m.email[0].toUpperCase()}
+                                        <div key={m.user_id} className="p-3 bg-gray-50 rounded-xl border border-gray-100">
+                                            <div className="flex items-center justify-between mb-2">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${m.completedAll ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'}`}>
+                                                        {m.completedAll ? '✓' : m.email[0].toUpperCase()}
+                                                    </div>
+                                                    <div>
+                                                        {/* Editable Name */}
+                                                        {editingName === m.id ? (
+                                                            <div className="flex items-center gap-1">
+                                                                <input
+                                                                    type="text"
+                                                                    value={editNameValue}
+                                                                    onChange={e => setEditNameValue(e.target.value)}
+                                                                    placeholder="Nome e Cognome"
+                                                                    className="px-2 py-1 text-sm border border-indigo-300 rounded-lg w-40 text-slate-900 bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                                                                    autoFocus
+                                                                />
+                                                                <button
+                                                                    onClick={() => handleSaveName(m.id, team.licenseId)}
+                                                                    disabled={savingName}
+                                                                    className="p-1 text-green-600 hover:bg-green-50 rounded"
+                                                                >
+                                                                    {savingName ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
+                                                                </button>
+                                                                <button onClick={() => setEditingName(null)} className="p-1 text-gray-400 hover:bg-gray-100 rounded">
+                                                                    <X className="w-3 h-3" />
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="flex items-center gap-1">
+                                                                <span className="text-sm font-medium text-gray-900">
+                                                                    {m.display_name || m.email}
+                                                                </span>
+                                                                <button
+                                                                    onClick={() => { setEditingName(m.id); setEditNameValue(m.display_name || '') }}
+                                                                    className="p-0.5 text-gray-300 hover:text-indigo-600 rounded"
+                                                                    title="Modifica nome"
+                                                                >
+                                                                    <Edit2 className="w-3 h-3" />
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                        {m.display_name && (
+                                                            <div className="text-xs text-gray-400">{m.email}</div>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <div className="text-sm font-medium text-gray-900">{m.email}</div>
-                                                    <div className="text-xs text-gray-500">Membro attivo</div>
+                                                <button
+                                                    onClick={() => handleRemoveMember(m.id, m.email, team.licenseId)}
+                                                    disabled={removingMember === m.id}
+                                                    className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
+                                                    title="Rimuovi membro"
+                                                >
+                                                    {removingMember === m.id
+                                                        ? <Loader2 className="w-4 h-4 animate-spin" />
+                                                        : <UserMinus className="w-4 h-4" />
+                                                    }
+                                                </button>
+                                            </div>
+
+                                            {/* Progress Bar */}
+                                            <div className="mt-2">
+                                                <div className="flex items-center justify-between text-xs mb-1">
+                                                    <span className="font-medium text-gray-500 flex items-center gap-1">
+                                                        <BarChart3 className="w-3 h-3" />
+                                                        {m.completedCount}/{m.totalCourses} video • {m.totalMinutes} min
+                                                    </span>
+                                                    <span className={`font-bold ${m.completedAll ? 'text-green-600' : m.completedCount > 0 ? 'text-blue-600' : 'text-gray-400'}`}>
+                                                        {Math.round((m.completedCount / m.totalCourses) * 100)}%
+                                                    </span>
+                                                </div>
+                                                <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                                                    <div
+                                                        className={`h-full rounded-full transition-all duration-500 ${m.completedAll ? 'bg-gradient-to-r from-green-500 to-emerald-500' : 'bg-gradient-to-r from-blue-500 to-indigo-500'}`}
+                                                        style={{ width: `${(m.completedCount / m.totalCourses) * 100}%` }}
+                                                    />
                                                 </div>
                                             </div>
-                                            <button
-                                                onClick={() => handleRemoveMember(m.id, m.email, team.licenseId)}
-                                                disabled={removingMember === m.id}
-                                                className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition disabled:opacity-50"
-                                                title="Rimuovi membro"
-                                            >
-                                                {removingMember === m.id
-                                                    ? <Loader2 className="w-4 h-4 animate-spin" />
-                                                    : <UserMinus className="w-4 h-4" />
-                                                }
-                                            </button>
+
+                                            {/* Certificate Button */}
+                                            {m.completedAll && m.display_name && (
+                                                <button
+                                                    onClick={() => handleDownloadCertificate(m.id, team.licenseId, m.display_name!)}
+                                                    disabled={downloadingCert === m.id}
+                                                    className="mt-3 w-full py-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-bold rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all shadow-lg shadow-amber-200 disabled:opacity-50 flex justify-center items-center gap-2 text-sm"
+                                                >
+                                                    {downloadingCert === m.id
+                                                        ? <Loader2 className="w-4 h-4 animate-spin" />
+                                                        : <><Award className="w-4 h-4" /> Scarica Certificato PDF</>
+                                                    }
+                                                </button>
+                                            )}
+                                            {m.completedAll && !m.display_name && (
+                                                <div className="mt-2 text-xs text-amber-600 bg-amber-50 p-2 rounded-lg flex items-center gap-1">
+                                                    <Edit2 className="w-3 h-3" />
+                                                    Inserisci Nome e Cognome per generare il certificato
+                                                </div>
+                                            )}
                                         </div>
                                     ))}
 

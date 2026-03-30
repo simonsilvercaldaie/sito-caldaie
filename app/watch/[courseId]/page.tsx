@@ -117,6 +117,7 @@ export default function WatchPage() {
                     videoUrl={videoUrl}
                     userEmail={userEmail}
                     orderId={orderId}
+                    courseId={params.courseId as string}
                     className="border border-gray-800"
                 />
 

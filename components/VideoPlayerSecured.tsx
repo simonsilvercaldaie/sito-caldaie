@@ -1,11 +1,13 @@
 'use client'
 import { useState, useEffect, useRef, useCallback, RefObject } from 'react'
 import { Maximize } from 'lucide-react'
+import { supabase } from '@/lib/supabaseClient'
 
 interface VideoPlayerSecuredProps {
     videoUrl: string
     userEmail: string
     orderId: string
+    courseId?: string  // For progress tracking
     className?: string
     iframeRef?: RefObject<HTMLIFrameElement | null>
 }
@@ -23,16 +25,18 @@ const CORNER_POSITIONS = [
 ]
 
 /**
- * Secured Video Player with "Flash Discreto" watermark
+ * Secured Video Player with "Flash Discreto" watermark + Progress Tracking
  * - Filigrana visibile 5 secondi ogni 45-60 secondi
  * - Solo negli angoli/bordi, MAI al centro del video
  * - Opacità 28% per leggibilità senza disturbo
  * - Funziona anche in fullscreen
+ * - Heartbeat: manda ping ogni 30s per tracking progressi
  */
 export default function VideoPlayerSecured({
     videoUrl,
     userEmail,
     orderId,
+    courseId,
     className = '',
     iframeRef
 }: VideoPlayerSecuredProps) {
@@ -40,6 +44,39 @@ export default function VideoPlayerSecured({
     const [showWatermark, setShowWatermark] = useState(false)
     const [cornerIndex, setCornerIndex] = useState(0)
     const [isFullscreen, setIsFullscreen] = useState(false)
+
+    // --- PROGRESS TRACKING HEARTBEAT ---
+    useEffect(() => {
+        if (!courseId) return // No tracking without courseId
+
+        let interval: ReturnType<typeof setInterval>
+
+        const sendPing = async () => {
+            try {
+                const { data: { session } } = await supabase.auth.getSession()
+                if (!session) return
+
+                await fetch('/api/video-progress', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${session.access_token}`
+                    },
+                    body: JSON.stringify({
+                        courseId,
+                        secondsWatched: 30
+                    })
+                })
+            } catch {
+                // Silent fail - non-critical
+            }
+        }
+
+        // First ping after 30 seconds, then every 30s
+        interval = setInterval(sendPing, 30000)
+
+        return () => clearInterval(interval)
+    }, [courseId])
 
     // Ciclo "Flash Discreto": 5s visibile, poi 45-60s nascosto
     useEffect(() => {

@@ -669,6 +669,7 @@ export default function CorsoPage() {
                                                     videoUrl={secureVideoUrl || course.premiumVideoUrl!}
                                                     userEmail={user?.email || 'utente@simonsilver.it'}
                                                     orderId={activeOrderId || 'ORDER-XXXX'}
+                                                    courseId={course.id}
                                                     iframeRef={bunnyRef}
                                                 />
                                                 {/* Overlay: transparent interceptor when no player selected, dark when YouTube is active */}

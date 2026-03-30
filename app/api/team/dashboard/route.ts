@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
             // Fetch Recent Members for list (exclude admin/owner)
             const { data: members, error: memListErr } = await supabase
                 .from('team_members')
-                .select('id, user_id, added_at')
+                .select('id, user_id, added_at, display_name')
                 .eq('team_license_id', lic.id)
                 .is('removed_at', null)
                 .neq('user_id', user.id)
@@ -72,12 +72,31 @@ export async function GET(request: NextRequest) {
 
             if (invErr) throw invErr
 
-            // Enrich Members with Emails
-            const enrichedMembers = await Promise.all(members!.map(async (m: any) => {
+            // Enrich Members with Emails + Video Progress
+            const memberIds = (members || []).map((m: any) => m.user_id)
+            const { data: allProgress } = await supabase
+                .from('video_watch_progress')
+                .select('user_id, course_id, watch_seconds, completed')
+                .in('user_id', memberIds.length > 0 ? memberIds : ['__none__'])
+
+            const progressMap = new Map<string, any[]>()
+            for (const p of (allProgress || [])) {
+                if (!progressMap.has(p.user_id)) progressMap.set(p.user_id, [])
+                progressMap.get(p.user_id)!.push(p)
+            }
+
+            const enrichedMembers = await Promise.all((members || []).map(async (m: any) => {
                 const { data: u } = await supabase.auth.admin.getUserById(m.user_id)
+                const userProgress = progressMap.get(m.user_id) || []
+                const completedCount = userProgress.filter((p: any) => p.completed).length
+                const totalSeconds = userProgress.reduce((sum: number, p: any) => sum + (p.watch_seconds || 0), 0)
                 return {
                     ...m,
-                    email: u.user?.email || 'Unknown'
+                    email: u.user?.email || 'Unknown',
+                    completedCount,
+                    totalCourses: 27,
+                    totalMinutes: Math.round(totalSeconds / 60),
+                    completedAll: completedCount >= 27
                 }
             }))
 
@@ -87,6 +106,7 @@ export async function GET(request: NextRequest) {
 
             teamsStats.push({
                 licenseId: lic.id,
+                companyName: lic.company_name || '',
                 seats: employeeSlots,
                 seatsUsed: memberCount || 0,
                 members: enrichedMembers,
@@ -101,6 +121,46 @@ export async function GET(request: NextRequest) {
 
     } catch (e: any) {
         console.error('Dashboard Error', e)
+        return NextResponse.json({ error: e.message }, { status: 500 })
+    }
+}
+
+// POST: Update member display_name
+export async function POST(request: NextRequest) {
+    try {
+        const authHeader = request.headers.get('authorization') || ''
+        const token = authHeader.replace(/^Bearer\s+/i, '').trim()
+        if (!token) return NextResponse.json({ error: 'Missing token' }, { status: 401 })
+
+        const supabase = getSupabaseAdmin()
+        const { data: { user }, error: authError } = await supabase.auth.getUser(token)
+        if (authError || !user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+        const { action, memberId, displayName, teamLicenseId } = await request.json()
+
+        if (action === 'update_member_name') {
+            // Verify ownership
+            const { data: license } = await supabase
+                .from('team_licenses')
+                .select('id')
+                .eq('id', teamLicenseId)
+                .eq('owner_user_id', user.id)
+                .maybeSingle()
+
+            if (!license) return NextResponse.json({ error: 'Non autorizzato' }, { status: 403 })
+
+            const { error } = await supabase
+                .from('team_members')
+                .update({ display_name: displayName })
+                .eq('id', memberId)
+                .eq('team_license_id', teamLicenseId)
+
+            if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+            return NextResponse.json({ success: true })
+        }
+
+        return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
+    } catch (e: any) {
         return NextResponse.json({ error: e.message }, { status: 500 })
     }
 }

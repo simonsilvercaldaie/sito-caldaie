@@ -90,6 +90,8 @@ export async function POST(request: NextRequest) {
         if (action === 'admin_revoke_access') return await adminRevokeAccess(body.userId, body.levels, body.reason, adminEmail)
         if (action === 'admin_add_note') return await adminAddNote(body.userId, body.note, adminEmail)
         if (action === 'get_audit_log') return await getAuditLog(body.userId)
+        if (action === 'get_user_video_progress') return await getUserVideoProgress(body.userId)
+        if (action === 'get_team_members_progress') return await getTeamMembersProgress(body.teamId)
 
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
 
@@ -668,4 +670,78 @@ async function deleteTeam(teamId: string, adminEmail: string) {
     })
 
     return NextResponse.json({ success: true, message: 'Licenza Team eliminata con successo.' })
+}
+
+// -------------------------------------------------------------------
+// GET USER VIDEO PROGRESS — Admin view of a user's watch history
+// -------------------------------------------------------------------
+async function getUserVideoProgress(userId: string) {
+    if (!userId) return NextResponse.json({ error: 'userId required' }, { status: 400 })
+
+    const { data: progress, error } = await supabaseAdmin
+        .from('video_watch_progress')
+        .select('*')
+        .eq('user_id', userId)
+        .order('last_watched_at', { ascending: false })
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+    const totalSeconds = (progress || []).reduce((sum: number, p: any) => sum + (p.watch_seconds || 0), 0)
+    const completedCount = (progress || []).filter((p: any) => p.completed).length
+
+    return NextResponse.json({
+        progress: progress || [],
+        totalMinutes: Math.round(totalSeconds / 60),
+        completedCount,
+        totalCourses: 27
+    })
+}
+
+// -------------------------------------------------------------------
+// GET TEAM MEMBERS PROGRESS — For team owner dashboard
+// -------------------------------------------------------------------
+async function getTeamMembersProgress(teamId: string) {
+    if (!teamId) return NextResponse.json({ error: 'teamId required' }, { status: 400 })
+
+    const { data: members } = await supabaseAdmin
+        .from('team_members')
+        .select('user_id, display_name, added_at')
+        .eq('team_license_id', teamId)
+        .is('removed_at', null)
+
+    if (!members || members.length === 0) return NextResponse.json({ members: [] })
+
+    const { data: { users } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 10000 })
+    const emailMap = new Map(users.map((u: any) => [u.id, u.email]))
+
+    const memberIds = members.map((m: any) => m.user_id)
+    const { data: allProgress } = await supabaseAdmin
+        .from('video_watch_progress')
+        .select('user_id, course_id, watch_seconds, completed, completed_at')
+        .in('user_id', memberIds)
+
+    const progressMap = new Map<string, any[]>()
+    for (const p of (allProgress || [])) {
+        if (!progressMap.has(p.user_id)) progressMap.set(p.user_id, [])
+        progressMap.get(p.user_id)!.push(p)
+    }
+
+    const result = members.map((m: any) => {
+        const userProgress = progressMap.get(m.user_id) || []
+        const completedCount = userProgress.filter((p: any) => p.completed).length
+        const totalSeconds = userProgress.reduce((sum: number, p: any) => sum + (p.watch_seconds || 0), 0)
+        return {
+            user_id: m.user_id,
+            email: emailMap.get(m.user_id) || 'Unknown',
+            display_name: m.display_name || null,
+            added_at: m.added_at,
+            completedCount,
+            totalCourses: 27,
+            totalMinutes: Math.round(totalSeconds / 60),
+            completedAll: completedCount >= 27,
+            courses: userProgress
+        }
+    })
+
+    return NextResponse.json({ members: result })
 }
