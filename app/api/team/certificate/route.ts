@@ -76,7 +76,8 @@ export async function POST(request: NextRequest) {
         // Fetch the EXACT AI mockup
         let bgImage;
         try {
-            const bgBuffer = Buffer.from(certificateTemplateBase64, 'base64')
+            const rawBase64 = certificateTemplateBase64.replace(/^data:image\/\w+;base64,/, '');
+            const bgBuffer = Buffer.from(rawBase64, 'base64')
             bgImage = await pdfDoc.embedPng(bgBuffer)
         } catch (e) {
             console.error("Failed to decode inline base64 template", e)
