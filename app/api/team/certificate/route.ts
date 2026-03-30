@@ -73,128 +73,89 @@ export async function POST(request: NextRequest) {
 
         // 5. Generate PDF
         const pdfDoc = await PDFDocument.create()
-        const page = pdfDoc.addPage([595.28, 841.89]) // A4
-        const { width, height } = page.getSize()
+
+        // Fetch the EXACT AI mockup
+        let bgImage;
+        try {
+            const bgResponse = await fetch('https://www.simonsilvercaldaie.it/certificate_template.png')
+            if (bgResponse.ok) {
+                const bgBuffer = await bgResponse.arrayBuffer()
+                bgImage = await pdfDoc.embedPng(bgBuffer)
+            }
+        } catch (e) {
+            console.error("Failed to load background template", e)
+        }
+
+        // Set page size exactly to the image's dimensions!
+        let width = 1024, height = 768
+        if (bgImage) {
+            width = bgImage.width
+            height = bgImage.height
+        }
+        
+        const page = pdfDoc.addPage([width, height])
 
         // Fonts
-        const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
-        const helvetica = await pdfDoc.embedFont(StandardFonts.Helvetica)
         const timesBold = await pdfDoc.embedFont(StandardFonts.TimesRomanBold)
-        const timesItalic = await pdfDoc.embedFont(StandardFonts.TimesRomanItalic)
         const timesRoman = await pdfDoc.embedFont(StandardFonts.TimesRoman)
+        const timesItalic = await pdfDoc.embedFont(StandardFonts.TimesRomanItalic)
+        const navy = rgb(0.1, 0.15, 0.25)
+        const gray = rgb(0.3, 0.3, 0.3)
 
-        // Colors
-        const navy = rgb(0.08, 0.12, 0.20)
-        const gold = rgb(0.85, 0.65, 0.20)
-        const orange = rgb(0.93, 0.45, 0.12)
-        const gray = rgb(0.40, 0.43, 0.47)
-        const lightGray = rgb(0.85, 0.88, 0.90)
+        if (bgImage) {
+            // Draw background spanning entire page
+            page.drawImage(bgImage, { x: 0, y: 0, width, height })
 
-        // --- GORGEOUS BORDERS ---
-        const outerMargin = 30
-        const innerMargin = 40
+            // 1. MASK THE OLD AI TEXT
+            // The parchment color: 
+            const parchment = rgb(0.992, 0.984, 0.965)
+            
+            // Mask "Marco Bianchi" all the way down to course name
+            // Y grows from bottom to top. 
+            // In a landscape image (e.g. 1024x768), names are around Y=50% to Y=25%
+            page.drawRectangle({
+                x: width * 0.15,
+                y: height * 0.23, // from above the date/signature line
+                width: width * 0.70,
+                height: height * 0.33, // up to below "Si certifica che"
+                color: parchment
+            })
 
-        // Outer crisp line
-        page.drawRectangle({
-            x: outerMargin, y: outerMargin,
-            width: width - outerMargin * 2, height: height - outerMargin * 2,
-            borderColor: navy, borderWidth: 1,
-        })
-        
-        // Inner elegant gold/orange thick frame
-        page.drawRectangle({
-            x: innerMargin, y: innerMargin,
-            width: width - innerMargin * 2, height: height - innerMargin * 2,
-            borderColor: orange, borderWidth: 5, opacity: 0.85
-        })
-        
-        // Very thin inner-inner line for depth
-        page.drawRectangle({
-            x: innerMargin + 6, y: innerMargin + 6,
-            width: width - (innerMargin + 6) * 2, height: height - (innerMargin + 6) * 2,
-            borderColor: gold, borderWidth: 0.5,
-        })
-
-        // --- EMBED LOGO ---
-        let logoImage;
-        try {
-            // Force fetch from live domain to avoid Vercel edge/local filesystem bugs with public folder
-            const logoResponse = await fetch('https://www.simonsilvercaldaie.it/logo.png')
-            if (logoResponse.ok) {
-                const logoArrayBuffer = await logoResponse.arrayBuffer()
-                logoImage = await pdfDoc.embedPng(logoArrayBuffer)
-            }
-        } catch (err) {
-            console.error("Failed to embed logo from URL", err)
-        }
-
-        const logoY = height - 120
-        if (logoImage) {
-            const logoDims = logoImage.scale(0.40)
-            page.drawImage(logoImage, {
-                x: width / 2 - logoDims.width / 2,
-                y: logoY - logoDims.height / 2,
-                width: logoDims.width,
-                height: logoDims.height,
+            // Mask the Date at bottom left
+            page.drawRectangle({
+                x: width * 0.15,
+                y: height * 0.15, // around 15% from bottom
+                width: width * 0.40, // up to middle
+                height: height * 0.08,
+                color: parchment
             })
         } else {
-            const brandText = 'SIMON SILVER CALDAIE'
-            const brandWidth = helveticaBold.widthOfTextAtSize(brandText, 24)
-            page.drawText(brandText, {
-                x: (width - brandWidth) / 2, y: logoY, size: 24, font: helveticaBold, color: navy
-            })
+            // Fallback (if image absolutely fails)
+            page.drawText("CERTIFICATO DI COMPLETAMENTO", { x: 100, y: height - 100, size: 30, font: timesBold })
         }
 
-        // --- CERTIFICATE TITLE ---
-        const titleY = logoY - 110
-        const titleText = 'CERTIFICATO DI COMPLETAMENTO'
-        const titleWidth = timesBold.widthOfTextAtSize(titleText, 28)
-        page.drawText(titleText, {
-            x: (width - titleWidth) / 2, y: titleY, size: 28, font: timesBold, color: navy
-        })
-
-        // Subtle underline centered
-        page.drawLine({
-            start: { x: width / 2 - 160, y: titleY - 15 },
-            end: { x: width / 2 + 160, y: titleY - 15 },
-            thickness: 1.5, color: gold, opacity: 0.9
-        })
-
-        // --- "Si certifica che" ---
-        const certifyY = titleY - 60
-        const certifyText = 'Si certifica che'
-        const certifyWidth = timesItalic.widthOfTextAtSize(certifyText, 20)
-        page.drawText(certifyText, {
-            x: (width - certifyWidth) / 2, y: certifyY, size: 20, font: timesItalic, color: gray
-        })
-
-        // --- EMPLOYEE NAME ---
-        const nameY = certifyY - 70
+        // 2. WRITE DYNAMIC TEXT
+        // In PDF coordinates, 0 is at bottom!
+        const nameY = height * 0.48
         const nameText = member.display_name || 'Nome Cognome'
-        const nameWidth = timesBold.widthOfTextAtSize(nameText, 42)
+        const nameWidth = timesBold.widthOfTextAtSize(nameText, 48)
         page.drawText(nameText, {
-            x: (width - nameWidth) / 2, y: nameY, size: 42, font: timesBold, color: navy
+            x: (width - nameWidth) / 2, y: nameY, size: 48, font: timesBold, color: navy
         })
 
-        // Decorative ornament underneath name
-        page.drawCircle({ x: width / 2 - 12, y: nameY - 25, size: 2, color: orange })
-        page.drawCircle({ x: width / 2, y: nameY - 25, size: 4, color: orange })
-        page.drawCircle({ x: width / 2 + 12, y: nameY - 25, size: 2, color: orange })
-
-        // --- "dipendente di" ---
-        const dipendenteY = nameY - 60
+        const dipendenteY = height * 0.40
         const ofText = 'dipendente di'
-        const ofWidth = timesItalic.widthOfTextAtSize(ofText, 16)
+        const ofWidth = timesItalic.widthOfTextAtSize(ofText, 18)
         page.drawText(ofText, {
-            x: (width - ofWidth) / 2, y: dipendenteY, size: 16, font: timesItalic, color: gray
+            x: (width - ofWidth) / 2, y: dipendenteY, size: 18, font: timesItalic, color: gray
         })
 
-        // --- COMPANY NAME (Word Wrapped) ---
-        const maxCompanyWidth = width - 140
+        const companyY = height * 0.34
+        // Wrap logic
+        const maxCompanyWidth = width * 0.7
         const words = finalCompanyName.split(' ')
         let currentLine = words[0] || ''
         const companyLines = []
-
         for (let i = 1; i < words.length; i++) {
             const word = words[i]
             const cw = timesBold.widthOfTextAtSize(currentLine + ' ' + word, 26)
@@ -207,86 +168,28 @@ export async function POST(request: NextRequest) {
         }
         if (currentLine) companyLines.push(currentLine)
 
-        let companyYPos = dipendenteY - 45
+        let currY = companyY
         for (const line of companyLines) {
             const lineWidth = timesBold.widthOfTextAtSize(line, 26)
             page.drawText(line, {
-                x: (width - lineWidth) / 2, y: companyYPos, size: 26, font: timesBold, color: navy
+                x: (width - lineWidth) / 2, y: currY, size: 26, font: timesBold, color: navy
             })
-            companyYPos -= 32
+            currY -= 32
         }
 
-        // --- DIVIDER ---
-        const dividerY = companyYPos - 10
-        page.drawLine({
-            start: { x: 140, y: dividerY },
-            end: { x: width - 140, y: dividerY },
-            thickness: 1, color: lightGray
-        })
-
-        // --- COURSE DETAILS ---
-        const descY = dividerY - 45
-        const line1 = 'ha completato con successo l\'intero percorso di formazione professionale:'
-        const line1Width = timesRoman.widthOfTextAtSize(line1, 16)
-        page.drawText(line1, {
-            x: (width - line1Width) / 2, y: descY, size: 16, font: timesRoman, color: navy
-        })
-
-        const descCourseY = descY - 35
+        const courseY = currY - 20
         const courseName = 'CORSO TECNICO DIAGNOSTICA CALDAIE'
-        const courseWidth = timesBold.widthOfTextAtSize(courseName, 20)
+        const courseWidth = timesBold.widthOfTextAtSize(courseName, 22)
         page.drawText(courseName, {
-            x: (width - courseWidth) / 2, y: descCourseY, size: 20, font: timesBold, color: navy
+            x: (width - courseWidth) / 2, y: courseY, size: 22, font: timesBold, color: navy
         })
 
-        const descResY = descCourseY - 30
-        const durationText = 'Esito Positivo • 27 Moduli Completati'
-        const durWidth = helveticaBold.widthOfTextAtSize(durationText, 14)
-        page.drawText(durationText, {
-            x: (width - durWidth) / 2, y: descResY, size: 14, font: helveticaBold, color: gold
-        })
-
-        // --- BOTTOM SECTION (Date & Signature) ---
-        const bottomY = 100
+        const dateY = height * 0.18
         const today = new Date()
-        const months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
-            'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
+        const months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
         const dateStr = `Data di conseguimento: ${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`
-        
-        // Date Block (Left)
         page.drawText(dateStr, {
-            x: 80, y: bottomY + 15, size: 12, font: timesRoman, color: gray
-        })
-
-        // Signature cursive fetching
-        let signatureFont = timesItalic
-        try {
-            const fontUrl = 'https://github.com/google/fonts/raw/main/ofl/greatvibes/GreatVibes-Regular.ttf'
-            const fontRes = await fetch(fontUrl)
-            if (fontRes.ok) {
-                const fontBuffer = await fontRes.arrayBuffer()
-                signatureFont = await pdfDoc.embedFont(fontBuffer)
-            }
-        } catch (e) {
-            console.log("Could not load cursive font, falling back to TimesItalic")
-        }
-
-        // Signature Block (Right)
-        const sigLine = '_________________________'
-        page.drawText(sigLine, {
-            x: width - 260, y: bottomY + 35, size: 12, font: helvetica, color: lightGray
-        })
-
-        const sigName = 'Simon Silver'
-        const sigNameWidth = signatureFont.widthOfTextAtSize(sigName, 32)
-        page.drawText(sigName, {
-            x: width - 135 - sigNameWidth / 2, y: bottomY + 5, size: 32, font: signatureFont, color: navy
-        })
-
-        const sigRole = 'Docente e Fondatore'
-        const sigRoleWidth = timesRoman.widthOfTextAtSize(sigRole, 11)
-        page.drawText(sigRole, {
-            x: width - 135 - sigRoleWidth / 2, y: bottomY - 15, size: 11, font: timesRoman, color: gray
+            x: width * 0.18, y: dateY, size: 16, font: timesRoman, color: gray
         })
 
         // Serialize and return
