@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { Loader2, AlertTriangle, UserX, ShieldAlert, RefreshCw, MonitorX, Search, X, ChevronDown, ChevronUp, FileText, Shield, Clock, Users } from 'lucide-react'
 
@@ -12,6 +12,9 @@ export default function AdminPage() {
     const [liveUsers, setLiveUsers] = useState<number>(0)
     const [teams, setTeams] = useState<any[]>([])
     const [actionLoading, setActionLoading] = useState(false)
+    const [expandedTeamId, setExpandedTeamId] = useState<string | null>(null)
+    const [teamMembersData, setTeamMembersData] = useState<any[]>([])
+    const [membersLoading, setMembersLoading] = useState(false)
 
     useEffect(() => {
         checkAuth()
@@ -167,6 +170,55 @@ export default function AdminPage() {
                 fetchTeams(session!.access_token)
             } else {
                 alert('Errore eliminazione Team.')
+            }
+        } finally {
+            setActionLoading(false)
+        }
+    }
+
+    const fetchTeamMembers = async (teamId: string) => {
+        setMembersLoading(true)
+        const { data: { session } } = await supabase.auth.getSession()
+        try {
+            const res = await fetch('/api/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+                body: JSON.stringify({ action: 'get_team_members_progress', teamId })
+            })
+            if (res.ok) {
+                const data = await res.json()
+                setTeamMembersData(data.members || [])
+            }
+        } finally {
+            setMembersLoading(false)
+        }
+    }
+
+    const handleExpandTeam = (teamId: string) => {
+        if (expandedTeamId === teamId) {
+            setExpandedTeamId(null)
+            setTeamMembersData([])
+        } else {
+            setExpandedTeamId(teamId)
+            fetchTeamMembers(teamId)
+        }
+    }
+
+    const handleResetTeamMemberVideo = async (userId: string, teamId: string) => {
+        if (!confirm('ATTENZIONE: vuoi davvero azzerare i minuti video e il completamento per questo dipendente? Azione irreversibile.')) return
+        setActionLoading(true)
+        const { data: { session } } = await supabase.auth.getSession()
+        try {
+            const res = await fetch('/api/admin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+                body: JSON.stringify({ action: 'admin_reset_video_progress', userId })
+            })
+            if (res.ok) { 
+                alert('Statistiche Video del dipendente Azzerate!')
+                fetchTeamMembers(teamId)
+            } else {
+                alert('Errore durante il reset.')
             }
         } finally {
             setActionLoading(false)
@@ -443,7 +495,8 @@ export default function AdminPage() {
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {teams.map((team: any) => (
-                                    <tr key={team.id} className="hover:bg-slate-50/50 transition-colors">
+                                    <React.Fragment key={team.id}>
+                                    <tr className={`hover:bg-slate-50/50 transition-colors ${expandedTeamId === team.id ? 'bg-indigo-50/20' : ''}`}>
                                         <td className="p-4 text-gray-500 font-mono text-xs">{new Date(team.created_at).toLocaleDateString()}</td>
                                         <td className="p-4 font-medium text-slate-900">
                                             {team.company_name || 'Sconosciuta'}
@@ -506,9 +559,78 @@ export default function AdminPage() {
                                                 >
                                                     Elimina
                                                 </button>
+                                                <button
+                                                    disabled={actionLoading}
+                                                    onClick={() => handleExpandTeam(team.id)}
+                                                    className={`px-3 py-1 flex items-center justify-center gap-1 text-[10px] font-bold rounded shadow-sm transition-colors disabled:opacity-50 ${expandedTeamId === team.id ? 'bg-indigo-200 text-indigo-800' : 'bg-slate-200 hover:bg-slate-300 text-slate-700'}`}
+                                                >
+                                                    {expandedTeamId === team.id ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                                                    Ispeziona
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
+                                    {/* EXPANDED MEMBER LIST */}
+                                    {expandedTeamId === team.id && (
+                                        <tr className="bg-indigo-50/10 border-b-2 border-indigo-100">
+                                            <td colSpan={5} className="p-0">
+                                                <div className="p-6">
+                                                    <h4 className="font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                                        <Search className="w-4 h-4 text-indigo-500" />
+                                                        Lista Dipendenti e Attività ({team.company_name})
+                                                    </h4>
+                                                    
+                                                    {membersLoading ? (
+                                                        <div className="flex justify-center p-4"><Loader2 className="w-6 h-6 animate-spin text-indigo-500" /></div>
+                                                    ) : teamMembersData.length === 0 ? (
+                                                        <div className="text-center p-4 text-slate-500 text-sm">Nessun dipendente ha ancora accettato l'invito per questo team.</div>
+                                                    ) : (
+                                                        <div className="overflow-x-auto bg-white border border-slate-200 rounded-lg shadow-sm">
+                                                            <table className="w-full text-sm text-left">
+                                                                <thead className="bg-slate-50 text-slate-500 font-semibold text-xs border-b border-slate-200">
+                                                                    <tr>
+                                                                        <th className="p-3">Dipendente (Email)</th>
+                                                                        <th className="p-3 text-center">Moduli Visti</th>
+                                                                        <th className="p-3">Minuti</th>
+                                                                        <th className="p-3 text-right">Azioni Rapide</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody className="divide-y divide-slate-100">
+                                                                    {teamMembersData.map((m: any) => (
+                                                                        <tr key={m.user_id} className="hover:bg-slate-50 transition-colors">
+                                                                            <td className="p-3 font-medium text-slate-800">
+                                                                                {m.email}
+                                                                                {m.added_at && <div className="text-[10px] text-slate-400 font-normal mt-0.5">Aggiunto il: {new Date(m.added_at).toLocaleDateString()}</div>}
+                                                                            </td>
+                                                                            <td className="p-3 text-center">
+                                                                                <span className={`px-2 py-1 rounded text-[10px] font-bold ${m.completedAll ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}`}>
+                                                                                    {m.completedCount} / 27
+                                                                                </span>
+                                                                            </td>
+                                                                            <td className="p-3 text-slate-600 font-mono text-xs">
+                                                                                {m.totalMinutes} min
+                                                                            </td>
+                                                                            <td className="p-3 flex justify-end">
+                                                                                <button 
+                                                                                    disabled={actionLoading}
+                                                                                    onClick={() => handleResetTeamMemberVideo(m.user_id, team.id)}
+                                                                                    className="px-3 py-1 bg-red-100 hover:bg-red-200 text-red-700 text-[10px] font-bold rounded shadow-sm transition-colors flex items-center gap-1 disabled:opacity-50"
+                                                                                    title="Azzera tutto il progresso video a 0"
+                                                                                >
+                                                                                    <Clock className="w-3 h-3" /> Azzera Video
+                                                                                </button>
+                                                                            </td>
+                                                                        </tr>
+                                                                    ))}
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                    </React.Fragment>
                                 ))}
                                 {teams.length === 0 && (
                                     <tr>
