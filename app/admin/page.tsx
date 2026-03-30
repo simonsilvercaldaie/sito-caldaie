@@ -229,6 +229,9 @@ export default function AdminPage() {
                         <a href="/" className="px-3 py-1 bg-white border border-slate-200 text-slate-600 rounded-lg hover:bg-slate-50 text-xs font-bold shadow-sm transition-colors">
                             🏠 Home
                         </a>
+                        <a href="/admin/statistiche-video" className="px-3 py-1 bg-indigo-50 border border-indigo-200 text-indigo-700 rounded-lg hover:bg-indigo-100 text-xs font-bold shadow-sm transition-colors flex items-center gap-2">
+                            📺 Statistiche Video
+                        </a>
                     </div>
                     <p className="text-[10px] text-slate-400 font-mono mt-1">Build: ADMIN-USERCARD-AUDIT-01</p>
                 </div>

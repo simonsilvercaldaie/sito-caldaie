@@ -92,6 +92,7 @@ export async function POST(request: NextRequest) {
         if (action === 'get_audit_log') return await getAuditLog(body.userId)
         if (action === 'get_user_video_progress') return await getUserVideoProgress(body.userId)
         if (action === 'get_team_members_progress') return await getTeamMembersProgress(body.teamId)
+        if (action === 'get_all_video_stats') return await getAllVideoStats()
 
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 })
 
@@ -781,4 +782,84 @@ async function getTeamMembersProgress(teamId: string) {
     })
 
     return NextResponse.json({ members: result })
+}
+
+// -------------------------------------------------------------------
+// GET ALL VIDEO STATS — For Admin Video Analytics Dashboard
+// -------------------------------------------------------------------
+async function getAllVideoStats() {
+    // 1. Get all video progress entries globally
+    const { data: allProgress } = await supabaseAdmin
+        .from('video_watch_progress')
+        .select('*');
+        
+    // 2. Get all users for mapping emails
+    const { data: { users } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 10000 })
+    const userMap = new Map(users.map((u: any) => [u.id, u.email]))
+
+    // 3. Get profiles for names and companies
+    const { data: profiles } = await supabaseAdmin.from('profiles').select('id, full_name, company_name')
+    const profileMap = new Map((profiles || []).map((p: any) => [p.id, p]))
+
+    // Aggregations
+    let globalTotalSeconds = 0;
+    let globalCompletedCount = 0;
+    
+    // Group by user
+    const userStatsMap = new Map<string, any>()
+    
+    for (const p of (allProgress || [])) {
+        globalTotalSeconds += (p.watch_seconds || 0);
+        if (p.completed) globalCompletedCount++;
+        
+        if (!userStatsMap.has(p.user_id)) {
+            const email = userMap.get(p.user_id) || 'Utente rimosso/sconosciuto';
+            const profile: any = profileMap.get(p.user_id);
+            userStatsMap.set(p.user_id, {
+                user_id: p.user_id,
+                email,
+                name: profile?.full_name || '-',
+                company: profile?.company_name || '-',
+                total_seconds: 0,
+                completed_count: 0,
+                last_active: null,
+                videos: []
+            })
+        }
+        
+        const uStat = userStatsMap.get(p.user_id)
+        uStat.total_seconds += (p.watch_seconds || 0)
+        
+        // Track latest updated_at or last_watched_at
+        const dateStr = p.last_watched_at || p.updated_at || p.created_at
+        if (dateStr && (!uStat.last_active || new Date(dateStr) > new Date(uStat.last_active))) {
+            uStat.last_active = dateStr;
+        }
+        
+        uStat.videos.push({
+            course_id: p.course_id,
+            watch_seconds: p.watch_seconds || 0,
+            completed: p.completed,
+            last_watched: dateStr
+        })
+    }
+    
+    // Transform Map to Array and sort by total watch time (most active first)
+    const activeUsers = Array.from(userStatsMap.values()).sort((a, b) => b.total_seconds - a.total_seconds)
+    
+    // Process final user array logic (completed_count dynamically calculated)
+    activeUsers.forEach(u => {
+        u.completed_count = u.videos.filter((v: any) => v.completed).length;
+        // Sort videos inside user by course_id (V01, V02, etc.)
+        u.videos.sort((a: any, b: any) => a.course_id.localeCompare(b.course_id))
+    })
+
+    return NextResponse.json({
+        global: {
+            totalHours: Math.round(globalTotalSeconds / 3600),
+            totalCompletedModules: globalCompletedCount,
+            activeLearners: activeUsers.length
+        },
+        users: activeUsers
+    })
 }
