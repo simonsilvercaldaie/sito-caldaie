@@ -6,8 +6,8 @@ export default function PurchaseProcessingOverlay({ visible }: { visible: boolea
     useEffect(() => {
         if (!visible) return
         const timeout = setTimeout(() => {
-            window.location.href = '/dashboard'
-        }, 60000)
+            window.location.href = '/pagamento-fallito'
+        }, 30000)
         return () => clearTimeout(timeout)
     }, [visible])
 
