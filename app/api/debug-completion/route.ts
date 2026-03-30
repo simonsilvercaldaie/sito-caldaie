@@ -40,12 +40,13 @@ export async function GET(req: NextRequest) {
     const records = courses.map(c => ({
         user_id: user.id,
         course_id: c.id,
-        highest_time_watched: 9999,
+        watch_seconds: 9999,
         last_watched_at: new Date().toISOString(),
-        completed: true
+        completed: true,
+        completed_at: new Date().toISOString()
     }))
 
-    const { error } = await supabaseAdmin.from('video_progress').upsert(records, {
+    const { error } = await supabaseAdmin.from('video_watch_progress').upsert(records, {
         onConflict: 'user_id,course_id'
     })
 
