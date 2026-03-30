@@ -469,9 +469,8 @@ export default function CorsoPage() {
         if (success) {
             window.location.href = `/ordine/${orderId}`
         } else {
-            setPurchaseProcessing(false)
-            localStorage.setItem('pendingOrderId', orderId)
-            window.location.href = `/ordine/${orderId}`
+            console.error("API error during purchase flow");
+            window.location.href = '/pagamento-fallito'
         }
     }
 

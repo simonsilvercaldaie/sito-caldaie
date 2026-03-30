@@ -52,17 +52,22 @@ export function PayPalBtn({ amount, courseTitle, onSuccess, onProcessing, showDi
                         });
                     }}
                     onApprove={async (data, actions) => {
-                        // Show processing overlay IMMEDIATELY when PayPal approves
                         if (onProcessing) onProcessing();
                         
                         if (actions.order) {
-                            const order = await actions.order.capture();
-                            console.log("Order Successful:", order);
-                            if (order.id) {
-                                onSuccess(order.id);
-                            } else {
-                                console.error("Order ID mancante");
-                                alert("Errore: ID ordine non ricevuto da PayPal.");
+                            try {
+                                const order = await actions.order.capture();
+                                console.log("Order Successful:", order);
+                                if (order.id) {
+                                    onSuccess(order.id);
+                                } else {
+                                    console.error("Order ID mancante");
+                                    alert("Errore: ID ordine non ricevuto da PayPal.");
+                                    window.location.href = '/pagamento-fallito';
+                                }
+                            } catch (e: any) {
+                                console.error("PayPal Capture Error:", e);
+                                window.location.href = '/pagamento-fallito';
                             }
                         }
                     }}

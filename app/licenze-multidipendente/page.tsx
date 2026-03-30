@@ -178,11 +178,12 @@ export default function TeamLicensePage() {
                 }
                 window.location.href = `/ordine/${orderId}`
             } else {
-                alert('Errore nel completamento dell\'ordine. Contatta l\'assistenza.')
+                console.error("API error", data);
+                window.location.href = '/pagamento-fallito'
             }
         } catch (err) {
             console.error(err)
-            alert('Errore di rete.')
+            window.location.href = '/pagamento-fallito'
         }
     }
 
