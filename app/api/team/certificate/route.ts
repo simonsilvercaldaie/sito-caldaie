@@ -109,22 +109,27 @@ export async function POST(request: NextRequest) {
 
         // 2. WRITE DYNAMIC TEXT
         // In PDF coordinates, 0 is at bottom! Height is 1024. Width is 724.
-        const nameY = 680 // Top white block (img_y ~ 340)
+        
+        // --- NAME ---
+        // Tracker Box: CenterX=364, Baseline Y=497
         const nameText = member.display_name || 'Nome Cognome'
-        const nameWidth = timesBold.widthOfTextAtSize(nameText, 36)
+        const nameFontSize = 36;
+        const nameWidth = timesBold.widthOfTextAtSize(nameText, nameFontSize)
+        const nameX = 364 - (nameWidth / 2);
         page.drawText(nameText, {
-            x: (width - nameWidth) / 2, y: nameY, size: 36, font: timesBold, color: navy
+            x: nameX, y: 497, size: nameFontSize, font: timesBold, color: navy
         })
 
-        const companyY = 500 // Bottom white block (img_y ~ 520)
-        // Wrap logic for company name
-        const maxCompanyWidth = width * 0.8
+        // --- COMPANY ---
+        // Tracker Box: CenterX=361.5, Baseline Y=328, Width=373
+        const companyFontSize = 24;
+        const maxCompanyWidth = 373;
         const words = finalCompanyName.split(' ')
         let currentLine = words[0] || ''
         const companyLines = []
         for (let i = 1; i < words.length; i++) {
             const word = words[i]
-            const cw = timesBold.widthOfTextAtSize(currentLine + ' ' + word, 22)
+            const cw = timesBold.widthOfTextAtSize(currentLine + ' ' + word, companyFontSize)
             if (cw < maxCompanyWidth) {
                 currentLine += ' ' + word
             } else {
@@ -134,21 +139,27 @@ export async function POST(request: NextRequest) {
         }
         if (currentLine) companyLines.push(currentLine)
 
-        let currY = companyY + ((companyLines.length - 1) * 12) // Center vertically if multiline
+        let currY = 328 + ((companyLines.length - 1) * 14) // Center vertically if multiline
         for (const line of companyLines) {
-            const lineWidth = timesBold.widthOfTextAtSize(line, 22)
+            const lineWidth = timesBold.widthOfTextAtSize(line, companyFontSize)
             page.drawText(line, {
-                x: (width - lineWidth) / 2, y: currY, size: 22, font: timesBold, color: navy
+                x: 361.5 - (lineWidth / 2), y: currY, size: companyFontSize, font: timesBold, color: navy
             })
-            currY -= 28
+            currY -= (companyFontSize * 1.2)
         }
 
-        const dateY = 175 // Baseline for Date text
+        // --- DATE ---
+        // Tracker Box: CenterX=345, Baseline Y=98
+        const dateFontSize = 18;
         const today = new Date()
         const months = ['Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno', 'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre']
         const dateStr = `${today.getDate()} ${months[today.getMonth()]} ${today.getFullYear()}`
+        
+        const dateWidth = timesBold.widthOfTextAtSize(dateStr, dateFontSize)
+        const dateX = 345 - (dateWidth / 2);
+        
         page.drawText(dateStr, {
-            x: 275, y: dateY, size: 15, font: timesRoman, color: navy
+            x: dateX, y: 98, size: dateFontSize, font: timesBold, color: navy
         })
 
         // Serialize and return
