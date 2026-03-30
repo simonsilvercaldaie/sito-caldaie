@@ -391,15 +391,25 @@ async function getStats() {
 }
 
 async function getOrders() {
-    const { data: orders } = await supabaseAdmin
+    const { data: orders, error } = await supabaseAdmin
         .from('purchases')
-        .select(`
-            *,
-            user:user_id (email)
-        `)
+        .select('*')
         .order('created_at', { ascending: false })
         .limit(50)
-    return NextResponse.json({ orders })
+
+    if (error || !orders) return NextResponse.json({ orders: [] })
+
+    // Resolve user emails from auth
+    const userIds = [...new Set(orders.map((o: any) => o.user_id))]
+    const { data: { users } } = await supabaseAdmin.auth.admin.listUsers({ perPage: 10000 })
+    const emailMap = new Map(users.map((u: any) => [u.id, u.email]))
+
+    const enrichedOrders = orders.map((o: any) => ({
+        ...o,
+        user: { email: emailMap.get(o.user_id) || 'Sconosciuto' }
+    }))
+
+    return NextResponse.json({ orders: enrichedOrders })
 }
 
 async function revokeUser(userId: string, reason: string, adminEmail: string) {
