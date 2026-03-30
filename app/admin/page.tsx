@@ -936,7 +936,7 @@ function UserCardSearch() {
                                                 value={noteText}
                                                 onChange={e => setNoteText(e.target.value)}
                                                 placeholder="Scrivi una nota..."
-                                                className="flex-1 p-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                                                className="flex-1 p-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-900 bg-white"
                                             />
                                             <button
                                                 onClick={handleAddNote}
@@ -1061,7 +1061,7 @@ function GrantAccessForm() {
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         placeholder="amico@esempio.com"
-                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-900 bg-white"
                     />
                     <p className="text-xs text-slate-400 mt-1">L'utente deve essere già registrato.</p>
                 </div>
@@ -1149,7 +1149,7 @@ function ResetDevicesForm() {
                         value={email}
                         onChange={e => setEmail(e.target.value)}
                         placeholder="utente@esempio.com"
-                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none"
+                        className="w-full p-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-900 bg-white"
                     />
                     <p className="text-xs text-slate-400 mt-1">Svuota le sessioni di questo account.</p>
                 </div>
