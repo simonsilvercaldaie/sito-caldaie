@@ -71,32 +71,23 @@ export default function UpgradePage() {
             return
         }
 
-        // Check individual purchases
-        const { data: purchases } = await supabase
-            .from('purchases')
-            .select('product_code')
+        // Check individual access
+        const { data: accesses } = await supabase
+            .from('user_access')
+            .select('access_level')
             .eq('user_id', session.user.id)
+            .neq('source', 'team') // Do not count levels granted by being an employee
 
-        if (purchases && purchases.length > 0) {
-            const codes = purchases.map(p => p.product_code?.toLowerCase())
-            const hasBase = codes.some(c => c?.includes('base'))
-            const hasInter = codes.some(c => c?.includes('intermedi') || c?.includes('intermediate'))
-            const hasAdvanced = codes.some(c => c?.includes('avanzat') || c?.includes('advanced'))
-            const hasComplete = codes.some(c => c?.includes('complete'))
-
-            const levels = []
-            if (hasBase || hasComplete) levels.push('base')
-            if (hasInter || hasComplete) levels.push('intermedio')
-            if (hasAdvanced || hasComplete) levels.push('avanzato')
-
+        if (accesses && accesses.length > 0) {
+            const levels = Array.from(new Set(accesses.map(a => a.access_level)))
             setOwnedLevels(levels)
 
-            if (levels.length === 3 || hasComplete) {
+            if (levels.includes('base') && levels.includes('intermedio') && levels.includes('avanzato')) {
                 setLicenseStatus('full_individual')
             } else if (levels.length > 0) {
                 setLicenseStatus('partial_individual')
             } else {
-                // No purchases at all, redirect
+                // Should not happen if length > 0, but just in case
                 router.push('/catalogo')
                 return
             }

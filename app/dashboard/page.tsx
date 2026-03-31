@@ -149,20 +149,16 @@ export default function DashboardPage() {
                 }
 
                 if (!teamLicense) {
-                    // No team license — check individual purchases
-                    const { data: purchases } = await supabase
-                        .from('purchases')
-                        .select('product_code')
+                    // No team license — check individual access (exclude team member access)
+                    const { data: accesses } = await supabase
+                        .from('user_access')
+                        .select('access_level')
                         .eq('user_id', session.user.id)
+                        .neq('source', 'team')
 
-                    if (purchases && purchases.length > 0) {
-                        const codes = purchases.map(p => p.product_code?.toLowerCase())
-                        const hasBase = codes.some(c => c?.includes('base'))
-                        const hasInter = codes.some(c => c?.includes('intermedi') || c?.includes('intermediate'))
-                        const hasAdvanced = codes.some(c => c?.includes('avanzat') || c?.includes('advanced'))
-                        const hasComplete = codes.some(c => c?.includes('complete'))
-
-                        if ((hasBase && hasInter && hasAdvanced) || hasComplete) {
+                    if (accesses && accesses.length > 0) {
+                        const levels = accesses.map(a => a.access_level)
+                        if (levels.includes('base') && levels.includes('intermedio') && levels.includes('avanzato')) {
                             setCanUpgrade(true)
                         }
                     }
