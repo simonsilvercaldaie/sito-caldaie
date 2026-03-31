@@ -271,7 +271,7 @@ export default function GuidaCaldaiePage() {
                             Dalla logica della caldaia alla gestione del cliente.
                         </p>
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                            <Link href="/catalogo/base" className="inline-flex items-center justify-center gap-2 bg-amber-500 text-white font-bold px-8 py-4 rounded-xl text-lg hover:bg-amber-600 transition-all shadow-xl shadow-amber-500/20">
+                            <Link href="/" className="inline-flex items-center justify-center gap-2 bg-amber-500 text-white font-bold px-8 py-4 rounded-xl text-lg hover:bg-amber-600 transition-all shadow-xl shadow-amber-500/20">
                                 Scopri i Corsi <ArrowRight className="w-5 h-5" />
                             </Link>
                             <Link href="/pacchetto-completo" className="inline-flex items-center justify-center gap-2 bg-white/10 text-white font-bold px-8 py-4 rounded-xl text-lg hover:bg-white/20 transition-all border border-white/20">
