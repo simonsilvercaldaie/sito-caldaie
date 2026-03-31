@@ -1117,9 +1117,12 @@ export default function CorsoPage() {
                                                     <User className={`w-6 h-6 ${c.sub}`} />
                                                 </div>
                                                 <div className="flex-1">
-                                                    <div className="flex items-center justify-between">
-                                                        <h4 className={`font-bold text-lg ${c.text}`}>Livello {course.level} Completo</h4>
-                                                        <span className={`font-extrabold text-xl ${c.price}`}>
+                                                    <div className="flex items-start justify-between">
+                                                        <h4 className={`font-bold text-lg ${c.text} leading-tight pr-2`}>
+                                                            Livello {course.level}<br/>
+                                                            <span className="text-base font-medium opacity-90">Completo</span>
+                                                        </h4>
+                                                        <span className={`font-extrabold text-xl ${c.price} whitespace-nowrap mt-1`}>
                                                             {pricingInfo ? formatPrice(getTestPrice(pricingInfo.amountToPay, user?.email)) : ''}
                                                         </span>
                                                     </div>
