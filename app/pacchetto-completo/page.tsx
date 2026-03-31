@@ -314,32 +314,41 @@ export default function PacchettoCompletoPage() {
                                             Cosa include il pacchetto:
                                         </h3>
                                         <ul className="space-y-6 w-full">
-                                            <li className="flex items-center justify-between text-gray-700 w-full">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="bg-blue-100 p-2 rounded-xl text-blue-600 shadow-sm">
-                                                        <CheckCircle2 className="w-6 h-6" />
-                                                    </div>
-                                                    <span className="text-lg"><strong className="text-blue-700">Livello Base</strong> (9 video)</span>
+                                            <li className="flex items-center gap-4 text-gray-700 w-full">
+                                                <div className="bg-blue-100 p-3 rounded-xl text-blue-600 shadow-sm flex-shrink-0">
+                                                    <CheckCircle2 className="w-6 h-6" />
                                                 </div>
-                                                <span className="font-bold text-gray-400">€ 200</span>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="text-lg font-bold text-blue-700 leading-tight">Livello Base</div>
+                                                    <div className="text-sm text-gray-500 mt-0.5">9 video inclusi</div>
+                                                </div>
+                                                <div className="font-bold text-gray-400 whitespace-nowrap pl-2">
+                                                    € 200
+                                                </div>
                                             </li>
-                                            <li className="flex items-center justify-between text-gray-700 w-full">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="bg-green-100 p-2 rounded-xl text-green-600 shadow-sm">
-                                                        <CheckCircle2 className="w-6 h-6" />
-                                                    </div>
-                                                    <span className="text-lg"><strong className="text-green-700">Livello Intermedio</strong> (9 video)</span>
+                                            <li className="flex items-center gap-4 text-gray-700 w-full">
+                                                <div className="bg-green-100 p-3 rounded-xl text-green-600 shadow-sm flex-shrink-0">
+                                                    <CheckCircle2 className="w-6 h-6" />
                                                 </div>
-                                                <span className="font-bold text-gray-400">€ 400</span>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="text-lg font-bold text-green-700 leading-tight">Livello Intermedio</div>
+                                                    <div className="text-sm text-gray-500 mt-0.5">9 video inclusi</div>
+                                                </div>
+                                                <div className="font-bold text-gray-400 whitespace-nowrap pl-2">
+                                                    € 400
+                                                </div>
                                             </li>
-                                            <li className="flex items-center justify-between text-gray-700 w-full">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="bg-red-100 p-2 rounded-xl text-red-600 shadow-sm">
-                                                        <CheckCircle2 className="w-6 h-6" />
-                                                    </div>
-                                                    <span className="text-lg"><strong className="text-red-700">Livello Avanzato</strong> (9 video)</span>
+                                            <li className="flex items-center gap-4 text-gray-700 w-full">
+                                                <div className="bg-red-100 p-3 rounded-xl text-red-600 shadow-sm flex-shrink-0">
+                                                    <CheckCircle2 className="w-6 h-6" />
                                                 </div>
-                                                <span className="font-bold text-gray-400">€ 600</span>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="text-lg font-bold text-red-700 leading-tight">Livello Avanzato</div>
+                                                    <div className="text-sm text-gray-500 mt-0.5">9 video inclusi</div>
+                                                </div>
+                                                <div className="font-bold text-gray-400 whitespace-nowrap pl-2">
+                                                    € 600
+                                                </div>
                                             </li>
                                         </ul>
                                     </div>
