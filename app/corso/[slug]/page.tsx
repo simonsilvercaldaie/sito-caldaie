@@ -1118,34 +1118,51 @@ export default function CorsoPage() {
                                                 </div>
                                                 <div className="flex-1">
                                                     <div className="flex items-center justify-between">
-                                                        <h4 className={`font-bold text-lg ${c.text}`}>Licenza Singola</h4>
+                                                        <h4 className={`font-bold text-lg ${c.text}`}>Livello {course.level} Completo</h4>
                                                         <span className={`font-extrabold text-xl ${c.price}`}>
                                                             {pricingInfo ? formatPrice(getTestPrice(pricingInfo.amountToPay, user?.email)) : ''}
                                                         </span>
                                                     </div>
-                                                    <p className="text-sm text-gray-500 mt-0.5">1 utente · Accesso a vita · 9 video corsi</p>
+                                                    <p className="text-sm text-gray-500 mt-1 leading-tight">
+                                                        Contiene tutti i 9 video del livello <strong>{course.level}</strong><br />
+                                                        <span className="text-xs opacity-80">1 utente · Accesso a vita</span>
+                                                    </p>
                                                 </div>
                                             </div>
                                         </button>
                                     );
                                 })()}
 
-                                {/* 2. Bundle Completo */}
                                 <Link
                                     href="/pacchetto-completo"
                                     onClick={() => setShowPurchaseModal(false)}
-                                    className="w-full bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border-2 border-amber-200 hover:border-amber-400 rounded-2xl p-5 text-left transition-all duration-200 group block"
+                                    className="w-full bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border-2 border-amber-400 rounded-2xl p-5 text-left transition-all duration-200 group block relative shadow-sm hover:shadow-md"
                                 >
-                                    <div className="flex items-center gap-4">
-                                        <div className="p-3 bg-white rounded-xl shadow-sm group-hover:scale-105 transition-transform">
+                                    <div className="absolute top-0 right-0 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-bl-lg rounded-tr-xl uppercase tracking-wider">
+                                        Miglior Affare
+                                    </div>
+                                    <div className="flex items-start gap-4">
+                                        <div className="p-3 bg-white rounded-xl shadow-sm group-hover:scale-105 transition-transform mt-1">
                                             <Package className="w-6 h-6 text-amber-600" />
                                         </div>
-                                        <div className="flex-1">
-                                            <div className="flex items-center justify-between">
-                                                <h4 className="font-bold text-lg text-amber-900">Tutti e 3 i Livelli</h4>
-                                                <span className="font-extrabold text-xl text-amber-700">€1.000</span>
+                                        <div className="flex-1 pt-1">
+                                            <h4 className="font-bold text-lg text-amber-900 mb-2 leading-tight">Pacchetto All-in-One<br/><span className="text-sm font-medium opacity-90">(Tutti e 3 i Livelli)</span></h4>
+                                            
+                                            <div className="text-xs text-amber-900/70 mb-3 space-y-1 pr-2">
+                                                <div className="flex justify-between"><span>✓ Livello Base</span><span>200€</span></div>
+                                                <div className="flex justify-between"><span>✓ Livello Intermedio</span><span>400€</span></div>
+                                                <div className="flex justify-between"><span>✓ Livello Avanzato</span><span>600€</span></div>
                                             </div>
-                                            <p className="text-sm text-amber-700 mt-0.5">27 video · <span className="font-semibold">Risparmi €200!</span></p>
+
+                                            <div className="pt-3 border-t border-amber-200/60 flex items-end justify-between">
+                                                <div>
+                                                    <span className="text-[11px] text-amber-800/80 block uppercase tracking-wide font-semibold">Valore: <del>1.200€</del></span>
+                                                    <span className="text-sm font-black text-green-700 block mt-0.5">Risparmi 200€!</span>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className="font-black text-2xl text-amber-800 block leading-none">€1.000</span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </Link>
