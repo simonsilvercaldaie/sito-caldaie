@@ -313,24 +313,33 @@ export default function PacchettoCompletoPage() {
                                             <Package className="w-6 h-6 text-amber-500" />
                                             Cosa include il pacchetto:
                                         </h3>
-                                        <ul className="space-y-8">
-                                            <li className="flex items-center gap-4 text-gray-700">
-                                                <div className="bg-blue-100 p-2 rounded-xl text-blue-600 shadow-sm">
-                                                    <CheckCircle2 className="w-6 h-6" />
+                                        <ul className="space-y-6 w-full">
+                                            <li className="flex items-center justify-between text-gray-700 w-full">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="bg-blue-100 p-2 rounded-xl text-blue-600 shadow-sm">
+                                                        <CheckCircle2 className="w-6 h-6" />
+                                                    </div>
+                                                    <span className="text-lg"><strong className="text-blue-700">Livello Base</strong> (9 video)</span>
                                                 </div>
-                                                <span className="text-lg"><strong className="text-blue-700">Livello Base</strong> (9 video)</span>
+                                                <span className="font-bold text-gray-400">€ 200</span>
                                             </li>
-                                            <li className="flex items-center gap-4 text-gray-700">
-                                                <div className="bg-green-100 p-2 rounded-xl text-green-600 shadow-sm">
-                                                    <CheckCircle2 className="w-6 h-6" />
+                                            <li className="flex items-center justify-between text-gray-700 w-full">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="bg-green-100 p-2 rounded-xl text-green-600 shadow-sm">
+                                                        <CheckCircle2 className="w-6 h-6" />
+                                                    </div>
+                                                    <span className="text-lg"><strong className="text-green-700">Livello Intermedio</strong> (9 video)</span>
                                                 </div>
-                                                <span className="text-lg"><strong className="text-green-700">Livello Intermedio</strong> (9 video)</span>
+                                                <span className="font-bold text-gray-400">€ 400</span>
                                             </li>
-                                            <li className="flex items-center gap-4 text-gray-700">
-                                                <div className="bg-red-100 p-2 rounded-xl text-red-600 shadow-sm">
-                                                    <CheckCircle2 className="w-6 h-6" />
+                                            <li className="flex items-center justify-between text-gray-700 w-full">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="bg-red-100 p-2 rounded-xl text-red-600 shadow-sm">
+                                                        <CheckCircle2 className="w-6 h-6" />
+                                                    </div>
+                                                    <span className="text-lg"><strong className="text-red-700">Livello Avanzato</strong> (9 video)</span>
                                                 </div>
-                                                <span className="text-lg"><strong className="text-red-700">Livello Avanzato</strong> (9 video)</span>
+                                                <span className="font-bold text-gray-400">€ 600</span>
                                             </li>
                                         </ul>
                                     </div>
@@ -338,13 +347,17 @@ export default function PacchettoCompletoPage() {
 
                                 {/* Right Side: Price & Action */}
                                 <div className="flex flex-col justify-center">
-                                    <div className="text-center mb-8 bg-amber-50 rounded-2xl p-6 border border-amber-100">
-                                        <p className="text-sm font-bold text-amber-800 uppercase tracking-wider mb-2">Prezzo Totale</p>
-                                        <div className="flex items-end justify-center gap-3 mb-2">
-                                            <span className="text-6xl font-extrabold text-gray-900 tracking-tight">€ {getTestPrice(BUNDLE_PRICE, user?.email).toLocaleString('it-IT')}</span>
+                                    <div className="text-center mb-8 bg-amber-50 rounded-2xl p-6 border border-amber-200 relative shadow-sm">
+                                        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-600 text-white font-black px-4 py-1 rounded-full text-xs uppercase tracking-wider shadow-md">
+                                            Miglior Affare
                                         </div>
-                                        <div className="inline-block bg-white text-green-700 font-bold px-4 py-1.5 rounded-full text-sm shadow-sm border border-green-100">
-                                            Prezzo speciale!
+                                        <p className="text-sm font-bold text-amber-800 uppercase tracking-wider mb-2 mt-2">Valore: <del className="text-gray-400">€ 1.200</del></p>
+                                        <div className="flex flex-col items-center justify-center gap-1 mb-2">
+                                            <span className="text-6xl font-extrabold text-gray-900 tracking-tight">€ {getTestPrice(BUNDLE_PRICE, user?.email).toLocaleString('it-IT')}</span>
+                                            <span className="text-amber-600 font-bold text-sm">per tutti e 27 i video</span>
+                                        </div>
+                                        <div className="inline-block bg-white text-green-700 font-bold px-5 py-2 rounded-full text-sm shadow-sm border border-green-200 mt-2">
+                                            Risparmi €200!
                                         </div>
                                     </div>
 
