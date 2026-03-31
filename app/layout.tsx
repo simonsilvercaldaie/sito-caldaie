@@ -36,6 +36,18 @@ export const metadata: Metadata = {
     "corso caldaie online",
     "formazione caldaie condensazione",
     "corso diagnosi caldaie",
+    "caldaia non parte",
+    "caldaia si blocca",
+    "codici errore caldaia",
+    "caldaia perde pressione",
+    "manutenzione caldaia cosa fare",
+    "scambiatore caldaia sporco",
+    "valvola tre vie bloccata",
+    "caldaia non scalda acqua",
+    "caldaia rumore strano",
+    "NTC caldaia guasta",
+    "scheda elettronica caldaia",
+    "caldaia condensazione problemi",
     "Simon Silver caldaie"
   ],
   authors: [{ name: "Simon Silver", url: siteUrl }],
@@ -146,6 +158,40 @@ export default function RootLayout({
                 "@type": "SearchAction",
                 "target": `${siteUrl}/catalogo?q={search_term_string}`,
                 "query-input": "required name=search_term_string"
+              }
+            }),
+          }}
+        />
+        {/* JSON-LD Person Schema for E-E-A-T */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Person",
+              "name": "Simon Silver",
+              "url": siteUrl,
+              "image": `${siteUrl}/logo.png`,
+              "jobTitle": "Tecnico Caldaista e Formatore",
+              "description": "Simon Silver è un tecnico caldaista con esperienza pluriennale nel campo della diagnosi guasti, manutenzione e riparazione di caldaie. Fondatore della piattaforma di formazione Simon Silver Caldaie, dedicata alla crescita professionale di tecnici, manutentori e installatori.",
+              "knowsAbout": [
+                "Caldaie a condensazione",
+                "Diagnosi guasti caldaie",
+                "Manutenzione caldaie",
+                "Riparazione caldaie",
+                "Schede elettroniche caldaie",
+                "Formazione tecnici caldaie",
+                "Impianti termici",
+                "Troubleshooting caldaie"
+              ],
+              "sameAs": [
+                "https://www.youtube.com/@SimonSilverCaldaie",
+                "https://www.instagram.com/simon_silver"
+              ],
+              "worksFor": {
+                "@type": "Organization",
+                "name": "Simon Silver Caldaie",
+                "url": siteUrl
               }
             }),
           }}

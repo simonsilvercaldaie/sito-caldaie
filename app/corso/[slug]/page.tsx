@@ -27,7 +27,7 @@ import {
     AlertTriangle,
     Monitor,
 } from "lucide-react"
-import { CourseJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd"
+import { CourseJsonLd, VideoJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd"
 import { useSessionGuard } from "@/hooks/useSessionGuard"
 
 export default function CorsoPage() {
@@ -508,6 +508,7 @@ export default function CorsoPage() {
             <PurchaseProcessingOverlay visible={purchaseProcessing} />
             <Navbar />
             <CourseJsonLd course={course} />
+            <VideoJsonLd course={course} />
             <BreadcrumbJsonLd items={[
                 { name: "Home", url: "/" },
                 { name: "Catalogo", url: "/catalogo" },
