@@ -54,6 +54,7 @@ export default function CorsoPage() {
 
     const [viewMode, setViewMode] = useState<'individual' | 'team' | null>(null)
     const [showBundleWarning, setShowBundleWarning] = useState(false)
+    const [showPurchaseModal, setShowPurchaseModal] = useState(false)
     const [teamAccess, setTeamAccess] = useState<'none' | 'multi' | 'scuola'>('none')
     const [secureVideoUrl, setSecureVideoUrl] = useState<string>("")
     const youtubeRef = useRef<HTMLIFrameElement>(null)
@@ -701,7 +702,7 @@ export default function CorsoPage() {
                                             </div>
                                         )
                                     ) : (
-                                        <div className="aspect-video bg-slate-900 relative group cursor-pointer" onClick={() => document.getElementById('purchase-card')?.scrollIntoView({ behavior: 'smooth' })}>
+                                        <div className="aspect-video bg-slate-900 relative group cursor-pointer" onClick={() => setShowPurchaseModal(true)}>
                                             <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center p-6 text-center">
                                                 <Lock className="w-16 h-16 text-white mb-4 group-hover:scale-110 transition-transform duration-300" />
                                                 <h3 className="text-2xl font-bold text-white mb-2">Contenuto Riservato</h3>
@@ -1066,6 +1067,114 @@ export default function CorsoPage() {
                                     className="block w-full py-3 text-gray-500 text-sm font-medium hover:bg-gray-100 rounded-xl transition-colors"
                                 >
                                     Ho capito, procedi con l'acquisto singolo
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* MODALE "SCEGLI COME ACQUISTARE" — dal video bloccato */}
+                {showPurchaseModal && !hasPurchased && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowPurchaseModal(false)}></div>
+                        <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full relative z-10 overflow-hidden animate-in fade-in zoom-in duration-300">
+                            {/* Header con gradiente */}
+                            <div className="bg-gradient-to-br from-primary via-primary to-slate-800 p-6 text-center text-white">
+                                <div className="w-14 h-14 bg-white/15 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                    <Lock className="w-7 h-7" />
+                                </div>
+                                <h3 className="text-2xl font-extrabold mb-1">Sblocca il Livello {course.level}</h3>
+                                <p className="text-white/70 text-sm">Scegli la modalità di acquisto</p>
+                            </div>
+
+                            {/* Opzioni */}
+                            <div className="p-6 space-y-3">
+                                {/* 1. Licenza Singola */}
+                                {(() => {
+                                    const levCols = {
+                                        'Base': { bg: 'bg-blue-50 hover:bg-blue-100', border: 'border-blue-200 hover:border-blue-400', text: 'text-blue-900', sub: 'text-blue-600', price: 'text-blue-700' },
+                                        'Intermedio': { bg: 'bg-green-50 hover:bg-green-100', border: 'border-green-200 hover:border-green-400', text: 'text-green-900', sub: 'text-green-600', price: 'text-green-700' },
+                                        'Avanzato': { bg: 'bg-red-50 hover:bg-red-100', border: 'border-red-200 hover:border-red-400', text: 'text-red-900', sub: 'text-red-600', price: 'text-red-700' },
+                                    };
+                                    const c = levCols[course.level as keyof typeof levCols] || levCols['Base'];
+                                    return (
+                                        <button
+                                            onClick={() => {
+                                                setShowPurchaseModal(false)
+                                                if (user && profileCompleted && !hasBoughtAnyCourse) {
+                                                    setShowBundleWarning(true)
+                                                } else {
+                                                    setViewMode('individual')
+                                                    setTimeout(() => {
+                                                        document.getElementById('purchase-card')?.scrollIntoView({ behavior: 'smooth' })
+                                                    }, 100)
+                                                }
+                                            }}
+                                            className={`w-full ${c.bg} border-2 ${c.border} rounded-2xl p-5 text-left transition-all duration-200 group`}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className="p-3 bg-white rounded-xl shadow-sm group-hover:scale-105 transition-transform">
+                                                    <User className={`w-6 h-6 ${c.sub}`} />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <div className="flex items-center justify-between">
+                                                        <h4 className={`font-bold text-lg ${c.text}`}>Licenza Singola</h4>
+                                                        <span className={`font-extrabold text-xl ${c.price}`}>
+                                                            {pricingInfo ? formatPrice(getTestPrice(pricingInfo.amountToPay, user?.email)) : ''}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-sm text-gray-500 mt-0.5">1 utente · Accesso a vita · 9 video corsi</p>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    );
+                                })()}
+
+                                {/* 2. Bundle Completo */}
+                                <Link
+                                    href="/pacchetto-completo"
+                                    onClick={() => setShowPurchaseModal(false)}
+                                    className="w-full bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 border-2 border-amber-200 hover:border-amber-400 rounded-2xl p-5 text-left transition-all duration-200 group block"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-3 bg-white rounded-xl shadow-sm group-hover:scale-105 transition-transform">
+                                            <Package className="w-6 h-6 text-amber-600" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <div className="flex items-center justify-between">
+                                                <h4 className="font-bold text-lg text-amber-900">Tutti e 3 i Livelli</h4>
+                                                <span className="font-extrabold text-xl text-amber-700">€1.000</span>
+                                            </div>
+                                            <p className="text-sm text-amber-700 mt-0.5">27 video · <span className="font-semibold">Risparmi €200!</span></p>
+                                        </div>
+                                    </div>
+                                </Link>
+
+                                {/* 3. Licenza Azienda/Scuola */}
+                                <Link
+                                    href="/licenze-multidipendente"
+                                    onClick={() => setShowPurchaseModal(false)}
+                                    className="w-full bg-indigo-50/50 hover:bg-indigo-100 border-2 border-indigo-200 hover:border-indigo-400 rounded-2xl p-5 text-left transition-all duration-200 group block"
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <div className="p-3 bg-white rounded-xl shadow-sm group-hover:scale-105 transition-transform">
+                                            <Users className="w-6 h-6 text-indigo-600" />
+                                        </div>
+                                        <div className="flex-1">
+                                            <h4 className="font-bold text-lg text-indigo-900">Azienda / Scuola</h4>
+                                            <p className="text-sm text-gray-500 mt-0.5">Licenze team · <span className="font-semibold text-indigo-600">Fino al 40% di sconto</span></p>
+                                        </div>
+                                    </div>
+                                </Link>
+                            </div>
+
+                            {/* Footer */}
+                            <div className="px-6 pb-5">
+                                <button
+                                    onClick={() => setShowPurchaseModal(false)}
+                                    className="w-full py-2.5 text-gray-400 text-sm font-medium hover:text-gray-600 hover:bg-gray-50 rounded-xl transition-colors"
+                                >
+                                    Chiudi
                                 </button>
                             </div>
                         </div>
