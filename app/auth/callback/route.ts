@@ -59,31 +59,25 @@ export async function GET(request: NextRequest) {
             process.env.SUPABASE_SERVICE_ROLE_KEY!
         )
 
-        // Check/Create profile
-        const { data: existingProfile, error: profileError } = await supabaseAdmin
-            .from('profiles')
-            .select('id, profile_completed')
-            .eq('id', user.id)
-            .maybeSingle()
+        // Detect if this is a FIRST-TIME signup by checking created_at timestamp.
+        // We can't rely on "profile doesn't exist" because the DB trigger 
+        // (handle_new_user) creates the profile before this callback runs.
+        const createdAt = new Date(user.created_at).getTime()
+        const isNewUser = (Date.now() - createdAt) < 60000 // Created less than 60 seconds ago
 
-        if (profileError) {
-            console.error('[auth/callback] Profile query error:', profileError)
-        }
+        if (isNewUser) {
+            console.log(`[auth/callback] New user detected: ${user.email}`)
 
-        if (!existingProfile) {
-            // First-time authentication - create profile
-            console.log(`[auth/callback] Creating profile for new user: ${user.email}`)
-
-            const { error: insertError } = await supabaseAdmin.from('profiles').insert({
+            // Ensure profile exists (trigger should have created it, but just in case)
+            const { error: insertError } = await supabaseAdmin.from('profiles').upsert({
                 id: user.id,
                 email: user.email,
                 full_name: user.user_metadata?.full_name || user.user_metadata?.name || null,
                 profile_completed: false
-            })
+            }, { onConflict: 'id', ignoreDuplicates: true })
 
             if (insertError) {
-                console.error('[auth/callback] Profile insert error:', insertError)
-                // Non-fatal: trigger might have created it
+                console.error('[auth/callback] Profile upsert error:', insertError)
             }
 
             // Send welcome email (async, don't block)
