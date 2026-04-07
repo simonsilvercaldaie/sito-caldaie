@@ -15,6 +15,7 @@ export default function AdminPage() {
     const [expandedTeamId, setExpandedTeamId] = useState<string | null>(null)
     const [teamMembersData, setTeamMembersData] = useState<any[]>([])
     const [membersLoading, setMembersLoading] = useState(false)
+    const [searchEmail, setSearchEmail] = useState('')
 
     useEffect(() => {
         checkAuth()
@@ -315,10 +316,10 @@ export default function AdminPage() {
             </div>
 
             {/* USER CARD SEARCH */}
-            <UserCardSearch />
+            <UserCardSearch prefillEmail={searchEmail} />
 
             {/* DIRECTORY TUTTI GLI UTENTI ATTIVI */}
-            <UserDirectory />
+            <UserDirectory onSelectUser={(e: string) => { setSearchEmail(e); window.scrollTo({ top: 0, behavior: 'smooth' }) }} />
 
             <div className="grid lg:grid-cols-3 gap-8">
                 {/* LEFT COLUMN: TICKETS & GRANT ACCESS */}
@@ -650,7 +651,7 @@ export default function AdminPage() {
 // ===================================================================
 // USER DIRECTORY — List all active users
 // ===================================================================
-function UserDirectory() {
+function UserDirectory({ onSelectUser }: { onSelectUser: (email: string) => void }) {
     const [users, setUsers] = useState<any[]>([])
     const [loading, setLoading] = useState(false)
     const [expanded, setExpanded] = useState(false)
@@ -701,7 +702,11 @@ function UserDirectory() {
                                 {users.map(u => (
                                     <tr key={u.user_id} className="hover:bg-slate-50/50">
                                         <td className="p-4">
-                                            <div className="font-bold text-slate-800">{u.email}</div>
+                                            <div
+                                                className="font-bold text-indigo-700 hover:text-indigo-900 cursor-pointer hover:underline transition-colors"
+                                                onClick={() => onSelectUser(u.email)}
+                                                title="Clicca per aprire la Scheda Utente"
+                                            >{u.email}</div>
                                             <div className="text-xs text-slate-500">{u.name}</div>
                                         </td>
                                         <td className="p-4 font-mono text-xs text-slate-400">{u.user_id.slice(0, 12)}...</td>
@@ -737,30 +742,55 @@ function UserDirectory() {
 // ===================================================================
 // USER CARD SEARCH — Complete user profile lookup
 // ===================================================================
-function UserCardSearch() {
-    const [email, setEmail] = useState('')
+function UserCardSearch({ prefillEmail }: { prefillEmail?: string }) {
+    const [email, setEmail] = useState(prefillEmail || '')
     const [loading, setLoading] = useState(false)
     const [card, setCard] = useState<any>(null)
+    const [videoProgress, setVideoProgress] = useState<any>(null)
     const [error, setError] = useState('')
     const [expanded, setExpanded] = useState(true)
     const [noteText, setNoteText] = useState('')
     const [noteLoading, setNoteLoading] = useState(false)
 
-    const handleSearch = async (e?: React.FormEvent) => {
+    useEffect(() => {
+        if (prefillEmail && prefillEmail !== email) {
+            setEmail(prefillEmail)
+            setExpanded(true)
+            // Auto-search when email is set from directory click
+            setTimeout(() => handleSearch(undefined, prefillEmail), 100)
+        }
+    }, [prefillEmail])
+
+    const handleSearch = async (e?: React.FormEvent, searchEmail?: string) => {
         e?.preventDefault()
-        if (!email) return
+        const targetEmail = searchEmail || email
+        if (!targetEmail) return
+        if (searchEmail) setEmail(searchEmail)
         setLoading(true)
         setError('')
         setCard(null)
+        setVideoProgress(null)
         const { data: { session } } = await supabase.auth.getSession()
         try {
             const res = await fetch('/api/admin', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
-                body: JSON.stringify({ action: 'get_user_card', email })
+                body: JSON.stringify({ action: 'get_user_card', email: targetEmail })
             })
             const data = await res.json()
-            if (res.ok) setCard(data)
+            if (res.ok) {
+                setCard(data)
+                // Also fetch video progress
+                const vpRes = await fetch('/api/admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
+                    body: JSON.stringify({ action: 'get_user_video_progress', userId: data.user.id })
+                })
+                if (vpRes.ok) {
+                    const vpData = await vpRes.json()
+                    setVideoProgress(vpData)
+                }
+            }
             else setError(data.error || 'Errore')
         } catch { setError('Errore di rete') }
         finally { setLoading(false) }
@@ -1133,6 +1163,59 @@ function UserCardSearch() {
                                         )}
                                     </div>
                                 </div>
+
+                                {/* Row 6: VIDEO PROGRESS */}
+                                <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                    <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider flex items-center gap-2">
+                                        📺 Video Guardati
+                                        {videoProgress && (
+                                            <span className="text-xs font-normal text-slate-500 ml-2">
+                                                {videoProgress.completedCount}/27 completati • {videoProgress.totalMinutes} minuti totali
+                                            </span>
+                                        )}
+                                    </h3>
+                                    {!videoProgress || videoProgress.progress.length === 0 ? (
+                                        <p className="text-sm text-slate-400">Questo utente non ha ancora guardato nessun video.</p>
+                                    ) : (
+                                        <div className="overflow-x-auto bg-white border border-slate-200 rounded-lg">
+                                            <table className="w-full text-sm text-left">
+                                                <thead className="bg-slate-50 text-slate-500 font-semibold text-xs border-b border-slate-200">
+                                                    <tr>
+                                                        <th className="p-3">Video</th>
+                                                        <th className="p-3 text-center">Minuti</th>
+                                                        <th className="p-3 text-center">Stato</th>
+                                                        <th className="p-3">Ultimo Accesso</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-100">
+                                                    {videoProgress.progress.map((vp: any) => (
+                                                        <tr key={vp.course_id || vp.id} className="hover:bg-slate-50 transition-colors">
+                                                            <td className="p-3 font-bold text-slate-800">
+                                                                Lezione {vp.course_id}
+                                                            </td>
+                                                            <td className="p-3 text-center font-mono text-xs text-slate-600">
+                                                                {Math.round((vp.watch_seconds || 0) / 60)} min
+                                                            </td>
+                                                            <td className="p-3 text-center">
+                                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
+                                                                    vp.completed
+                                                                        ? 'bg-green-100 text-green-700'
+                                                                        : 'bg-yellow-100 text-yellow-700'
+                                                                }`}>
+                                                                    {vp.completed ? '✅ COMPLETATO' : '⏳ In corso'}
+                                                                </span>
+                                                            </td>
+                                                            <td className="p-3 text-xs text-slate-500">
+                                                                {vp.last_watched_at ? new Date(vp.last_watched_at).toLocaleString() : '-'}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
+                                </div>
+
                             </div>
                         )}
                     </div>
