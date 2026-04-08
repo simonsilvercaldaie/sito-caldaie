@@ -15,7 +15,6 @@ export default function AdminPage() {
     const [expandedTeamId, setExpandedTeamId] = useState<string | null>(null)
     const [teamMembersData, setTeamMembersData] = useState<any[]>([])
     const [membersLoading, setMembersLoading] = useState(false)
-    const [searchEmail, setSearchEmail] = useState('')
 
     useEffect(() => {
         checkAuth()
@@ -294,14 +293,18 @@ export default function AdminPage() {
             </header>
 
             {/* STATS CARDS */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                     <div className="text-gray-500 text-xs uppercase font-bold tracking-wider">Utenti Totali</div>
                     <div className="text-3xl font-extrabold text-slate-800 mt-2">{stats?.totalUsers || 0}</div>
                 </div>
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <div className="text-gray-500 text-xs uppercase font-bold tracking-wider">Ordini Totali</div>
-                    <div className="text-3xl font-extrabold text-blue-600 mt-2">{stats?.totalOrders || 0}</div>
+                    <div className="text-gray-500 text-xs uppercase font-bold tracking-wider">Clienti Paganti</div>
+                    <div className="text-3xl font-extrabold text-blue-600 mt-2">{stats?.paidCustomers || 0}</div>
+                </div>
+                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                    <div className="text-gray-500 text-xs uppercase font-bold tracking-wider">Regali Admin</div>
+                    <div className="text-3xl font-extrabold text-purple-600 mt-2">{stats?.giftedAccounts || 0}</div>
                 </div>
                 <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                     <div className="text-gray-500 text-xs uppercase font-bold tracking-wider flex items-center gap-2">
@@ -315,11 +318,8 @@ export default function AdminPage() {
                 </div>
             </div>
 
-            {/* USER CARD SEARCH */}
-            <UserCardSearch prefillEmail={searchEmail} />
-
-            {/* DIRECTORY TUTTI GLI UTENTI ATTIVI */}
-            <UserDirectory onSelectUser={(e: string) => { setSearchEmail(e); window.scrollTo({ top: 0, behavior: 'smooth' }) }} />
+            {/* GESTIONE UTENTI — Unified search + directory + card */}
+            <UserCardSection />
 
             <div className="grid lg:grid-cols-3 gap-8">
                 {/* LEFT COLUMN: TICKETS & GRANT ACCESS */}
@@ -649,19 +649,25 @@ export default function AdminPage() {
 }
 
 // ===================================================================
-// USER DIRECTORY — List all active users
+// UNIFIED USER SECTION — Directory + Search + Card
 // ===================================================================
-function UserDirectory({ onSelectUser }: { onSelectUser: (email: string) => void }) {
+// ===================================================================
+// UNIFIED USER SECTION — Directory + Search + Card
+// ===================================================================
+function UserCardSection() {
     const [users, setUsers] = useState<any[]>([])
     const [loading, setLoading] = useState(false)
-    const [expanded, setExpanded] = useState(false)
+    const [filter, setFilter] = useState('')
+    const [selectedEmail, setSelectedEmail] = useState('')
+    const [card, setCard] = useState<any>(null)
+    const [videoProgress, setVideoProgress] = useState<any>(null)
+    const [cardLoading, setCardLoading] = useState(false)
+    const [noteText, setNoteText] = useState('')
+    const [noteLoading, setNoteLoading] = useState(false)
 
-    const fetchDirectory = async () => {
-        if (users.length > 0) {
-            setExpanded(!expanded)
-            return
-        }
-        setExpanded(true)
+    useEffect(() => { fetchUsers() }, [])
+
+    const fetchUsers = async () => {
         setLoading(true)
         const { data: { session } } = await supabase.auth.getSession()
         try {
@@ -671,103 +677,13 @@ function UserDirectory({ onSelectUser }: { onSelectUser: (email: string) => void
                 body: JSON.stringify({ action: 'get_active_users_list' })
             })
             if (res.ok) setUsers(await res.json())
-        } catch { 
-            alert('Errore caricamento lista utenti')
-        } finally { setLoading(false) }
+        } catch { }
+        finally { setLoading(false) }
     }
 
-    return (
-        <div className="mb-8">
-            <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-6 border-b border-slate-100 flex justify-between items-center cursor-pointer" onClick={fetchDirectory}>
-                    <h2 className="font-bold text-lg text-slate-800 flex items-center gap-2">
-                        <Users className="w-5 h-5 text-indigo-600" />
-                        Directory Utenti Attivi ({users.length > 0 ? users.length : 'Clicca per caricare'})
-                    </h2>
-                    {loading ? <Loader2 className="w-5 h-5 animate-spin text-indigo-600" /> : expanded ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
-                </div>
-
-                {expanded && users.length > 0 && (
-                    <div className="overflow-x-auto max-h-[500px] overflow-y-auto">
-                        <table className="w-full text-sm text-left">
-                            <thead className="bg-slate-50 text-slate-500 font-semibold sticky top-0 z-10 shadow-sm">
-                                <tr>
-                                    <th className="p-4">Email / Nome</th>
-                                    <th className="p-4">ID Formato</th>
-                                    <th className="p-4">Livelli Sbloccati</th>
-                                    <th className="p-4 flex-wrap">Fonti</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-slate-100">
-                                {users.map(u => (
-                                    <tr key={u.user_id} className="hover:bg-slate-50/50">
-                                        <td className="p-4">
-                                            <div
-                                                className="font-bold text-indigo-700 hover:text-indigo-900 cursor-pointer hover:underline transition-colors"
-                                                onClick={() => onSelectUser(u.email)}
-                                                title="Clicca per aprire la Scheda Utente"
-                                            >{u.email}</div>
-                                            <div className="text-xs text-slate-500">{u.name}</div>
-                                        </td>
-                                        <td className="p-4 font-mono text-xs text-slate-400">{u.user_id.slice(0, 12)}...</td>
-                                        <td className="p-4">
-                                            <div className="flex gap-1 flex-wrap">
-                                                {u.access_levels.map((l: string) => (
-                                                    <span key={l} className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
-                                                        {l}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </td>
-                                        <td className="p-4">
-                                            <div className="flex gap-1 flex-wrap">
-                                                {u.sources.map((s: string) => (
-                                                    <span key={s} className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-slate-100 text-slate-600 border border-slate-200">
-                                                        {s}
-                                                    </span>
-                                                ))}
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-            </div>
-        </div>
-    )
-}
-
-// ===================================================================
-// USER CARD SEARCH — Complete user profile lookup
-// ===================================================================
-function UserCardSearch({ prefillEmail }: { prefillEmail?: string }) {
-    const [email, setEmail] = useState(prefillEmail || '')
-    const [loading, setLoading] = useState(false)
-    const [card, setCard] = useState<any>(null)
-    const [videoProgress, setVideoProgress] = useState<any>(null)
-    const [error, setError] = useState('')
-    const [expanded, setExpanded] = useState(true)
-    const [noteText, setNoteText] = useState('')
-    const [noteLoading, setNoteLoading] = useState(false)
-
-    useEffect(() => {
-        if (prefillEmail && prefillEmail !== email) {
-            setEmail(prefillEmail)
-            setExpanded(true)
-            // Auto-search when email is set from directory click
-            setTimeout(() => handleSearch(undefined, prefillEmail), 100)
-        }
-    }, [prefillEmail])
-
-    const handleSearch = async (e?: React.FormEvent, searchEmail?: string) => {
-        e?.preventDefault()
-        const targetEmail = searchEmail || email
-        if (!targetEmail) return
-        if (searchEmail) setEmail(searchEmail)
-        setLoading(true)
-        setError('')
+    const handleSelectUser = async (email: string) => {
+        setSelectedEmail(email)
+        setCardLoading(true)
         setCard(null)
         setVideoProgress(null)
         const { data: { session } } = await supabase.auth.getSession()
@@ -775,25 +691,20 @@ function UserCardSearch({ prefillEmail }: { prefillEmail?: string }) {
             const res = await fetch('/api/admin', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
-                body: JSON.stringify({ action: 'get_user_card', email: targetEmail })
+                body: JSON.stringify({ action: 'get_user_card', email })
             })
             const data = await res.json()
             if (res.ok) {
                 setCard(data)
-                // Also fetch video progress
                 const vpRes = await fetch('/api/admin', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
                     body: JSON.stringify({ action: 'get_user_video_progress', userId: data.user.id })
                 })
-                if (vpRes.ok) {
-                    const vpData = await vpRes.json()
-                    setVideoProgress(vpData)
-                }
+                if (vpRes.ok) setVideoProgress(await vpRes.json())
             }
-            else setError(data.error || 'Errore')
-        } catch { setError('Errore di rete') }
-        finally { setLoading(false) }
+        } catch { }
+        finally { setCardLoading(false) }
     }
 
     const handleRevokeLevel = async (userId: string, level: string) => {
@@ -805,22 +716,8 @@ function UserCardSearch({ prefillEmail }: { prefillEmail?: string }) {
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
             body: JSON.stringify({ action: 'admin_revoke_access', userId, levels: [level], reason })
         })
-        if (res.ok) { alert('Revocato!'); handleSearch() }
+        if (res.ok) { alert('Revocato!'); handleSelectUser(selectedEmail) }
         else alert('Errore revoca')
-    }
-
-    const handleGrantLevel = async (userId: string) => {
-        const { data: { session } } = await supabase.auth.getSession()
-        const levels = prompt('Livelli da sbloccare (separati da virgola, es: base,intermedio,avanzato):')
-        if (!levels) return
-        const products = levels.split(',').map(l => l.trim())
-        const res = await fetch('/api/admin', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
-            body: JSON.stringify({ action: 'grant_access', email: card.user.email, products })
-        })
-        if (res.ok) { alert('Accesso concesso!'); handleSearch() }
-        else alert('Errore grant')
     }
 
     const handleResetDevices = async (userId: string) => {
@@ -831,22 +728,20 @@ function UserCardSearch({ prefillEmail }: { prefillEmail?: string }) {
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
             body: JSON.stringify({ action: 'reset_devices', userId })
         })
-        if (res.ok) { alert('Dispositivi resettati!'); handleSearch() }
+        if (res.ok) { alert('Dispositivi resettati!'); handleSelectUser(selectedEmail) }
         else alert('Errore reset')
     }
 
     const handleResetVideo = async (userId: string) => {
-        if (!confirm('Sei sicuro? Questo cancellerà tutti i minuti di visualizzazione video e i completamenti di questo utente. IRREVERSIBILE.')) return
-        setLoading(true)
+        if (!confirm('Sei sicuro? Cancellerà tutti i minuti video. IRREVERSIBILE.')) return
         const { data: { session } } = await supabase.auth.getSession()
         const res = await fetch('/api/admin', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
             body: JSON.stringify({ action: 'admin_reset_video_progress', userId })
         })
-        if (res.ok) { alert('Statistiche Video Azzerate!'); handleSearch() }
-        else alert('Errore reset video')
-        setLoading(false)
+        if (res.ok) { alert('Statistiche azzerate!'); handleSelectUser(selectedEmail) }
+        else alert('Errore')
     }
 
     const handleAddNote = async () => {
@@ -858,372 +753,222 @@ function UserCardSearch({ prefillEmail }: { prefillEmail?: string }) {
             headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session?.access_token}` },
             body: JSON.stringify({ action: 'admin_add_note', userId: card.user.id, note: noteText })
         })
-        if (res.ok) { setNoteText(''); handleSearch() }
+        if (res.ok) { setNoteText(''); handleSelectUser(selectedEmail) }
         else alert('Errore salvataggio nota')
         setNoteLoading(false)
     }
 
+    const filtered = filter
+        ? users.filter(u => u.email.toLowerCase().includes(filter.toLowerCase()) || (u.name || '').toLowerCase().includes(filter.toLowerCase()))
+        : users
+
     return (
         <div className="mb-8">
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-                <div className="p-6 border-b border-slate-100 flex justify-between items-center cursor-pointer" onClick={() => setExpanded(!expanded)}>
-                    <h2 className="font-bold text-lg text-slate-800 flex items-center gap-2">
-                        <Search className="w-5 h-5 text-indigo-600" />
-                        Scheda Utente
+                <div className="p-6 border-b border-slate-100">
+                    <h2 className="font-bold text-lg text-slate-800 flex items-center gap-2 mb-4">
+                        <Users className="w-5 h-5 text-indigo-600" />
+                        Gestione Utenti ({users.length})
                     </h2>
-                    {expanded ? <ChevronUp className="w-5 h-5 text-slate-400" /> : <ChevronDown className="w-5 h-5 text-slate-400" />}
+                    <input
+                        type="text"
+                        value={filter}
+                        onChange={e => setFilter(e.target.value)}
+                        placeholder="🔍 Filtra per email o nome..."
+                        className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm text-slate-900 bg-white"
+                    />
                 </div>
 
-                {expanded && (
-                    <div className="p-6">
-                        {/* Search Bar */}
-                        <form onSubmit={handleSearch} className="flex gap-3 mb-6">
-                            <input
-                                type="email"
-                                value={email}
-                                onChange={e => setEmail(e.target.value)}
-                                placeholder="Cerca per email utente..."
-                                className="flex-1 p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm text-slate-900 bg-white"
-                            />
-                            <button type="submit" disabled={loading} className="px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50">
-                                {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                                Cerca
-                            </button>
-                            {card && (
-                                <button type="button" onClick={() => { setCard(null); setEmail('') }} className="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg transition-colors">
-                                    <X className="w-4 h-4" />
-                                </button>
-                            )}
-                        </form>
-
-                        {error && <p className="text-red-600 text-sm font-bold mb-4">{error}</p>}
-
-                        {/* User Card Result */}
-                        {card && (
-                            <div className="space-y-6">
-                                {/* ANOMALIE */}
-                                {card.anomalies?.length > 0 && (
-                                    <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-                                        <h3 className="font-bold text-red-700 text-sm mb-2 flex items-center gap-2">
-                                            <AlertTriangle className="w-4 h-4" /> Anomalie Rilevate
-                                        </h3>
-                                        <ul className="text-xs text-red-600 space-y-1">
-                                            {card.anomalies.map((a: string, i: number) => <li key={i}>{a}</li>)}
-                                        </ul>
-                                    </div>
+                {loading ? (
+                    <div className="flex justify-center p-8"><Loader2 className="w-6 h-6 animate-spin text-indigo-600" /></div>
+                ) : (
+                    <div className="overflow-x-auto max-h-[400px] overflow-y-auto">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-slate-50 text-slate-500 font-semibold sticky top-0 z-10 shadow-sm">
+                                <tr>
+                                    <th className="p-4">Email / Nome</th>
+                                    <th className="p-4">Livelli</th>
+                                    <th className="p-4">Fonte</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                                {filtered.map(u => (
+                                    <tr key={u.user_id} className={`hover:bg-indigo-50/50 cursor-pointer transition-colors ${selectedEmail === u.email ? 'bg-indigo-50 border-l-4 border-l-indigo-600' : ''}`} onClick={() => handleSelectUser(u.email)}>
+                                        <td className="p-4">
+                                            <div className="font-bold text-indigo-700">{u.email}</div>
+                                            <div className="text-xs text-slate-500">{u.name}</div>
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="flex gap-1 flex-wrap">
+                                                {u.access_levels.map((l: string) => (
+                                                    <span key={l} className="px-2 py-0.5 rounded text-[10px] uppercase font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">{l}</span>
+                                                ))}
+                                            </div>
+                                        </td>
+                                        <td className="p-4">
+                                            <div className="flex gap-1 flex-wrap">
+                                                {u.sources.map((s: string) => (
+                                                    <span key={s} className={`px-2 py-0.5 rounded text-[10px] uppercase font-bold border ${s === 'purchase' ? 'bg-green-50 text-green-700 border-green-200' : s === 'admin' ? 'bg-purple-50 text-purple-700 border-purple-200' : 'bg-slate-100 text-slate-600 border-slate-200'}`}>{s === 'purchase' ? '💰 ACQUISTO' : s === 'admin' ? '🎁 REGALO' : s}</span>
+                                                ))}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))}
+                                {filtered.length === 0 && (
+                                    <tr><td colSpan={3} className="p-8 text-center text-gray-400">Nessun utente trovato.</td></tr>
                                 )}
-
-                                {/* Row 1: Profile + Quick Actions */}
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    {/* PROFILO */}
-                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Profilo</h3>
-                                        <div className="space-y-2 text-sm">
-                                            <div className="flex justify-between"><span className="text-slate-500">Email</span><span className="font-mono font-bold text-slate-800">{card.user.email}</span></div>
-                                            <div className="flex justify-between"><span className="text-slate-500">ID</span><span className="font-mono text-xs text-slate-600">{card.user.id.slice(0, 12)}...</span></div>
-                                            <div className="flex justify-between"><span className="text-slate-500">Provider</span><span className="font-bold text-slate-700">{card.user.provider}</span></div>
-                                            <div className="flex justify-between"><span className="text-slate-500">Registrato</span><span className="text-slate-700">{new Date(card.user.created_at).toLocaleDateString()}</span></div>
-                                            <div className="flex justify-between"><span className="text-slate-500">Ultimo Login</span><span className="text-slate-700">{card.user.last_sign_in_at ? new Date(card.user.last_sign_in_at).toLocaleString() : 'Mai'}</span></div>
-                                            {card.profile && (
-                                                <>
-                                                    <div className="flex justify-between"><span className="text-slate-500">Nome</span><span className="text-slate-700">{card.profile.full_name || '-'}</span></div>
-                                                    <div className="flex justify-between"><span className="text-slate-500">Profilo Completo</span><span className={card.profile.profile_completed ? 'text-green-600 font-bold' : 'text-red-600 font-bold'}>{card.profile.profile_completed ? 'SÌ' : 'NO'}</span></div>
-                                                </>
-                                            )}
-                                            {card.billing && (
-                                                <>
-                                                    <div className="flex justify-between"><span className="text-slate-500">Azienda</span><span className="text-slate-700">{card.billing.company_name || '-'}</span></div>
-                                                    <div className="flex justify-between"><span className="text-slate-500">P.IVA</span><span className="font-mono text-slate-700">{card.billing.vat_number || '-'}</span></div>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* AZIONI RAPIDE */}
-                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Azioni Rapide</h3>
-                                        <div className="space-y-3">
-                                            <button onClick={() => handleGrantLevel(card.user.id)} className="w-full py-2.5 bg-green-600 hover:bg-green-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
-                                                <Shield className="w-4 h-4" /> Grant Accesso
-                                            </button>
-                                            <button onClick={() => handleResetDevices(card.user.id)} className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
-                                                <MonitorX className="w-4 h-4" /> Reset Dispositivi
-                                            </button>
-                                            <button onClick={() => handleResetVideo(card.user.id)} className="w-full py-2.5 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2">
-                                                <Clock className="w-4 h-4" /> Azzera Minuti Video
-                                            </button>
-                                        </div>
-
-                                        {/* Online status */}
-                                        <div className="mt-4 p-3 bg-white rounded-lg border border-slate-200">
-                                            <div className="text-xs text-slate-500 uppercase font-bold mb-1">Stato Online</div>
-                                            {card.presence ? (
-                                                <div className="flex items-center gap-2 text-sm">
-                                                    <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                                                    <span className="text-green-700 font-bold">Online</span>
-                                                    <span className="text-slate-400 text-xs">— {new Date(card.presence.last_seen_at).toLocaleString()}</span>
-                                                </div>
-                                            ) : (
-                                                <div className="text-sm text-slate-400">Offline</div>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Row 2: Purchases + Access */}
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    {/* ACQUISTI */}
-                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Acquisti ({card.purchases.length})</h3>
-                                        {card.purchases.length === 0 ? (
-                                            <p className="text-sm text-slate-400">Nessun acquisto</p>
-                                        ) : (
-                                            <div className="space-y-2 max-h-60 overflow-y-auto">
-                                                {card.purchases.map((p: any) => (
-                                                    <div key={p.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs">
-                                                        <div className="flex justify-between items-start mb-1">
-                                                            <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold border border-blue-100">{p.product_code}</span>
-                                                            <span className="font-mono text-slate-600">€{(p.amount_cents / 100).toFixed(2)}</span>
-                                                        </div>
-                                                        <div className="text-slate-500 mt-1">{new Date(p.created_at).toLocaleString()}</div>
-                                                        <div className="font-mono text-[10px] text-slate-400 mt-1 break-all">capture: {p.paypal_capture_id?.slice(0, 20)}...</div>
-                                                        {p.snapshot_company_name === 'REGALO ADMIN' && (
-                                                            <span className="mt-1 inline-block px-2 py-0.5 bg-green-100 text-green-700 text-[10px] font-bold rounded">REGALO ADMIN</span>
-                                                        )}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* ACCESSI ATTIVI */}
-                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Accessi Attivi ({card.access.length})</h3>
-                                        {card.access.length === 0 ? (
-                                            <p className="text-sm text-slate-400">Nessun accesso</p>
-                                        ) : (
-                                            <div className="space-y-2">
-                                                {card.access.map((a: any) => (
-                                                    <div key={a.id} className="bg-white p-3 rounded-lg border border-slate-200 flex justify-between items-center">
-                                                        <div>
-                                                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${a.access_level === 'base' ? 'bg-green-50 text-green-700 border border-green-200' :
-                                                                a.access_level === 'intermedio' ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' :
-                                                                    'bg-purple-50 text-purple-700 border border-purple-200'
-                                                                }`}>{a.access_level.toUpperCase()}</span>
-                                                            <span className="text-[10px] text-slate-400 ml-2">via {a.source}</span>
-                                                        </div>
-                                                        <button
-                                                            onClick={() => handleRevokeLevel(card.user.id, a.access_level)}
-                                                            className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                                            title={`Revoca ${a.access_level}`}
-                                                        >
-                                                            <X className="w-3.5 h-3.5" />
-                                                        </button>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Row 3: Devices + Sessions */}
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    {/* DISPOSITIVI */}
-                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Dispositivi ({card.devices.length})</h3>
-                                        {card.devices.length === 0 ? (
-                                            <p className="text-sm text-slate-400">Nessun dispositivo</p>
-                                        ) : (
-                                            <div className="space-y-2 max-h-40 overflow-y-auto">
-                                                {card.devices.map((d: any) => (
-                                                    <div key={d.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs">
-                                                        <div className="font-bold text-slate-700">{d.device_name || 'Dispositivo sconosciuto'}</div>
-                                                        <div className="text-slate-400 font-mono mt-1 text-[10px]">FP: {d.fingerprint?.slice(0, 16)}...</div>
-                                                        <div className="text-slate-400 mt-1">Creato: {new Date(d.created_at).toLocaleString()}</div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* SESSIONI */}
-                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Sessioni Attive ({card.sessions.length})</h3>
-                                        {card.sessions.length === 0 ? (
-                                            <p className="text-sm text-slate-400">Nessuna sessione</p>
-                                        ) : (
-                                            <div className="space-y-2 max-h-40 overflow-y-auto">
-                                                {card.sessions.map((s: any) => (
-                                                    <div key={s.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs">
-                                                        <div className="flex justify-between">
-                                                            <span className="text-slate-500">Last Seen</span>
-                                                            <span className="text-slate-700 font-mono">{new Date(s.last_seen_at).toLocaleString()}</span>
-                                                        </div>
-                                                        <div className="text-slate-400 font-mono mt-1 text-[10px]">ID: {s.id.slice(0, 12)}...</div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Row 4: Team Info */}
-                                {(card.teamOwnership.length > 0 || card.teamMembership.length > 0) && (
-                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Team</h3>
-                                        {card.teamOwnership.length > 0 && (
-                                            <div className="mb-3">
-                                                <div className="text-xs text-indigo-600 font-bold uppercase mb-2">👑 Owner di:</div>
-                                                {card.teamOwnership.map((t: any) => (
-                                                    <div key={t.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs mb-2">
-                                                        <div className="font-bold text-slate-700">{t.company_name || 'Team'}</div>
-                                                        <div className="text-slate-500 mt-1">Seats: {t.seats} | Max Inviti: {t.max_invites_total || 'N/A'}</div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                        {card.teamMembership.length > 0 && (
-                                            <div>
-                                                <div className="text-xs text-slate-600 font-bold uppercase mb-2">👤 Membro di:</div>
-                                                {card.teamMembership.map((m: any) => (
-                                                    <div key={m.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs mb-2">
-                                                        <div className="font-bold text-slate-700">{m.team_license?.company_name || 'Team'}</div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                )}
-
-                                {/* Row 5: Notes + Security Events */}
-                                <div className="grid md:grid-cols-2 gap-6">
-                                    {/* NOTE ASSISTENZA */}
-                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider flex items-center gap-2">
-                                            <FileText className="w-4 h-4" /> Note Assistenza
-                                        </h3>
-                                        <div className="flex gap-2 mb-3">
-                                            <input
-                                                type="text"
-                                                value={noteText}
-                                                onChange={e => setNoteText(e.target.value)}
-                                                placeholder="Scrivi una nota..."
-                                                className="flex-1 p-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-900 bg-white"
-                                            />
-                                            <button
-                                                onClick={handleAddNote}
-                                                disabled={noteLoading || !noteText}
-                                                className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg disabled:opacity-50"
-                                            >
-                                                {noteLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Salva'}
-                                            </button>
-                                        </div>
-                                        {card.notes.length === 0 ? (
-                                            <p className="text-xs text-slate-400">Nessuna nota</p>
-                                        ) : (
-                                            <div className="space-y-2 max-h-40 overflow-y-auto">
-                                                {card.notes.map((n: any) => (
-                                                    <div key={n.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs">
-                                                        <div className="text-slate-700">{n.note}</div>
-                                                        <div className="text-slate-400 mt-1 flex justify-between">
-                                                            <span>{n.admin_email}</span>
-                                                            <span>{new Date(n.created_at).toLocaleString()}</span>
-                                                        </div>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* EVENTI RECENTI */}
-                                    <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                                        <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider flex items-center gap-2">
-                                            <Clock className="w-4 h-4" /> Eventi Recenti
-                                        </h3>
-                                        {card.securityEvents.length === 0 ? (
-                                            <p className="text-xs text-slate-400">Nessun evento</p>
-                                        ) : (
-                                            <div className="space-y-2 max-h-40 overflow-y-auto">
-                                                {card.securityEvents.map((ev: any) => (
-                                                    <div key={ev.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs">
-                                                        <div className="flex justify-between items-start">
-                                                            <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase ${ev.event_type.includes('blocked') ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'}`}>
-                                                                {ev.event_type}
-                                                            </span>
-                                                            <span className="text-slate-400 text-[10px]">{new Date(ev.created_at).toLocaleString()}</span>
-                                                        </div>
-                                                        {ev.metadata && (
-                                                            <div className="text-[10px] text-slate-500 mt-1 font-mono bg-slate-50 p-1 rounded break-all">
-                                                                {JSON.stringify(ev.metadata).slice(0, 120)}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Row 6: VIDEO PROGRESS */}
-                                <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
-                                    <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider flex items-center gap-2">
-                                        📺 Video Guardati
-                                        {videoProgress && (
-                                            <span className="text-xs font-normal text-slate-500 ml-2">
-                                                {videoProgress.completedCount}/27 completati • {videoProgress.totalMinutes} minuti totali
-                                            </span>
-                                        )}
-                                    </h3>
-                                    {!videoProgress || videoProgress.progress.length === 0 ? (
-                                        <p className="text-sm text-slate-400">Questo utente non ha ancora guardato nessun video.</p>
-                                    ) : (
-                                        <div className="overflow-x-auto bg-white border border-slate-200 rounded-lg">
-                                            <table className="w-full text-sm text-left">
-                                                <thead className="bg-slate-50 text-slate-500 font-semibold text-xs border-b border-slate-200">
-                                                    <tr>
-                                                        <th className="p-3">Video</th>
-                                                        <th className="p-3 text-center">Minuti</th>
-                                                        <th className="p-3 text-center">Stato</th>
-                                                        <th className="p-3">Ultimo Accesso</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-slate-100">
-                                                    {videoProgress.progress.map((vp: any) => (
-                                                        <tr key={vp.course_id || vp.id} className="hover:bg-slate-50 transition-colors">
-                                                            <td className="p-3 font-bold text-slate-800">
-                                                                Lezione {vp.course_id}
-                                                            </td>
-                                                            <td className="p-3 text-center font-mono text-xs text-slate-600">
-                                                                {Math.round((vp.watch_seconds || 0) / 60)} min
-                                                            </td>
-                                                            <td className="p-3 text-center">
-                                                                <span className={`px-2 py-0.5 rounded text-[10px] font-bold ${
-                                                                    vp.completed
-                                                                        ? 'bg-green-100 text-green-700'
-                                                                        : 'bg-yellow-100 text-yellow-700'
-                                                                }`}>
-                                                                    {vp.completed ? '✅ COMPLETATO' : '⏳ In corso'}
-                                                                </span>
-                                                            </td>
-                                                            <td className="p-3 text-xs text-slate-500">
-                                                                {vp.last_watched_at ? new Date(vp.last_watched_at).toLocaleString() : '-'}
-                                                            </td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    )}
-                                </div>
-
-                            </div>
-                        )}
+                            </tbody>
+                        </table>
                     </div>
                 )}
             </div>
+
+            {cardLoading && (
+                <div className="mt-4 bg-white rounded-xl shadow-sm border border-slate-200 p-8 flex justify-center">
+                    <Loader2 className="w-6 h-6 animate-spin text-indigo-600" />
+                </div>
+            )}
+
+            {card && !cardLoading && (
+                <div className="mt-4 bg-white rounded-xl shadow-sm border border-indigo-200 overflow-hidden">
+                    <div className="p-6 bg-indigo-50 border-b border-indigo-100 flex justify-between items-center">
+                        <h3 className="font-bold text-lg text-indigo-800">📋 {card.user.email}</h3>
+                        <button onClick={() => { setCard(null); setSelectedEmail('') }} className="px-3 py-1 bg-white rounded-lg hover:bg-slate-50 text-slate-500 text-sm border border-slate-200">
+                            <X className="w-4 h-4" />
+                        </button>
+                    </div>
+                    <div className="p-6 space-y-6">
+                        {card.anomalies?.length > 0 && (
+                            <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                                <h3 className="font-bold text-red-700 text-sm mb-2 flex items-center gap-2"><AlertTriangle className="w-4 h-4" /> Anomalie</h3>
+                                <ul className="text-xs text-red-600 space-y-1">{card.anomalies.map((a: string, i: number) => <li key={i}>{a}</li>)}</ul>
+                            </div>
+                        )}
+
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Profilo</h3>
+                                <div className="space-y-2 text-sm">
+                                    <div className="flex justify-between"><span className="text-slate-500">Email</span><span className="font-mono font-bold text-slate-800">{card.user.email}</span></div>
+                                    <div className="flex justify-between"><span className="text-slate-500">Provider</span><span className="font-bold text-slate-700">{card.user.provider}</span></div>
+                                    <div className="flex justify-between"><span className="text-slate-500">Registrato</span><span className="text-slate-700">{new Date(card.user.created_at).toLocaleDateString()}</span></div>
+                                    <div className="flex justify-between"><span className="text-slate-500">Ultimo Login</span><span className="text-slate-700">{card.user.last_sign_in_at ? new Date(card.user.last_sign_in_at).toLocaleString() : 'Mai'}</span></div>
+                                    {card.profile && <div className="flex justify-between"><span className="text-slate-500">Nome</span><span className="text-slate-700">{card.profile.full_name || '-'}</span></div>}
+                                    {card.billing && (
+                                        <>
+                                            <div className="flex justify-between"><span className="text-slate-500">Azienda</span><span className="text-slate-700">{card.billing.company_name || '-'}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">P.IVA</span><span className="font-mono text-slate-700">{card.billing.vat_number || '-'}</span></div>
+                                        </>
+                                    )}
+                                    {card.presence && (
+                                        <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-200">
+                                            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+                                            <span className="text-green-700 font-bold text-xs">Online</span>
+                                            <span className="text-slate-400 text-[10px]">{new Date(card.presence.last_seen_at).toLocaleString()}</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Azioni Rapide</h3>
+                                <div className="space-y-3">
+                                    <button onClick={() => handleResetDevices(card.user.id)} className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2"><MonitorX className="w-4 h-4" /> Reset Dispositivi</button>
+                                    <button onClick={() => handleResetVideo(card.user.id)} className="w-full py-2.5 bg-red-100 hover:bg-red-200 text-red-700 text-sm font-bold rounded-lg transition-colors flex items-center justify-center gap-2"><Clock className="w-4 h-4" /> Azzera Minuti Video</button>
+                                </div>
+                                <div className="mt-4 p-3 bg-white rounded-lg border border-slate-200 text-xs text-slate-600">
+                                    <span className="font-bold">{card.devices.length}</span> dispositivi • <span className="font-bold">{card.sessions.length}</span> sessioni attive
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-6">
+                            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Acquisti ({card.purchases.length})</h3>
+                                {card.purchases.length === 0 ? <p className="text-sm text-slate-400">Nessun acquisto</p> : (
+                                    <div className="space-y-2 max-h-40 overflow-y-auto">
+                                        {card.purchases.map((p: any) => (
+                                            <div key={p.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs">
+                                                <div className="flex justify-between items-start">
+                                                    <span className="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold border border-blue-100">{p.product_code}</span>
+                                                    <span className="font-mono text-slate-600">€{(p.amount_cents / 100).toFixed(2)}</span>
+                                                </div>
+                                                <div className="text-slate-500 mt-1">{new Date(p.created_at).toLocaleString()}</div>
+                                                {p.snapshot_company_name === 'REGALO ADMIN' && <span className="mt-1 inline-block px-2 py-0.5 bg-purple-100 text-purple-700 text-[10px] font-bold rounded">🎁 REGALO ADMIN</span>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                            <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                                <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider">Accessi Attivi ({card.access.length})</h3>
+                                {card.access.length === 0 ? <p className="text-sm text-slate-400">Nessun accesso</p> : (
+                                    <div className="space-y-2">
+                                        {card.access.map((a: any) => (
+                                            <div key={a.id} className="bg-white p-3 rounded-lg border border-slate-200 flex justify-between items-center">
+                                                <div>
+                                                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${a.access_level === 'base' ? 'bg-green-50 text-green-700 border border-green-200' : a.access_level === 'intermedio' ? 'bg-yellow-50 text-yellow-700 border border-yellow-200' : 'bg-purple-50 text-purple-700 border border-purple-200'}`}>{a.access_level.toUpperCase()}</span>
+                                                    <span className="text-[10px] text-slate-400 ml-2">via {a.source}</span>
+                                                </div>
+                                                <button onClick={() => handleRevokeLevel(card.user.id, a.access_level)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><X className="w-3.5 h-3.5" /></button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                            <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider flex items-center gap-2"><FileText className="w-4 h-4" /> Note Assistenza</h3>
+                            <div className="flex gap-2 mb-3">
+                                <input type="text" value={noteText} onChange={e => setNoteText(e.target.value)} placeholder="Scrivi una nota..." className="flex-1 p-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 focus:outline-none text-slate-900 bg-white" />
+                                <button onClick={handleAddNote} disabled={noteLoading || !noteText} className="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg disabled:opacity-50">{noteLoading ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Salva'}</button>
+                            </div>
+                            {(card.notes || []).length === 0 ? <p className="text-xs text-slate-400">Nessuna nota</p> : (
+                                <div className="space-y-2 max-h-40 overflow-y-auto">
+                                    {card.notes.map((n: any) => (
+                                        <div key={n.id} className="bg-white p-3 rounded-lg border border-slate-200 text-xs">
+                                            <div className="text-slate-700">{n.note}</div>
+                                            <div className="text-slate-400 mt-1 flex justify-between"><span>{n.admin_email}</span><span>{new Date(n.created_at).toLocaleString()}</span></div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="bg-slate-50 rounded-xl p-5 border border-slate-200">
+                            <h3 className="font-bold text-slate-700 text-sm mb-3 uppercase tracking-wider flex items-center gap-2">
+                                📺 Video Guardati
+                                {videoProgress && <span className="text-xs font-normal text-slate-500 ml-2">{videoProgress.completedCount}/27 completati • {videoProgress.totalMinutes} minuti totali</span>}
+                            </h3>
+                            {!videoProgress || videoProgress.progress.length === 0 ? (
+                                <p className="text-sm text-slate-400">Nessun video guardato.</p>
+                            ) : (
+                                <div className="overflow-x-auto bg-white border border-slate-200 rounded-lg">
+                                    <table className="w-full text-sm text-left">
+                                        <thead className="bg-slate-50 text-slate-500 font-semibold text-xs border-b border-slate-200">
+                                            <tr><th className="p-3">Video</th><th className="p-3 text-center">Minuti</th><th className="p-3 text-center">Stato</th><th className="p-3">Ultimo Accesso</th></tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-100">
+                                            {videoProgress.progress.map((vp: any) => (
+                                                <tr key={vp.course_id || vp.id} className="hover:bg-slate-50 transition-colors">
+                                                    <td className="p-3 font-bold text-slate-800">Lezione {vp.course_id}</td>
+                                                    <td className="p-3 text-center font-mono text-xs">{Math.round((vp.watch_seconds || 0) / 60)} min</td>
+                                                    <td className="p-3 text-center"><span className={`px-2 py-0.5 rounded text-[10px] font-bold ${vp.completed ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>{vp.completed ? '✅ COMPLETATO' : '⏳ In corso'}</span></td>
+                                                    <td className="p-3 text-xs text-slate-500">{vp.last_watched_at ? new Date(vp.last_watched_at).toLocaleString() : '-'}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
+
 
 function GrantAccessForm() {
     const [email, setEmail] = useState('')

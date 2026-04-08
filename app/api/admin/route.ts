@@ -420,7 +420,25 @@ async function getActiveUsersList() {
 
 async function getStats() {
     const { count: totalUsers } = await supabaseAdmin.from('profiles').select('*', { count: 'exact', head: true })
-    const { count: totalOrders } = await supabaseAdmin.from('purchases').select('*', { count: 'exact', head: true })
+
+    // Fetch all purchases to compute paid vs gifted
+    const { data: purchases } = await supabaseAdmin.from('purchases').select('user_id, amount_cents, snapshot_company_name')
+
+    const paidUserIds = new Set<string>()
+    const giftedUserIds = new Set<string>()
+
+    for (const p of (purchases || [])) {
+        if (p.amount_cents > 0) {
+            paidUserIds.add(p.user_id)
+        } else if (p.snapshot_company_name === 'REGALO ADMIN') {
+            giftedUserIds.add(p.user_id)
+        }
+    }
+
+    // If someone paid AND got a gift, count only as paid
+    for (const id of paidUserIds) {
+        giftedUserIds.delete(id)
+    }
 
     const { data: securityEvents } = await supabaseAdmin
         .from('security_events')
@@ -428,7 +446,12 @@ async function getStats() {
         .order('created_at', { ascending: false })
         .limit(20)
 
-    return NextResponse.json({ totalUsers, totalOrders, securityEvents })
+    return NextResponse.json({
+        totalUsers,
+        paidCustomers: paidUserIds.size,
+        giftedAccounts: giftedUserIds.size,
+        securityEvents
+    })
 }
 
 async function getOrders() {
