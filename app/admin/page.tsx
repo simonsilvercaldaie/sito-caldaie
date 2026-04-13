@@ -858,6 +858,10 @@ function UserCardSection() {
                                         <>
                                             <div className="flex justify-between"><span className="text-slate-500">Azienda</span><span className="text-slate-700">{card.billing.company_name || '-'}</span></div>
                                             <div className="flex justify-between"><span className="text-slate-500">P.IVA</span><span className="font-mono text-slate-700">{card.billing.vat_number || '-'}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">📞 Telefono</span><span className="font-mono font-bold text-indigo-700">{card.billing.phone || '-'}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">Indirizzo</span><span className="text-slate-700 text-right text-xs">{[card.billing.address, card.billing.postal_code, card.billing.city, card.billing.province].filter(Boolean).join(', ') || '-'}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">SDI</span><span className="font-mono text-slate-700">{card.billing.sdi_code || '-'}</span></div>
+                                            <div className="flex justify-between"><span className="text-slate-500">PEC</span><span className="text-slate-700 text-xs">{card.billing.pec || '-'}</span></div>
                                         </>
                                     )}
                                     {card.presence && (
