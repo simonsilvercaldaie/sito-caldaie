@@ -35,9 +35,11 @@ export async function POST(request: NextRequest) {
             company_name,
             vat_number,
             sdi_code,
+            pec,
             fiscal_code,
             address,
             city,
+            province,
             postal_code,
             phone
         } = body
@@ -58,6 +60,10 @@ export async function POST(request: NextRequest) {
         }
         if (!/^\d{5}$/.test(postal_code?.trim() || '')) {
             return NextResponse.json({ error: 'CAP non valido (5 cifre)' }, { status: 400 })
+        }
+        // Provincia: obbligatoria, 2 lettere maiuscole
+        if (!/^[A-Z]{2}$/.test(province?.trim() || '')) {
+            return NextResponse.json({ error: 'Provincia non valida (seleziona dal menu)' }, { status: 400 })
         }
         if (!phone?.trim() || phone.trim().length < 8) {
             return NextResponse.json({ error: 'Telefono non valido (minimo 8 caratteri)' }, { status: 400 })
@@ -89,10 +95,15 @@ export async function POST(request: NextRequest) {
                 return NextResponse.json({ error: pivaResult.error }, { status: 400 })
             }
             const sdi = sdi_code?.trim() || ''
-            const isSdi = /^[A-Za-z0-9]{7}$/.test(sdi)
-            const isPec = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sdi)
-            if (!isSdi && !isPec) {
-                return NextResponse.json({ error: 'Codice SDI (7 caratteri) o PEC obbligatorio' }, { status: 400 })
+            const pecAddr = pec?.trim() || ''
+            if (!sdi && !pecAddr) {
+                return NextResponse.json({ error: 'Codice SDI o PEC obbligatorio' }, { status: 400 })
+            }
+            if (sdi && !/^[A-Za-z0-9]{7}$/.test(sdi)) {
+                return NextResponse.json({ error: 'Codice SDI non valido (7 caratteri alfanumerici)' }, { status: 400 })
+            }
+            if (pecAddr && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(pecAddr)) {
+                return NextResponse.json({ error: 'Indirizzo PEC non valido' }, { status: 400 })
             }
         }
 
@@ -103,11 +114,13 @@ export async function POST(request: NextRequest) {
             first_name: first_name.trim(),
             last_name: last_name.trim(),
             company_name: customer_type === 'company' ? company_name?.trim() || null : null,
-            vat_number: customer_type === 'company' ? vat_number?.trim() || null : null,
-            sdi_code: customer_type === 'company' ? sdi_code?.trim() || null : null,
+            vat_number: customer_type === 'company' ? (vat_number?.trim().replace(/\D/g, '') || null) : null,
+            sdi_code: customer_type === 'company' ? (sdi_code?.trim().toUpperCase() || '0000000') : null,
+            pec: customer_type === 'company' ? (pec?.trim().toLowerCase() || null) : null,
             fiscal_code: customer_type === 'private' ? fiscal_code?.trim() || null : null,
             address: address.trim(),
             city: city.trim(),
+            province: province?.trim().toUpperCase() || null,
             postal_code: postal_code.trim(),
             phone: phone.trim(),
             updated_at: new Date().toISOString()

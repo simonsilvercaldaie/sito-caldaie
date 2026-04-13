@@ -36,11 +36,22 @@ function CompletaProfiloContent() {
     const [companyName, setCompanyName] = useState('')
     const [vatNumber, setVatNumber] = useState('')
     const [sdiCode, setSdiCode] = useState('')
+    const [pec, setPec] = useState('')
     const [fiscalCode, setFiscalCode] = useState('')
     const [address, setAddress] = useState('')
     const [city, setCity] = useState('')
+    const [province, setProvince] = useState('')
     const [postalCode, setPostalCode] = useState('')
     const [phone, setPhone] = useState('')
+
+    const PROVINCE_ITALIANE = [
+        'AG','AL','AN','AO','AP','AQ','AR','AT','AV','BA','BG','BI','BL','BN','BO','BR','BS','BT','BZ',
+        'CA','CB','CE','CH','CI','CL','CN','CO','CR','CS','CT','CZ','EN','FC','FE','FG','FI','FM','FR',
+        'GE','GO','GR','IM','IS','KR','LC','LE','LI','LO','LT','LU','MB','MC','ME','MI','MN','MO','MS',
+        'MT','NA','NO','NU','OG','OR','OT','PA','PC','PD','PE','PG','PI','PN','PO','PR','PT','PU','PV',
+        'PZ','RA','RC','RE','RG','RI','RM','RN','RO','SA','SI','SO','SP','SR','SS','SU','SV','TA','TE',
+        'TN','TO','TP','TR','TS','TV','UD','VA','VB','VC','VE','VI','VR','VT','VV'
+    ]
 
     useEffect(() => {
         const checkSession = async () => {
@@ -140,8 +151,9 @@ function CompletaProfiloContent() {
                 return
             }
 
-            // Partita IVA con check digit
-            const pivaResult = validatePartitaIVA(vatNumber.trim())
+            // Partita IVA: solo cifre, 11 caratteri
+            const pivaClean = vatNumber.replace(/\D/g, '')
+            const pivaResult = validatePartitaIVA(pivaClean)
             if (!pivaResult.valid) {
                 setError(pivaResult.error!)
                 setSaving(false)
@@ -149,19 +161,31 @@ function CompletaProfiloContent() {
             }
 
             // Codice SDI o PEC: almeno uno dei due obbligatorio
-            const sdiClean = sdiCode.trim()
-            if (!sdiClean) {
-                setError('Il Codice SDI o la PEC sono obbligatori per la fatturazione elettronica')
+            const sdiClean = sdiCode.trim().toUpperCase()
+            const pecClean = pec.trim().toLowerCase()
+
+            if (!sdiClean && !pecClean) {
+                setError('Inserisci il Codice SDI oppure la PEC (almeno uno è obbligatorio)')
                 setSaving(false)
                 return
             }
-            const isSdi = /^[A-Za-z0-9]{7}$/.test(sdiClean)
-            const isPec = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(sdiClean)
-            if (!isSdi && !isPec) {
-                setError('Inserisci un Codice SDI valido (7 caratteri) oppure un indirizzo PEC valido')
+            if (sdiClean && !/^[A-Z0-9]{7}$/.test(sdiClean)) {
+                setError('Il Codice SDI deve essere esattamente 7 caratteri alfanumerici (es. M5UXCR1)')
                 setSaving(false)
                 return
             }
+            if (pecClean && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(pecClean)) {
+                setError('Indirizzo PEC non valido')
+                setSaving(false)
+                return
+            }
+        }
+
+        // --- PROVINCIA (obbligatoria per tutti) ---
+        if (!province) {
+            setError('Seleziona la Provincia')
+            setSaving(false)
+            return
         }
 
         try {
@@ -179,11 +203,13 @@ function CompletaProfiloContent() {
                     first_name: firstName.trim(),
                     last_name: lastName.trim(),
                     company_name: customerType === 'company' ? companyName.trim() : null,
-                    vat_number: customerType === 'company' ? vatNumber.trim() : null,
-                    sdi_code: customerType === 'company' ? sdiCode.trim() : null,
+                    vat_number: customerType === 'company' ? vatNumber.replace(/\D/g, '') : null,
+                    sdi_code: customerType === 'company' ? (sdiCode.trim().toUpperCase() || '0000000') : null,
+                    pec: customerType === 'company' ? (pec.trim().toLowerCase() || null) : null,
                     fiscal_code: customerType === 'private' ? fiscalCode.trim() : null,
                     address: address.trim(),
                     city: city.trim(),
+                    province: province,
                     postal_code: postalCode.trim(),
                     phone: phoneClean
                 })
@@ -389,33 +415,51 @@ Simon Silver
                                         placeholder="Termotecnica SRL"
                                     />
                                 </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Partita IVA <span className="text-red-500">*</span>
+                                        <span className="text-xs text-gray-400 ml-1">(11 cifre, senza spazi o barre)</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        required
+                                        value={vatNumber}
+                                        onChange={(e) => setVatNumber(e.target.value.replace(/\D/g, '').slice(0, 11))}
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white transition-all text-gray-900 placeholder:text-gray-400 font-mono tracking-wider"
+                                        placeholder="01234567890"
+                                        maxLength={11}
+                                    />
+                                </div>
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Partita IVA <span className="text-red-500">*</span>
-                                        </label>
-                                        <input
-                                            type="text"
-                                            required
-                                            value={vatNumber}
-                                            onChange={(e) => setVatNumber(e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white transition-all text-gray-900 placeholder:text-gray-400"
-                                            placeholder="12345678901"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                                            Codice SDI / PEC <span className="text-red-500">*</span>
+                                            Codice SDI
+                                            <span className="text-xs text-gray-400 ml-1">(7 caratteri)</span>
                                         </label>
                                         <input
                                             type="text"
                                             value={sdiCode}
-                                            onChange={(e) => setSdiCode(e.target.value)}
+                                            onChange={(e) => setSdiCode(e.target.value.replace(/[^A-Za-z0-9]/g, '').slice(0, 7).toUpperCase())}
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white transition-all text-gray-900 placeholder:text-gray-400 font-mono tracking-wider uppercase"
+                                            placeholder="M5UXCR1"
+                                            maxLength={7}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            PEC
+                                            <span className="text-xs text-gray-400 ml-1">(alternativa al SDI)</span>
+                                        </label>
+                                        <input
+                                            type="email"
+                                            value={pec}
+                                            onChange={(e) => setPec(e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none bg-white transition-all text-gray-900 placeholder:text-gray-400"
-                                            placeholder="XXXXXXX o email@pec.it"
+                                            placeholder="info@pec.azienda.it"
                                         />
                                     </div>
                                 </div>
+                                <p className="text-xs text-blue-600 -mt-2">⚠️ Inserisci almeno uno tra Codice SDI e PEC. Se non hai il codice SDI, inserisci la PEC.</p>
                             </div>
                         )}
 
@@ -470,7 +514,7 @@ Simon Silver
                                     />
                                 </div>
 
-                                <div className="grid md:grid-cols-2 gap-4">
+                                <div className="grid md:grid-cols-3 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
                                             Città <span className="text-red-500">*</span>
@@ -481,8 +525,24 @@ Simon Silver
                                             value={city}
                                             onChange={(e) => setCity(e.target.value)}
                                             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-gray-900 placeholder:text-gray-400"
-                                            placeholder="Milano"
+                                            placeholder="Brescia"
                                         />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Provincia <span className="text-red-500">*</span>
+                                        </label>
+                                        <select
+                                            required
+                                            value={province}
+                                            onChange={(e) => setProvince(e.target.value)}
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-gray-900 bg-white"
+                                        >
+                                            <option value="">Seleziona...</option>
+                                            {PROVINCE_ITALIANE.map(p => (
+                                                <option key={p} value={p}>{p}</option>
+                                            ))}
+                                        </select>
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -492,9 +552,9 @@ Simon Silver
                                             type="text"
                                             required
                                             value={postalCode}
-                                            onChange={(e) => setPostalCode(e.target.value)}
-                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-gray-900 placeholder:text-gray-400"
-                                            placeholder="20100"
+                                            onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                                            className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all text-gray-900 placeholder:text-gray-400 font-mono"
+                                            placeholder="25017"
                                             maxLength={5}
                                         />
                                     </div>
