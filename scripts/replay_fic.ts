@@ -45,9 +45,11 @@ async function replayLastPurchase() {
         company_name: purchase.billing_profiles.company_name,
         vat_number: purchase.billing_profiles.vat_number,
         sdi_code: purchase.billing_profiles.sdi_code,
+        pec: purchase.billing_profiles.pec || null,
         fiscal_code: purchase.billing_profiles.fiscal_code,
         address: purchase.billing_profiles.address,
         city: purchase.billing_profiles.city,
+        province: purchase.billing_profiles.province || null,
         postal_code: purchase.billing_profiles.postal_code,
     };
 
