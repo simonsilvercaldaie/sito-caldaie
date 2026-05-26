@@ -23,10 +23,13 @@ interface BillingProfile {
     company_name: string | null
     vat_number: string | null
     sdi_code: string | null
+    pec: string | null
     fiscal_code: string | null
     address: string
     city: string
+    province: string | null
     postal_code: string
+    phone: string | null
 }
 
 // Admin Client
@@ -285,9 +288,11 @@ export async function POST(request: NextRequest) {
             snapshot_company_name: billing?.company_name || null,
             snapshot_vat_number: billing?.vat_number || null,
             snapshot_sdi_code: billing?.sdi_code || null,
+            snapshot_pec: billing?.pec || null,
             snapshot_fiscal_code: billing?.fiscal_code || null,
             snapshot_address: billing?.address || null,
             snapshot_city: billing?.city || null,
+            snapshot_province: billing?.province || null,
             snapshot_postal_code: billing?.postal_code || null
         }
 

@@ -75,20 +75,20 @@ export interface InvoiceResult {
 // -------------------------------------------------------------------
 
 const PRODUCT_DESCRIPTIONS: Record<string, string> = {
-    'base': 'Video Corso Formazione Tecnica — Pacchetto Base (9 Video)',
-    'intermediate': 'Video Corso Formazione Tecnica — Pacchetto Intermedio (9 Video)',
-    'advanced': 'Video Corso Formazione Tecnica — Pacchetto Avanzato (9 Video)',
-    'complete': 'Video Corso Formazione Tecnica — Pacchetto Completo (27 Video)',
-    'complete_bundle': 'Video Corso Formazione Tecnica — Pacchetto Completo Bundle (27 Video)',
-    'multi_5': 'Licenza Multidipendente 5 Posti — Video Corso Completo',
-    'multi_10': 'Licenza Multidipendente 10 Posti — Video Corso Completo',
-    'multi_25': 'Licenza Multidipendente 25 Posti — Video Corso Completo',
-    'scuola_10': 'Licenza Scuola/Formazione 10 Posti — Video Corso Completo',
-    'extra_invito_1': 'Pacchetto Invito Extra (+1 Posto) — Licenza Multidipendente',
+    'base': 'Video Corso Formazione Tecnica - Pacchetto Base (9 Video)',
+    'intermediate': 'Video Corso Formazione Tecnica - Pacchetto Intermedio (9 Video)',
+    'advanced': 'Video Corso Formazione Tecnica - Pacchetto Avanzato (9 Video)',
+    'complete': 'Video Corso Formazione Tecnica - Pacchetto Completo (27 Video)',
+    'complete_bundle': 'Video Corso Formazione Tecnica - Pacchetto Completo Bundle (27 Video)',
+    'multi_5': 'Licenza Multidipendente 5 Posti - Video Corso Completo',
+    'multi_10': 'Licenza Multidipendente 10 Posti - Video Corso Completo',
+    'multi_25': 'Licenza Multidipendente 25 Posti - Video Corso Completo',
+    'scuola_10': 'Licenza Scuola/Formazione 10 Posti - Video Corso Completo',
+    'extra_invito_1': 'Pacchetto Invito Extra (+1 Posto) - Licenza Multidipendente',
 }
 
 function getProductDescription(productCode: string): string {
-    return PRODUCT_DESCRIPTIONS[productCode] || `Video Corso Formazione Tecnica — ${productCode}`
+    return PRODUCT_DESCRIPTIONS[productCode] || `Video Corso Formazione Tecnica - ${productCode}`
 }
 
 // -------------------------------------------------------------------
@@ -135,6 +135,16 @@ async function ficFetch(
  * Handles both private customers (codice fiscale) and companies (P.IVA + SDI).
  */
 function buildEntityFromBilling(billing: BillingData): any {
+    // Validate province format (must be 2 uppercase letters for Italian e-invoicing)
+    let province = billing.province?.trim().toUpperCase() || undefined
+    if (province && !/^[A-Z]{2}$/.test(province)) {
+        console.warn(`[FIC] Province '${province}' is not a valid 2-letter code — omitting from invoice`)
+        province = undefined
+    }
+    if (!province) {
+        console.warn(`[FIC] ⚠️ Province is missing for ${billing.first_name} ${billing.last_name} — e-invoice may be rejected by SDI`)
+    }
+
     const entity: any = {
         name: billing.customer_type === 'company' && billing.company_name
             ? billing.company_name
@@ -144,7 +154,7 @@ function buildEntityFromBilling(billing: BillingData): any {
         address_street: billing.address || undefined,
         address_city: billing.city || undefined,
         address_postal_code: billing.postal_code || undefined,
-        address_province: billing.province || undefined,
+        address_province: province,
         country: 'Italia',
         country_iso: 'IT',
         phone: billing.phone || undefined,

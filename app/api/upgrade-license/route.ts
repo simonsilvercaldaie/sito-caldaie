@@ -203,6 +203,14 @@ export async function POST(request: NextRequest) {
 
         // 8. Record upgrade purchase
         const productCode = `upgrade_to_multi_${target_team_size}`
+
+        // Fetch billing profile for snapshot & invoice
+        const { data: billing } = await supabaseAdmin
+            .from('billing_profiles')
+            .select('*')
+            .eq('user_id', user.id)
+            .maybeSingle()
+
         const { data: purchaseRow } = await supabaseAdmin
             .from('purchases')
             .insert({
@@ -211,7 +219,16 @@ export async function POST(request: NextRequest) {
                 plan_type: 'team_upgrade',
                 amount_cents: expectedPrice,
                 paypal_order_id: orderId,
-                paypal_capture_id: captureId
+                paypal_capture_id: captureId,
+                snapshot_company_name: billing?.company_name || null,
+                snapshot_vat_number: billing?.vat_number || null,
+                snapshot_sdi_code: billing?.sdi_code || null,
+                snapshot_pec: billing?.pec || null,
+                snapshot_fiscal_code: billing?.fiscal_code || null,
+                snapshot_address: billing?.address || null,
+                snapshot_city: billing?.city || null,
+                snapshot_province: billing?.province || null,
+                snapshot_postal_code: billing?.postal_code || null
             })
             .select('id')
             .single()
@@ -220,11 +237,6 @@ export async function POST(request: NextRequest) {
 
         // 9. Create FIC invoice (AWAIT to prevent serverless termination)
         let ficResult: any = null
-        const { data: billing } = await supabaseAdmin
-            .from('billing_profiles')
-            .select('*')
-            .eq('user_id', user.id)
-            .maybeSingle()
 
         if (billing) {
             try {
