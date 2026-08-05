@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { checkCourseAccess } from '@/lib/accessControl'
+import { checkCourseAccess, isUserBudgetExempt } from '@/lib/accessControl'
 import { courses } from '@/lib/coursesData'
 
 function getSupabaseAdmin() {
@@ -61,6 +61,32 @@ export async function POST(request: NextRequest) {
                 requiredLevel: access.requiredLevel,
                 courseTitle: access.courseTitle
             }, { status: 403 })
+        }
+
+        // 3b. Check Video Budget (unless exempt e.g., scuola)
+        const isExempt = await isUserBudgetExempt(user.id)
+        let budgetInfo = null
+
+        if (!isExempt) {
+            const { data: budgetData, error: budgetError } = await supabase
+                .rpc('check_video_budget', {
+                    p_user_id: user.id,
+                    p_course_id: courseId
+                })
+
+            if (budgetError) {
+                console.error('[video-access] Budget check error:', budgetError)
+            } else if (budgetData) {
+                budgetInfo = budgetData
+                if (budgetData.exhausted) {
+                    return NextResponse.json({
+                        authorized: false,
+                        viewBudgetExhausted: true,
+                        nextUnlockAt: budgetData.next_unlock_at,
+                        courseTitle: access.courseTitle
+                    }, { status: 403 })
+                }
+            }
         }
 
         // 4. Generate video URL

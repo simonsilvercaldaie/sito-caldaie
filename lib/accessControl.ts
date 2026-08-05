@@ -7,6 +7,7 @@
 
 import { createClient } from '@supabase/supabase-js'
 import { courses } from './coursesData'
+import { EXEMPT_LICENSE_TYPES } from './constants'
 
 // -------------------------------------------------------------------
 // TYPES
@@ -281,4 +282,73 @@ export async function checkVideoAccessByBunnyId(userId: string, bunnyVideoId: st
 export async function revokeAllAccess(userId: string): Promise<void> {
     const supabase = getSupabaseAdmin()
     await supabase.from('user_access').delete().eq('user_id', userId)
+}
+
+/**
+ * Checks if a user has an exempt license type (e.g., scuola) that bypasses video budget limits.
+ * Checks both direct purchases and team membership.
+ */
+export async function isUserBudgetExempt(userId: string): Promise<boolean> {
+    const supabase = getSupabaseAdmin()
+    
+    // 1. Check direct purchases with exempt product codes
+    const { data: exemptPurchase } = await supabase
+        .from('purchases')
+        .select('id')
+        .eq('user_id', userId)
+        .in('product_code', EXEMPT_LICENSE_TYPES)
+        .eq('status', 'completed')
+        .maybeSingle()
+    
+    if (exemptPurchase) return true
+    
+    // 2. Check if user is a member of a team with exempt license
+    const { data: teamMember } = await supabase
+        .from('team_members')
+        .select('team_license_id')
+        .eq('user_id', userId)
+        .is('removed_at', null)
+        .maybeSingle()
+    
+    if (teamMember) {
+        const { data: teamLicense } = await supabase
+            .from('team_licenses')
+            .select('id')
+            .eq('id', teamMember.team_license_id)
+            .maybeSingle()
+        
+        if (teamLicense) {
+            // Check if the purchase that created this team has an exempt product_code
+            const { data: teamPurchase } = await supabase
+                .from('purchases')
+                .select('id')
+                .eq('team_license_id', teamLicense.id)
+                .in('product_code', EXEMPT_LICENSE_TYPES)
+                .eq('status', 'completed')
+                .maybeSingle()
+            
+            if (teamPurchase) return true
+        }
+    }
+    
+    // 3. Check if user OWNS a team with exempt license
+    const { data: ownedTeam } = await supabase
+        .from('team_licenses')
+        .select('id')
+        .eq('owner_user_id', userId)
+        .maybeSingle()
+    
+    if (ownedTeam) {
+        const { data: ownerPurchase } = await supabase
+            .from('purchases')
+            .select('id')
+            .eq('team_license_id', ownedTeam.id)
+            .in('product_code', EXEMPT_LICENSE_TYPES)
+            .eq('status', 'completed')
+            .maybeSingle()
+        
+        if (ownerPurchase) return true
+    }
+    
+    return false
 }

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import crypto from 'crypto'
-import { checkVideoAccessByBunnyId } from '@/lib/accessControl'
+import { checkVideoAccessByBunnyId, isUserBudgetExempt } from '@/lib/accessControl'
 import { checkRateLimit } from '@/lib/rateLimit'
 
 function getSupabaseAdmin() {
@@ -47,6 +47,25 @@ export async function GET(request: NextRequest) {
         if (!accessResult.authorized) {
             console.warn(`[bunny-token] ACCESS DENIED: user=${user.email}, videoId=${videoId}, courseId=${accessResult.courseId || 'unknown'}`)
             return NextResponse.json({ error: 'Accesso al contenuto non autorizzato' }, { status: 403 })
+        }
+
+        // 2b. Check Video Budget (unless exempt)
+        if (accessResult.courseId) {
+            const isExempt = await isUserBudgetExempt(user.id)
+            if (!isExempt) {
+                const { data: budgetData } = await supabaseAdmin.rpc('check_video_budget', {
+                    p_user_id: user.id,
+                    p_course_id: accessResult.courseId
+                })
+                if (budgetData?.exhausted) {
+                    console.warn(`[bunny-token] BUDGET EXHAUSTED: user=${user.email}, courseId=${accessResult.courseId}`)
+                    return NextResponse.json({ 
+                        error: 'Hai esaurito il budget di minuti per questo video.',
+                        budgetExhausted: true,
+                        nextUnlockAt: budgetData.next_unlock_at
+                    }, { status: 403 })
+                }
+            }
         }
 
         // 3. Load Bunny Stream configuration

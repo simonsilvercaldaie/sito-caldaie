@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabaseClient'
 import { useRouter, useParams } from 'next/navigation'
-import { Loader2, Lock, ArrowLeft, ShoppingCart } from 'lucide-react'
+import { Loader2, Lock, ArrowLeft, ShoppingCart, Clock, Users } from 'lucide-react'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import VideoPlayerSecured from '@/components/VideoPlayerSecured'
@@ -15,6 +15,8 @@ export default function WatchPage() {
     const [userEmail, setUserEmail] = useState("")
     const [orderId, setOrderId] = useState("")
     const [requiredLevel, setRequiredLevel] = useState<string | null>(null)
+    const [budgetExhausted, setBudgetExhausted] = useState(false)
+    const [nextUnlockAt, setNextUnlockAt] = useState<string | null>(null)
 
     const params = useParams()
     const router = useRouter()
@@ -49,12 +51,16 @@ export default function WatchPage() {
                     setAuthorized(true)
                     setCourseTitle(data.courseTitle || courseId)
                     setVideoUrl(data.videoUrl)
-                    // Use a stable identifier for the watermark
                     setOrderId(session.user.id.slice(-12))
                 } else {
                     setAuthorized(false)
                     setCourseTitle(data.courseTitle || courseId)
-                    setRequiredLevel(data.requiredLevel || null)
+                    if (data.viewBudgetExhausted) {
+                        setBudgetExhausted(true)
+                        setNextUnlockAt(data.nextUnlockAt || null)
+                    } else {
+                        setRequiredLevel(data.requiredLevel || null)
+                    }
                 }
             } catch (err) {
                 console.error('Error checking video access:', err)
@@ -67,9 +73,77 @@ export default function WatchPage() {
         checkAccess()
     }, [params, router])
 
+    const handleMidWatchBudgetExhausted = (unlockAt?: string) => {
+        setBudgetExhausted(true)
+        if (unlockAt) setNextUnlockAt(unlockAt)
+    }
+
     if (loading) return (
         <div className="min-h-screen flex items-center justify-center bg-gray-900 text-white gap-2">
             <Loader2 className="animate-spin" /> Caricamento Player...
+        </div>
+    )
+
+    // Format unlock date cleanly
+    const formattedUnlockDate = nextUnlockAt
+        ? new Date(nextUnlockAt).toLocaleDateString('it-IT', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        })
+        : null
+
+    if (budgetExhausted) return (
+        <div className="min-h-screen flex flex-col items-center justify-center bg-slate-900 px-4 py-12 text-center text-white">
+            <div className="max-w-xl w-full bg-slate-800 p-8 md:p-10 rounded-2xl border border-slate-700 shadow-2xl space-y-6">
+                <div className="w-16 h-16 bg-amber-500/10 border border-amber-500/20 rounded-full flex items-center justify-center mx-auto text-amber-400">
+                    <Clock className="w-8 h-8" />
+                </div>
+
+                <div className="space-y-2">
+                    <h1 className="text-2xl md:text-3xl font-extrabold text-white">
+                        Limite Minuti Raggiunto
+                    </h1>
+                    <p className="text-slate-300 text-base">
+                        Hai utilizzato tutti i <strong>66 minuti disponibili</strong> per questa lezione.
+                    </p>
+                </div>
+
+                {formattedUnlockDate && (
+                    <div className="bg-slate-900/80 p-4 rounded-xl border border-slate-700 text-slate-300 text-sm">
+                        ⏳ Nuovi minuti saranno automaticamente disponibili dal:<br />
+                        <strong className="text-amber-400 text-base font-semibold">{formattedUnlockDate}</strong>
+                        <span className="block text-xs text-slate-400 mt-1">
+                            (22 minuti aggiunti per ogni 30 giorni consecutivi di inattività su questo video)
+                        </span>
+                    </div>
+                )}
+
+                <div className="bg-gradient-to-br from-primary/20 to-accent/20 p-5 rounded-xl border border-primary/30 text-left space-y-3">
+                    <div className="flex items-center gap-2 text-amber-400 font-bold text-sm uppercase tracking-wide">
+                        <Users className="w-4 h-4" />
+                        Stai formando più collaboratori in azienda?
+                    </div>
+                    <p className="text-slate-300 text-xs md:text-sm leading-relaxed">
+                        Le licenze individuali sono destinate allo studio personale. Con le <strong>Licenze Team</strong>, ogni dipendente o tecnico ha il proprio account dedicato con budget indipendente e senza rischi di blocco.
+                    </p>
+                    <Link
+                        href="/licenze-multidipendente"
+                        className="inline-flex items-center justify-center w-full px-4 py-2.5 bg-accent text-white font-bold rounded-lg text-sm hover:bg-orange-600 transition-colors shadow-lg shadow-accent/20"
+                    >
+                        Scopri le Licenze Aziendali →
+                    </Link>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
+                    <Link
+                        href="/dashboard"
+                        className="px-6 py-3 bg-slate-700 text-white font-bold rounded-xl hover:bg-slate-600 transition-colors text-sm"
+                    >
+                        Torna alla Dashboard
+                    </Link>
+                </div>
+            </div>
         </div>
     )
 
@@ -118,6 +192,7 @@ export default function WatchPage() {
                     userEmail={userEmail}
                     orderId={orderId}
                     courseId={params.courseId as string}
+                    onBudgetExhausted={handleMidWatchBudgetExhausted}
                     className="border border-gray-800"
                 />
 

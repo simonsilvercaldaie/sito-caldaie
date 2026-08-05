@@ -4,7 +4,7 @@
 // ============================================
 // TERMINI E CONDIZIONI
 // ============================================
-export const TOS_VERSION = '2026-01-18-v1'
+export const TOS_VERSION = '2026-08-06-v2'
 
 // ============================================
 // CONFIGURAZIONE PAGAMENTI
@@ -47,6 +47,14 @@ export const SESSION_TTL_DAYS = 7
 
 // Giorni di cooldown tra reset dispositivi
 export const DEVICE_RESET_COOLDOWN_DAYS = 30
+
+// BUDGET MINUTI VIDEO
+export const VIDEO_DURATION_SECONDS = 1320      // 22 min (durata standard video)
+export const MAX_VIDEO_BUDGET_SECONDS = 3960    // 66 min (3× durata video)
+export const BUDGET_REGEN_SECONDS = 1320        // 22 min ripristinati per periodo
+export const BUDGET_REGEN_DAYS = 30             // ogni 30 giorni di inattività
+export const BUDGET_GRACE_HOURS = 2             // ricarica pagina entro 2h = stessa sessione
+export const EXEMPT_LICENSE_TYPES = ['scuola_10'] // product_code senza limite budget
 
 // ============================================
 // FATTURE IN CLOUD

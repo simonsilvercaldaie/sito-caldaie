@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { isUserBudgetExempt } from '@/lib/accessControl'
 
 function getSupabaseAdmin() {
     return createClient(
@@ -35,7 +36,32 @@ export async function POST(request: NextRequest) {
         // Sanity check: max 60 seconds per ping (prevent abuse)
         const sanitizedSeconds = Math.min(secondsWatched, 60)
 
-        // 3. Upsert progress using the DB function
+        // 3. Consume budget (unless exempt)
+        const isExempt = await isUserBudgetExempt(user.id)
+        let budgetResult = null
+
+        if (!isExempt) {
+            const { data: bData, error: bError } = await supabaseAdmin.rpc('consume_video_budget', {
+                p_user_id: user.id,
+                p_course_id: courseId,
+                p_seconds: sanitizedSeconds
+            })
+
+            if (bError) {
+                console.error('[video-progress] consume_video_budget error:', bError)
+            } else if (bData) {
+                budgetResult = bData
+                if (bData.exhausted) {
+                    return NextResponse.json({
+                        success: false,
+                        budgetExhausted: true,
+                        nextUnlockAt: bData.next_unlock_at
+                    })
+                }
+            }
+        }
+
+        // 4. Upsert progress using the DB function (for watch stats)
         const { data, error } = await supabaseAdmin.rpc('upsert_video_progress', {
             p_user_id: user.id,
             p_course_id: courseId,
@@ -48,7 +74,13 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: 'Failed to update progress' }, { status: 500 })
         }
 
-        return NextResponse.json(data || { success: true })
+        return NextResponse.json({
+            ...(data || { success: true }),
+            budget: budgetResult ? {
+                remainingSeconds: budgetResult.remaining_seconds,
+                exhausted: false
+            } : null
+        })
 
     } catch (e: any) {
         console.error('[video-progress] Error:', e)

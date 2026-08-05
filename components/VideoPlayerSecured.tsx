@@ -10,6 +10,7 @@ interface VideoPlayerSecuredProps {
     courseId?: string  // For progress tracking
     className?: string
     iframeRef?: RefObject<HTMLIFrameElement | null>
+    onBudgetExhausted?: (nextUnlockAt?: string) => void
 }
 
 // Posizioni angolari fisse (mai al centro)
@@ -30,7 +31,7 @@ const CORNER_POSITIONS = [
  * - Solo negli angoli/bordi, MAI al centro del video
  * - Opacità 28% per leggibilità senza disturbo
  * - Funziona anche in fullscreen
- * - Heartbeat: manda ping ogni 30s per tracking progressi
+ * - Heartbeat: manda ping ogni 30s per tracking progressi e consumo budget
  */
 export default function VideoPlayerSecured({
     videoUrl,
@@ -38,7 +39,8 @@ export default function VideoPlayerSecured({
     orderId,
     courseId,
     className = '',
-    iframeRef
+    iframeRef,
+    onBudgetExhausted
 }: VideoPlayerSecuredProps) {
     const containerRef = useRef<HTMLDivElement>(null)
     const [showWatermark, setShowWatermark] = useState(false)
@@ -56,7 +58,7 @@ export default function VideoPlayerSecured({
                 const { data: { session } } = await supabase.auth.getSession()
                 if (!session) return
 
-                await fetch('/api/video-progress', {
+                const res = await fetch('/api/video-progress', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -67,6 +69,11 @@ export default function VideoPlayerSecured({
                         secondsWatched: 30
                     })
                 })
+
+                const resData = await res.json()
+                if (resData.budgetExhausted && onBudgetExhausted) {
+                    onBudgetExhausted(resData.nextUnlockAt)
+                }
             } catch {
                 // Silent fail - non-critical
             }
@@ -76,7 +83,7 @@ export default function VideoPlayerSecured({
         interval = setInterval(sendPing, 30000)
 
         return () => clearInterval(interval)
-    }, [courseId])
+    }, [courseId, onBudgetExhausted])
 
     // Ciclo "Flash Discreto": 5s visibile, poi 45-60s nascosto
     useEffect(() => {

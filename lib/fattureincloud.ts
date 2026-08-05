@@ -53,13 +53,11 @@ export interface BillingData {
     company_name: string | null
     vat_number: string | null
     sdi_code: string | null
-    pec: string | null
     fiscal_code: string | null
     address: string
     city: string
-    province: string | null
     postal_code: string
-    phone?: string
+    phone?: string // Aggiunto telefono opzionale per retrocompatibilità
 }
 
 export interface InvoiceResult {
@@ -75,20 +73,20 @@ export interface InvoiceResult {
 // -------------------------------------------------------------------
 
 const PRODUCT_DESCRIPTIONS: Record<string, string> = {
-    'base': 'Video Corso Formazione Tecnica - Pacchetto Base (9 Video)',
-    'intermediate': 'Video Corso Formazione Tecnica - Pacchetto Intermedio (9 Video)',
-    'advanced': 'Video Corso Formazione Tecnica - Pacchetto Avanzato (9 Video)',
-    'complete': 'Video Corso Formazione Tecnica - Pacchetto Completo (27 Video)',
-    'complete_bundle': 'Video Corso Formazione Tecnica - Pacchetto Completo Bundle (27 Video)',
-    'multi_5': 'Licenza Multidipendente 5 Posti - Video Corso Completo',
-    'multi_10': 'Licenza Multidipendente 10 Posti - Video Corso Completo',
-    'multi_25': 'Licenza Multidipendente 25 Posti - Video Corso Completo',
-    'scuola_10': 'Licenza Scuola/Formazione 10 Posti - Video Corso Completo',
-    'extra_invito_1': 'Pacchetto Invito Extra (+1 Posto) - Licenza Multidipendente',
+    'base': 'Video Corso Formazione Tecnica — Pacchetto Base (9 Video)',
+    'intermediate': 'Video Corso Formazione Tecnica — Pacchetto Intermedio (9 Video)',
+    'advanced': 'Video Corso Formazione Tecnica — Pacchetto Avanzato (9 Video)',
+    'complete': 'Video Corso Formazione Tecnica — Pacchetto Completo (27 Video)',
+    'complete_bundle': 'Video Corso Formazione Tecnica — Pacchetto Completo Bundle (27 Video)',
+    'multi_5': 'Licenza Multidipendente 5 Posti — Video Corso Completo',
+    'multi_10': 'Licenza Multidipendente 10 Posti — Video Corso Completo',
+    'multi_25': 'Licenza Multidipendente 25 Posti — Video Corso Completo',
+    'scuola_10': 'Licenza Scuola/Formazione 10 Posti — Video Corso Completo',
+    'extra_invito_1': 'Pacchetto Invito Extra (+1 Posto) — Licenza Multidipendente',
 }
 
 function getProductDescription(productCode: string): string {
-    return PRODUCT_DESCRIPTIONS[productCode] || `Video Corso Formazione Tecnica - ${productCode}`
+    return PRODUCT_DESCRIPTIONS[productCode] || `Video Corso Formazione Tecnica — ${productCode}`
 }
 
 // -------------------------------------------------------------------
@@ -135,16 +133,6 @@ async function ficFetch(
  * Handles both private customers (codice fiscale) and companies (P.IVA + SDI).
  */
 function buildEntityFromBilling(billing: BillingData): any {
-    // Validate province format (must be 2 uppercase letters for Italian e-invoicing)
-    let province = billing.province?.trim().toUpperCase() || undefined
-    if (province && !/^[A-Z]{2}$/.test(province)) {
-        console.warn(`[FIC] Province '${province}' is not a valid 2-letter code — omitting from invoice`)
-        province = undefined
-    }
-    if (!province) {
-        console.warn(`[FIC] ⚠️ Province is missing for ${billing.first_name} ${billing.last_name} — e-invoice may be rejected by SDI`)
-    }
-
     const entity: any = {
         name: billing.customer_type === 'company' && billing.company_name
             ? billing.company_name
@@ -154,28 +142,19 @@ function buildEntityFromBilling(billing: BillingData): any {
         address_street: billing.address || undefined,
         address_city: billing.city || undefined,
         address_postal_code: billing.postal_code || undefined,
-        address_province: province,
         country: 'Italia',
         country_iso: 'IT',
-        phone: billing.phone || undefined,
+        phone: billing.phone || undefined, // Aggiunto telefono all'anagrafica
     }
 
     if (billing.customer_type === 'company') {
-        // Azienda: P.IVA obbligatoria
+        // Azienda: P.IVA + Codice SDI/PEC obbligatori per fattura elettronica
         if (billing.vat_number) entity.vat_number = billing.vat_number
-        // SDI code: use provided or '0000000' if PEC is used instead
-        if (billing.sdi_code && billing.sdi_code !== '0000000') {
-            entity.ei_code = billing.sdi_code
-        } else {
-            entity.ei_code = '0000000'
-        }
-        // PEC: campo separato per fattura elettronica
-        if (billing.pec) {
-            entity.certified_email = billing.pec
-        }
+        if (billing.sdi_code) entity.ei_code = billing.sdi_code
     } else {
         // Privato: Codice Fiscale
         if (billing.fiscal_code) entity.tax_code = billing.fiscal_code
+        // Privati: codice destinatario = "0000000" per fattura elettronica
         entity.ei_code = '0000000'
     }
 

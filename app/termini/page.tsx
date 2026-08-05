@@ -136,49 +136,58 @@ export default function TerminiPage() {
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-bold text-primary">10. Monitoraggio e Finalità</h2>
-                            <p><strong>10.1.</strong> La piattaforma registra dati tecnici di accesso (indirizzo IP, data e ora, tipo di dispositivo) esclusivamente a fini di:</p>
+                            <h2 className="text-xl font-bold text-primary">10. Limiti di Visualizzazione</h2>
+                            <p><strong>10.1.</strong> Ogni video acquistato è soggetto a un limite di utilizzo pari a <strong>66 minuti di visione effettiva</strong> (equivalenti a circa 3 visualizzazioni complete della durata standard di 22 minuti). Il conteggio avviene in tempo reale durante la riproduzione del video.</p>
+                            <p className="mt-4"><strong>10.2.</strong> <strong>Rigenerazione automatica:</strong> Per ogni periodo di 30 giorni consecutivi in cui il video non viene visualizzato, vengono automaticamente ripristinati 22 minuti di visione, fino al raggiungimento del limite massimo di 66 minuti.</p>
+                            <p className="mt-4"><strong>10.3.</strong> Il ricaricamento accidentale della pagina durante la visione non comporta un consumo aggiuntivo del budget: i minuti vengono conteggiati esclusivamente in base al tempo di riproduzione effettivo del video.</p>
+                            <p className="mt-4"><strong>10.4.</strong> <strong>Eccezione:</strong> Le Licenze Formazione (Scuola) non sono soggette ai limiti di visualizzazione di cui al presente articolo.</p>
+                            <p className="mt-4"><strong>10.5.</strong> Questi limiti sono previsti per garantire un utilizzo corretto della piattaforma e proteggere i diritti d'autore. Per le aziende e i centri di assistenza tecnica che necessitano di formare più dipendenti, sono disponibili <Link href="/licenze-multidipendente" className="text-accent hover:underline font-semibold">Licenze Multidipendente</Link> con account individuali per ciascun membro del team.</p>
+                        </section>
+
+                        <section>
+                            <h2 className="text-xl font-bold text-primary">11. Monitoraggio e Finalità</h2>
+                            <p><strong>11.1.</strong> La piattaforma registra dati tecnici di accesso (indirizzo IP, data e ora, tipo di dispositivo) esclusivamente a fini di:</p>
                             <ul className="list-disc pl-6 mt-2 space-y-1">
                                 <li>prevenzione delle frodi;</li>
                                 <li>tutela dei diritti di proprietà intellettuale;</li>
                                 <li>verifica del rispetto delle condizioni di licenza.</li>
                             </ul>
-                            <p className="mt-4"><strong>10.2.</strong> I dati raccolti sono trattati nel rispetto della normativa vigente in materia di protezione dei dati personali (Regolamento UE 2016/679).</p>
-                            <p className="mt-4"><strong>10.3.</strong> Il monitoraggio non prevede profilazione comportamentale né cessione di dati a terzi per finalità commerciali.</p>
+                            <p className="mt-4"><strong>11.2.</strong> I dati raccolti sono trattati nel rispetto della normativa vigente in materia di protezione dei dati personali (Regolamento UE 2016/679).</p>
+                            <p className="mt-4"><strong>11.3.</strong> Il monitoraggio non prevede profilazione comportamentale né cessione di dati a terzi per finalità commerciali.</p>
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-bold text-primary">11. Utilizzo Non Conforme alla Licenza</h2>
-                            <p><strong>11.1.</strong> In caso di rilevazione di un utilizzo non conforme alla licenza, il Titolare si riserva il diritto di:</p>
+                            <h2 className="text-xl font-bold text-primary">12. Utilizzo Non Conforme alla Licenza</h2>
+                            <p><strong>12.1.</strong> In caso di rilevazione di un utilizzo non conforme alla licenza, il Titolare si riserva il diritto di:</p>
                             <ul className="list-disc pl-6 mt-2 space-y-1">
                                 <li>inviare una comunicazione all'utente per richiedere chiarimenti;</li>
                                 <li>sospendere temporaneamente l'accesso all'account;</li>
                                 <li>proporre la regolarizzazione tramite acquisto della licenza appropriata;</li>
                                 <li>in caso di rifiuto o mancata risposta, revocare definitivamente l'accesso senza diritto a rimborso.</li>
                             </ul>
-                            <p className="mt-4"><strong>11.2.</strong> La sospensione o revoca dell'accesso non comporta alcun obbligo di indennizzo a carico del Titolare.</p>
-                            <p className="mt-4"><strong>11.3.</strong> L'utente ha sempre la possibilità di contestare la rilevazione e fornire chiarimenti prima di qualsiasi provvedimento definitivo.</p>
+                            <p className="mt-4"><strong>12.2.</strong> La sospensione o revoca dell'accesso non comporta alcun obbligo di indennizzo a carico del Titolare.</p>
+                            <p className="mt-4"><strong>12.3.</strong> L'utente ha sempre la possibilità di contestare la rilevazione e fornire chiarimenti prima di qualsiasi provvedimento definitivo.</p>
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-bold text-primary">12. Proprietà Intellettuale</h2>
-                            <p><strong>12.1.</strong> Tutti i Contenuti sono protetti dalle leggi italiane e internazionali sul diritto d'autore.</p>
-                            <p className="mt-4"><strong>12.2.</strong> L'acquisto di una licenza non trasferisce alcun diritto di proprietà intellettuale. L'utente acquisisce esclusivamente un diritto di fruizione personale, nei limiti della licenza acquistata.</p>
-                            <p className="mt-4"><strong>12.3.</strong> È vietata qualsiasi forma di riproduzione, distribuzione, comunicazione al pubblico o messa a disposizione dei Contenuti senza autorizzazione scritta del Titolare.</p>
+                            <h2 className="text-xl font-bold text-primary">13. Proprietà Intellettuale</h2>
+                            <p><strong>13.1.</strong> Tutti i Contenuti sono protetti dalle leggi italiane e internazionali sul diritto d'autore.</p>
+                            <p className="mt-4"><strong>13.2.</strong> L'acquisto di una licenza non trasferisce alcun diritto di proprietà intellettuale. L'utente acquisisce esclusivamente un diritto di fruizione personale, nei limiti della licenza acquistata.</p>
+                            <p className="mt-4"><strong>13.3.</strong> È vietata qualsiasi forma di riproduzione, distribuzione, comunicazione al pubblico o messa a disposizione dei Contenuti senza autorizzazione scritta del Titolare.</p>
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-bold text-primary">13. Cancellazione dell'Account e Perdita dei Dati</h2>
-                            <p><strong>13.1.</strong> L'utente ha il diritto di eliminare definitivamente il proprio account in qualsiasi momento dalla propria area personale, nel pieno rispetto del Regolamento UE sulla privacy (GDPR - Diritto all'oblio).</p>
-                            <p className="mt-4"><strong>13.2.</strong> <strong>L'eliminazione dell'account è un'azione irreversibile.</strong> Comporta la cancellazione fisica e definitiva dal sistema di tutti gli acquisti, storico fatturazioni, sessioni e certificati di licenza associati all'utente.</p>
-                            <p className="mt-4"><strong>13.3.</strong> Procedendo con l'eliminazione, <strong>l'utente perde irrevocabilmente l'accesso a tutti i contenuti e le licenze acquistate precedentemente</strong>. Non sarà possibile ripristinare o recuperare gli acquisti, né richiedere rimborsi totali o parziali a seguito dell'eliminazione volontaria dell'account.</p>
-                            <p className="mt-4"><strong>13.4.</strong> Una successiva registrazione utilizzando lo stesso indirizzo email o provider (Google) comporterà la creazione di un account completamente nuovo, privo delle vecchie licenze associate.</p>
+                            <h2 className="text-xl font-bold text-primary">14. Cancellazione dell'Account e Perdita dei Dati</h2>
+                            <p><strong>14.1.</strong> L'utente ha il diritto di eliminare definitivamente il proprio account in qualsiasi momento dalla propria area personale, nel pieno rispetto del Regolamento UE sulla privacy (GDPR - Diritto all'oblio).</p>
+                            <p className="mt-4"><strong>14.2.</strong> <strong>L'eliminazione dell'account è un'azione irreversibile.</strong> Comporta la cancellazione fisica e definitiva dal sistema di tutti gli acquisti, storico fatturazioni, sessioni e certificati di licenza associati all'utente.</p>
+                            <p className="mt-4"><strong>14.3.</strong> Procedendo con l'eliminazione, <strong>l'utente perde irrevocabilmente l'accesso a tutti i contenuti e le licenze acquistate precedentemente</strong>. Non sarà possibile ripristinare o recuperare gli acquisti, né richiedere rimborsi totali o parziali a seguito dell'eliminazione volontaria dell'account.</p>
+                            <p className="mt-4"><strong>14.4.</strong> Una successiva registrazione utilizzando lo stesso indirizzo email o provider (Google) comporterà la creazione di un account completamente nuovo, privo delle vecchie licenze associate.</p>
                         </section>
 
                         <section>
-                            <h2 className="text-xl font-bold text-primary">14. Accettazione</h2>
-                            <p><strong>14.1.</strong> L'acquisto di qualsiasi licenza comporta l'accettazione integrale dei presenti Termini e Condizioni.</p>
-                            <p className="mt-4"><strong>14.2.</strong> In fase di acquisto, l'utente conferma di aver letto e compreso le limitazioni della licenza selezionata e le conseguenze della cancellazione dei dati.</p>
+                            <h2 className="text-xl font-bold text-primary">15. Accettazione</h2>
+                            <p><strong>15.1.</strong> L'acquisto di qualsiasi licenza comporta l'accettazione integrale dei presenti Termini e Condizioni.</p>
+                            <p className="mt-4"><strong>15.2.</strong> In fase di acquisto, l'utente conferma di aver letto e compreso le limitazioni della licenza selezionata e le conseguenze della cancellazione dei dati.</p>
                         </section>
 
                     </div>
