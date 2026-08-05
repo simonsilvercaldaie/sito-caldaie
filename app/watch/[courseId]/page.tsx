@@ -50,17 +50,17 @@ export default function WatchPage() {
                 if (res.ok && data.authorized) {
                     setAuthorized(true)
                     setCourseTitle(data.courseTitle || courseId)
-                    setVideoUrl(data.videoUrl)
-                    setOrderId(session.user.id.slice(-12))
-                } else {
-                    setAuthorized(false)
-                    setCourseTitle(data.courseTitle || courseId)
                     if (data.viewBudgetExhausted) {
                         setBudgetExhausted(true)
                         setNextUnlockAt(data.nextUnlockAt || null)
                     } else {
-                        setRequiredLevel(data.requiredLevel || null)
+                        setVideoUrl(data.videoUrl)
+                        setOrderId(session.user.id.slice(-12))
                     }
+                } else {
+                    setAuthorized(false)
+                    setCourseTitle(data.courseTitle || courseId)
+                    setRequiredLevel(data.requiredLevel || null)
                 }
             } catch (err) {
                 console.error('Error checking video access:', err)

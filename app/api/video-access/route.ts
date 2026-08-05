@@ -80,11 +80,13 @@ export async function POST(request: NextRequest) {
                 budgetInfo = budgetData
                 if (budgetData.exhausted) {
                     return NextResponse.json({
-                        authorized: false,
+                        authorized: true,
                         viewBudgetExhausted: true,
                         nextUnlockAt: budgetData.next_unlock_at,
-                        courseTitle: access.courseTitle
-                    }, { status: 403 })
+                        courseTitle: access.courseTitle,
+                        courseLevel: access.requiredLevel,
+                        videoUrl: ''
+                    })
                 }
             }
         }
