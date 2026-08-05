@@ -57,6 +57,8 @@ export default function CorsoPage() {
     const [showPurchaseModal, setShowPurchaseModal] = useState(false)
     const [teamAccess, setTeamAccess] = useState<'none' | 'multi' | 'scuola'>('none')
     const [secureVideoUrl, setSecureVideoUrl] = useState<string>("")
+    const [budgetExhausted, setBudgetExhausted] = useState(false)
+    const [nextUnlockAt, setNextUnlockAt] = useState<string | null>(null)
     const youtubeRef = useRef<HTMLIFrameElement>(null)
     const bunnyRef = useRef<HTMLIFrameElement>(null)
 
@@ -159,6 +161,9 @@ export default function CorsoPage() {
                     const tokenData = await tokenRes.json()
                     if (tokenData.embedUrl) {
                         setSecureVideoUrl(tokenData.embedUrl)
+                    } else if (tokenData.budgetExhausted) {
+                        setBudgetExhausted(true)
+                        setNextUnlockAt(tokenData.nextUnlockAt || null)
                     }
                 } catch (e) {
                     console.error('Error fetching secure video URL', e)
@@ -274,6 +279,10 @@ export default function CorsoPage() {
                             if (accessData.authorized) {
                                 hasAccess = true
                                 orderLimitId = 'LIC-' + new Date().toISOString().slice(0, 10).replace(/-/g, '')
+                                if (accessData.viewBudgetExhausted) {
+                                    setBudgetExhausted(true)
+                                    setNextUnlockAt(accessData.nextUnlockAt || null)
+                                }
                             }
                         }
                     } catch (e) {
@@ -659,7 +668,44 @@ export default function CorsoPage() {
                                                     </p>
                                                 </div>
                                             </div>
-                                        ) : sessionStatus === 'connecting' ? (
+                                         ) : budgetExhausted ? (
+                                             <div className="aspect-video bg-slate-900 relative flex flex-col items-center justify-center p-6 text-center text-white">
+                                                 <div className="max-w-md w-full bg-slate-800 p-6 md:p-8 rounded-2xl border border-slate-700 shadow-2xl space-y-4">
+                                                     <div className="w-12 h-12 bg-amber-500/10 border border-amber-500/20 rounded-full flex items-center justify-center mx-auto text-amber-400">
+                                                         <Clock className="w-6 h-6" />
+                                                     </div>
+                                                     <div>
+                                                         <h3 className="text-xl font-bold text-white mb-1">Limite Minuti Raggiunto</h3>
+                                                         <p className="text-slate-300 text-xs md:text-sm">
+                                                             Hai utilizzato tutti i <strong>66 minuti disponibili</strong> per questa lezione.
+                                                         </p>
+                                                     </div>
+                                                     {nextUnlockAt && (
+                                                         <div className="bg-slate-900/80 p-3 rounded-xl border border-slate-700 text-slate-300 text-xs">
+                                                             ⏳ Nuovi minuti saranno disponibili dal:<br />
+                                                             <strong className="text-amber-400 text-sm font-semibold">
+                                                                 {new Date(nextUnlockAt).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })}
+                                                             </strong>
+                                                         </div>
+                                                     )}
+                                                     <div className="bg-gradient-to-br from-primary/20 to-accent/20 p-4 rounded-xl border border-primary/30 text-left space-y-2">
+                                                         <div className="flex items-center gap-1.5 text-amber-400 font-bold text-xs uppercase tracking-wide">
+                                                             <Users className="w-4 h-4" />
+                                                             Stai formando più collaboratori?
+                                                         </div>
+                                                         <p className="text-slate-300 text-xs">
+                                                             Con le <strong>Licenze Team</strong>, ogni dipendente dispone del proprio account dedicato con budget indipendente.
+                                                         </p>
+                                                         <Link
+                                                             href="/licenze-multidipendente"
+                                                             className="inline-flex items-center justify-center w-full px-3 py-2 bg-accent text-white font-bold rounded-lg text-xs hover:bg-orange-600 transition-colors shadow"
+                                                         >
+                                                             Scopri le Licenze Aziendali →
+                                                         </Link>
+                                                     </div>
+                                                 </div>
+                                             </div>
+                                         ) : sessionStatus === 'connecting' ? (
                                             <div className="aspect-video bg-slate-900 relative flex flex-col items-center justify-center">
                                                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-white mb-4"></div>
                                                 <p className="text-slate-300 animate-pulse">Verifica licenza in corso...</p>
