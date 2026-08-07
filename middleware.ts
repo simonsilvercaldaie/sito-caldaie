@@ -61,22 +61,22 @@ export async function middleware(request: NextRequest) {
         }
     )
 
-    // Refresh session - IMPORTANT: keeps session cookies updated
+    const cleanPath = (pathname.endsWith('/') && pathname !== '/') ? pathname.slice(0, -1) : pathname
+    const isPublicPath = PUBLIC_PATHS.includes(cleanPath) ||
+        cleanPath.startsWith('/catalogo') ||
+        cleanPath.startsWith('/corso') ||
+        cleanPath.startsWith('/assistenza-caldaie-varese')
+
+    // Public pages are accessible to everyone without login
+    if (isPublicPath) {
+        return supabaseResponse
+    }
+
+    // Refresh session for protected routes
     const { data: { user } } = await supabase.auth.getUser()
 
-    // Check if path is public
-    const isPublicPath = PUBLIC_PATHS.some(p =>
-        pathname === p ||
-        pathname.startsWith('/catalogo') ||
-        pathname.startsWith('/corso/') ||
-        pathname.startsWith('/assistenza-caldaie-varese')
-    )
-
-    // Profile completion is no longer enforced by middleware.
-    // It is checked at purchase time in the purchase pages and API.
-
     // SECURITY: If user is not authenticated and path is not public, redirect to login
-    if (!user && !isPublicPath) {
+    if (!user) {
         const loginUrl = new URL('/login', request.url)
         loginUrl.searchParams.set('redirect', pathname)
         return NextResponse.redirect(loginUrl)
