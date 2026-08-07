@@ -9,7 +9,11 @@ const PUBLIC_PATHS = [
     '/privacy',
     '/contatti',
     '/catalogo',
-    '/corso'
+    '/corso',
+    '/assistenza-caldaie-varese',
+    '/guida-caldaie',
+    '/pacchetto-completo',
+    '/licenze-multidipendente'
 ]
 
 // Paths that require profile completion
@@ -64,7 +68,8 @@ export async function middleware(request: NextRequest) {
     const isPublicPath = PUBLIC_PATHS.some(p =>
         pathname === p ||
         pathname.startsWith('/catalogo') ||
-        pathname.startsWith('/corso/')
+        pathname.startsWith('/corso/') ||
+        pathname.startsWith('/assistenza-caldaie-varese')
     )
 
     // Profile completion is no longer enforced by middleware.
