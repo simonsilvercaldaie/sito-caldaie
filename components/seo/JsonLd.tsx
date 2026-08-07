@@ -289,3 +289,91 @@ export function BreadcrumbJsonLd({ items }: BreadcrumbJsonLdProps) {
         />
     )
 }
+
+// HVACBusiness Local Business JSON-LD for Local SEO (Varese & Provincia)
+export function HvacLocalBusinessJsonLd() {
+    const siteUrl = "https://simonsilvercaldaie.it"
+
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": ["HVACBusiness", "HomeAndConstructionBusiness", "LocalBusiness"],
+        "@id": `${siteUrl}/#hvacbusiness`,
+        "name": "SIMON SILVER ASSISTENZA CALDAIE DI CAROLEO SIMONE",
+        "alternateName": "Simon Silver Assistenza e Manutenzione Caldaie Varese",
+        "url": siteUrl,
+        "logo": `${siteUrl}/logo.png`,
+        "image": `${siteUrl}/og-image.png`,
+        "telephone": "+393493852854",
+        "email": "simonsilver@tiscali.it",
+        "vatID": "IT03235620121",
+        "priceRange": "$$",
+        "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Via San Martino 14",
+            "addressLocality": "Casciago",
+            "addressRegion": "VA",
+            "postalCode": "21020",
+            "addressCountry": "IT"
+        },
+        "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 45.8341,
+            "longitude": 8.7733
+        },
+        "sameAs": [
+            "https://share.google/7p84HL7bNiG7vb4Li",
+            "https://www.youtube.com/@SimonSilverCaldaie",
+            "https://www.instagram.com/simon_silver"
+        ],
+        "areaServed": [
+            { "@type": "City", "name": "Varese" },
+            { "@type": "City", "name": "Casciago" },
+            { "@type": "City", "name": "Gallarate" },
+            { "@type": "City", "name": "Busto Arsizio" },
+            { "@type": "City", "name": "Saronno" },
+            { "@type": "City", "name": "Tradate" },
+            { "@type": "City", "name": "Somma Lombardo" },
+            { "@type": "City", "name": "Luino" },
+            { "@type": "City", "name": "Gavirate" },
+            { "@type": "AdministrativeArea", "name": "Provincia di Varese" }
+        ],
+        "hasOfferCatalog": {
+            "@type": "OfferCatalog",
+            "name": "Servizi Assistenza e Manutenzione Caldaie Varese",
+            "itemListElement": [
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Manutenzione Caldaie Varese e Provincia",
+                        "description": "Manutenzione ordinaria, pulizia e controllo efficienza termica caldaie a gas e a condensazione."
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Riparazione e Pronto Intervento Caldaia Bloccata",
+                        "description": "Diagnosi guasti immediata e riparazione caldaie in blocco o non funzionanti in provincia di Varese."
+                    }
+                },
+                {
+                    "@type": "Offer",
+                    "itemOffered": {
+                        "@type": "Service",
+                        "name": "Analisi Fumi e Rilascio Bollino Caldaia",
+                        "description": "Controllo fumi di combustione, verifica rendimento e aggiornamento libretto d'impianto."
+                    }
+                }
+            ]
+        }
+    }
+
+    return (
+        <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+    )
+}
+

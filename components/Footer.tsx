@@ -14,11 +14,12 @@ export default function Footer() {
                         </div>
                         <span className="font-semibold text-slate-200">Simon Silver Caldaie</span>
                     </div>
-                    <div className="text-xs text-slate-500 max-w-xs">
-                        <p>Simon Silver Assistenza Caldaie di Caroleo Simone</p>
-                        <p>Sede Legale: Via San Martino 14L, 21020 Casciago (VA), Italia</p>
-                        <p>P.IVA 03235620121</p>
-                        <p>Email: simonsilvercaldaie@gmail.com</p>
+                    <div className="text-xs text-slate-500 max-w-sm">
+                        <p className="font-semibold text-slate-300">SIMON SILVER ASSISTENZA CALDAIE DI CAROLEO SIMONE</p>
+                        <p>Sede Legale: Via San Martino 14, 21020 Casciago (VA), Italia</p>
+                        <p>Tel: <a href="tel:+393493852854" className="hover:text-slate-300 transition-colors">+39 349 385 2854</a></p>
+                        <p>P.IVA / C.F.: 03235620121 | REA VA-334292</p>
+                        <p>Email: <a href="mailto:simonsilver@tiscali.it" className="hover:text-slate-300 transition-colors">simonsilver@tiscali.it</a></p>
                     </div>
                 </div>
 

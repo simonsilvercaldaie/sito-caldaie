@@ -7,6 +7,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     // Pagine statiche principali
     const staticRoutes = [
         { route: '', priority: 1, changeFrequency: 'weekly' as const },
+        { route: '/assistenza-caldaie-varese', priority: 1, changeFrequency: 'daily' as const },
         { route: '/catalogo/base', priority: 0.9, changeFrequency: 'weekly' as const },
         { route: '/catalogo/intermedio', priority: 0.9, changeFrequency: 'weekly' as const },
         { route: '/catalogo/avanzato', priority: 0.9, changeFrequency: 'weekly' as const },
