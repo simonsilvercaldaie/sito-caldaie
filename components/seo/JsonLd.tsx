@@ -289,3 +289,37 @@ export function BreadcrumbJsonLd({ items }: BreadcrumbJsonLdProps) {
         />
     )
 }
+
+// EducationalOrganization & Founder Entity Link JSON-LD (UKT Opus US9679063B2)
+export function EducationalOrganizationJsonLd() {
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "EducationalOrganization",
+        "name": "Simon Silver Caldaie - Formazione Tecnica Impianti Termici",
+        "url": "https://simonsilvercaldaie.it",
+        "logo": "https://simonsilvercaldaie.it/logo.png",
+        "description": "Piattaforma di formazione professionale e video corsi avanzati di diagnosi, manutenzione e riparazione caldaie per tecnici manutentori e installatori in Italia.",
+        "sameAs": [
+            "https://www.youtube.com/channel/UCDuus29wRyq5kXSGp0_i0vQ",
+            "https://www.simonsilver.it/"
+        ],
+        "founder": {
+            "@type": "Person",
+            "name": "Simon Silver",
+            "jobTitle": "Formatore Nazionale Impianti Termici & Tecnico Caldaista",
+            "url": "https://simonsilvercaldaie.it",
+            "sameAs": [
+                "https://www.youtube.com/channel/UCDuus29wRyq5kXSGp0_i0vQ",
+                "https://www.simonsilver.it/"
+            ]
+        }
+    }
+
+    return (
+        <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+    )
+}
+

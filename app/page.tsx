@@ -7,7 +7,7 @@ import AboutSimonSection from "@/components/AboutSimonSection";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import { supabase } from "@/lib/supabaseClient";
-import { FaqJsonLd } from "@/components/seo/JsonLd";
+import { FaqJsonLd, EducationalOrganizationJsonLd } from "@/components/seo/JsonLd";
 import Footer from "@/components/Footer";
 
 export default function Home() {
@@ -29,6 +29,7 @@ export default function Home() {
         <div className="min-h-screen flex flex-col font-sans">
             <Navbar />
             <FaqJsonLd />
+            <EducationalOrganizationJsonLd />
             <main className="flex-grow">
                 <section className="relative py-20 px-4 md:px-8 bg-gradient-to-b from-muted to-white flex flex-col items-center text-center">
                     <div className="max-w-4xl space-y-6">
