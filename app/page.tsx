@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { PlayCircle, MonitorPlay, Lock, ShieldCheck, UserCheck } from "lucide-react";
 import ProductShowcase from "@/components/ProductShowcase";
-import LocalServiceSection from "@/components/LocalServiceSection";
 import AboutSimonSection from "@/components/AboutSimonSection";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -72,7 +71,6 @@ export default function Home() {
                 </section>
 
                 <ProductShowcase />
-                <LocalServiceSection />
                 <AboutSimonSection />
 
                 <section className="py-20 bg-primary text-white">
